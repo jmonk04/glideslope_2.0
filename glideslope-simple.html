@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTAG Southwest - Triton Glideslope Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #334155 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.5rem;
+            color: #bfdbfe;
+            margin-bottom: 5px;
+        }
+        
+        .header .tagline {
+            color: #60a5fa;
+            font-style: italic;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-group select option {
+            background: #1e40af;
+            color: white;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #15803d;
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+        
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: #bfdbfe;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat-card .subtext {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #bfdbfe;
+        }
+        
+        .mission-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mission-btn {
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .mission-btn:hover {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.2);
+        }
+        
+        .mission-btn.active {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.3);
+        }
+        
+        .mission-btn .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .mission-btn .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .mission-btn .desc {
+            font-size: 0.9rem;
+            color: #bfdbfe;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 20px 40px;
+            border-radius: 12px;
+            border: 4px solid;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .tier-zeus {
+            border-color: #ec4899;
+            background: rgba(236, 72, 153, 0.2);
+            color: #fce7f3;
+        }
+        
+        .tier-poseidon {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.2);
+            color: #f3e8ff;
+        }
+        
+        .tier-triton {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+            color: #dbeafe;
+        }
+        
+        .tier-below {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fee2e2;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .card {
+                break-inside: avoid;
+            }
+        }
+        
+        .print-section {
+            background: white;
+            color: black;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .print-section h1,
+        .print-section h2,
+        .print-section h3 {
+            color: black;
+            border-bottom: 3px solid black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .print-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .print-box {
+            border: 2px solid black;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .print-box.large {
+            border: 4px solid black;
+            background: #f3f4f6;
+        }
+        
+        .print-box p {
+            margin: 5px 0;
+        }
+        
+        .print-box .big {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🔱</div>
+            <h1 id="orgNameHeader">NTAG Southwest</h1>
+            <p class="subtitle">TRITON GLIDESLOPE CALCULATOR</p>
+            <p class="tagline">To the Moon 🚀</p>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="card no-print">
+            <h2>📊 STEP 1: Glideslope Assessment</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Select Your Station</label>
+                    <select id="stationSelect">
+                        <option value="">-- Select Station --</option>
+                        <optgroup label="Division 1 (PRIMETIME)">
+                            <option value="CHULA VISTA|144">CHULA VISTA (Goal: 144)</option>
+                            <option value="COLLEGE GROVE|76">COLLEGE GROVE (Goal: 76)</option>
+                            <option value="EL CAJON|109">EL CAJON (Goal: 109)</option>
+                            <option value="IMPERIAL BEACH|84">IMPERIAL BEACH (Goal: 84)</option>
+                            <option value="NATIONAL CITY|155">NATIONAL CITY (Goal: 155)</option>
+                            <option value="YUMA|57">YUMA (Goal: 57)</option>
+                        </optgroup>
+                        <optgroup label="Division 2 (AVENGERS)">
+                            <option value="ESCONDIDO|77">ESCONDIDO (Goal: 77)</option>
+                            <option value="CLAIREMONT|94">CLAIREMONT (Goal: 94)</option>
+                            <option value="MIRA MESA|60">MIRA MESA (Goal: 60)</option>
+                            <option value="OCEANSIDE|131">OCEANSIDE (Goal: 131)</option>
+                            <option value="POWAY|61">POWAY (Goal: 61)</option>
+                        </optgroup>
+                        <optgroup label="Division 3 (SLUGGERS)">
+                            <option value="ANAHEIM|65">ANAHEIM (Goal: 65)</option>
+                            <option value="GARDEN GROVE|57">GARDEN GROVE (Goal: 57)</option>
+                            <option value="HUNTINGTON BEACH|65">HUNTINGTON BEACH (Goal: 65)</option>
+                            <option value="MISSION VIEJO|68">MISSION VIEJO (Goal: 68)</option>
+                            <option value="SANTA ANA|71">SANTA ANA (Goal: 71)</option>
+                        </optgroup>
+                        <optgroup label="Division 4 (REGULATORS)">
+                            <option value="HEMET|74">HEMET (Goal: 74)</option>
+                            <option value="MORENO VALLEY|80">MORENO VALLEY (Goal: 80)</option>
+                            <option value="PALM DESERT|80">PALM DESERT (Goal: 80)</option>
+                            <option value="SUN CITY|77">SUN CITY (Goal: 77)</option>
+                            <option value="TEMECULA|168">TEMECULA (Goal: 168)</option>
+                        </optgroup>
+                        <optgroup label="Division 5 (EMPIRE)">
+                            <option value="BREA|85">BREA (Goal: 85)</option>
+                            <option value="CORONA|83">CORONA (Goal: 83)</option>
+                            <option value="RANCHO CUCAMONGA|81">RANCHO CUCAMONGA (Goal: 81)</option>
+                            <option value="RIVERSIDE|101">RIVERSIDE (Goal: 101)</option>
+                            <option value="UPLAND|95">UPLAND (Goal: 95)</option>
+                        </optgroup>
+                        <optgroup label="Division 6 (OUTLAWS)">
+                            <option value="FONTANA|77">FONTANA (Goal: 77)</option>
+                            <option value="REDLANDS|87">REDLANDS (Goal: 87)</option>
+                            <option value="SAN BERNARDINO|96">SAN BERNARDINO (Goal: 96)</option>
+                            <option value="VICTORVILLE|122">VICTORVILLE (Goal: 122)</option>
+                        </optgroup>
+                        <optgroup label="Division 7 (KNIGHTS)">
+                            <option value="HENDERSON|106">HENDERSON (Goal: 106)</option>
+                            <option value="LAS VEGAS|85">LAS VEGAS (Goal: 85)</option>
+                            <option value="NORTHERN LIGHTS|129">NORTHERN LIGHTS (Goal: 129)</option>
+                            <option value="RED ROCK|77">RED ROCK (Goal: 77)</option>
+                            <option value="SPRING VALLEY|89">SPRING VALLEY (Goal: 89)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Today's Date</label>
+                    <input type="date" id="todayDate" min="2025-10-01" max="2026-09-30">
+                </div>
+                <div class="form-group">
+                    <label>Annual Goal (ALNAV)</label>
+                    <input type="number" id="annualGoal" value="3200">
+                </div>
+                <div class="form-group">
+                    <label>Actual Contracts to Date</label>
+                    <input type="number" id="actualToDate" value="0">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="assessGlideslope()">Assess Glideslope</button>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="results" class="hidden">
+            <div id="alertBox" class="alert"></div>
+            
+            <div class="card">
+                <h2>📋 SITREP</h2>
+                <div style="text-align: center;">
+                    <div id="tierBadge" class="tier-badge"></div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Glideslope Status</div>
+                        <div class="value" id="deltaValue"></div>
+                        <div class="subtext" id="deltaText"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Current Pace</div>
+                        <div class="value" id="paceValue"></div>
+                        <div class="subtext">Contracts/Day</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Projected EOY</div>
+                        <div class="value" id="projectedValue"></div>
+                        <div class="subtext" id="projectedText"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Next Tier</div>
+                        <div class="value" id="nextTierValue"></div>
+                        <div class="subtext" id="nextTierText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="card no-print">
+                <h2>🎯 STEP 2: Build Your Mission Plan</h2>
+                <p style="margin-bottom: 20px; font-size: 1.1rem;">Choose your objective:</p>
+                
+                <div class="mission-buttons">
+                    <div class="mission-btn" onclick="selectMission('recovery')">
+                        <div class="icon">⚡</div>
+                        <div class="title">Recovery Plan</div>
+                        <div class="desc">Get back on glideslope</div>
+                    </div>
+                    <div class="mission-btn" onclick="selectMission('incentive')">
+                        <div class="icon">🏆</div>
+                        <div class="title">Incentive Tier Plan</div>
+                        <div class="desc">Hit Poseidon or Zeus</div>
+                    </div>
+                    <div class="mission-btn" onclick="selectMission('both')">
+                        <div class="icon">🚀</div>
+                        <div class="title">Both</div>
+                        <div class="desc">Recovery + Incentive</div>
+                    </div>
+                </div>
+
+                <div id="missionConfig" class="hidden">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Target Date</label>
+                            <input type="date" id="targetDate" value="2026-06-30" min="2025-10-01" max="2026-09-30">
+                        </div>
+                        <div class="form-group" id="tierSelectGroup" style="display: none;">
+                            <label>Target Tier</label>
+                            <select id="targetTier">
+                                <option value="triton">Triton (100%)</option>
+                                <option value="poseidon" selected>Poseidon (120%)</option>
+                                <option value="zeus">Zeus (140%)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Conversion Rate</label>
+                            <input type="number" id="conversion" value="0.75" step="0.01" min="0.01" max="1">
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(147, 51, 234, 0.2); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                        <h3 style="margin-bottom: 15px;">📊 PATE Configuration (per contract)</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Contacts</label>
+                                <input type="number" id="pateContacts" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Appointments</label>
+                                <input type="number" id="pateAppointments" value="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Interviews</label>
+                                <input type="number" id="pateInterviews" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Qualified</label>
+                                <input type="number" id="pateQualified" value="5">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="generateMissionPlan()">Generate Mission Plan</button>
+                </div>
+            </div>
+
+            <!-- MISSION PLAN RESULTS -->
+            <div id="missionResults" class="hidden">
+                <div class="card">
+                    <h2>📋 Your Action Plan</h2>
+                    <div style="background: rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 30px;">
+                        <h3 id="planTitle" style="margin-bottom: 20px; font-size: 1.5rem;"></h3>
+                        
+                        <div class="stats-grid" style="margin-bottom: 20px;">
+                            <div class="stat-card">
+                                <div class="label">Target Date</div>
+                                <div class="value" id="planTargetDate" style="font-size: 1.5rem;"></div>
+                                <div class="subtext" id="planDaysRemaining"></div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Contracts Per Week</div>
+                                <div class="value" id="planContractsWeek" style="color: #fbbf24;"></div>
+                                <div class="subtext">actual contracts needed</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Projections Per Week</div>
+                                <div class="value" id="planProjectionsWeek" style="color: #fbbf24;"></div>
+                                <div class="subtext" id="planConversionText"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(30, 64, 175, 0.4); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                            <div class="label">Daily Target</div>
+                            <div class="value" id="planProjectionsDay" style="color: #fbbf24; font-size: 1.8rem;"></div>
+                        </div>
+
+                        <div style="background: rgba(15, 23, 42, 0.5); border-radius: 8px; padding: 20px;">
+                            <h4 style="margin-bottom: 15px; font-size: 1.2rem;">📋 Required Weekly Activity:</h4>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="value" id="pateContactsWeek" style="color: #34d399;"></div>
+                                    <div class="subtext">Contacts</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="value" id="pateAppointmentsWeek" style="color: #34d399;"></div>
+                                    <div class="subtext">Appointments</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="value" id="pateInterviewsWeek" style="color: #34d399;"></div>
+                                    <div class="subtext">Interviews</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="value" id="pateQualifiedWeek" style="color: #34d399;"></div>
+                                    <div class="subtext">Qualified</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card no-print">
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Print Weekly Battle Rhythm</button>
+                </div>
+
+                <!-- PRINTABLE SECTION -->
+                <div class="print-section">
+                    <div style="text-align: center; border-bottom: 4px solid black; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 id="printOrgName"></h1>
+                        <h2>WEEKLY BATTLE RHYTHM</h2>
+                        <p style="font-size: 1.1rem; margin-top: 10px;">Week of: <span id="printWeekOf"></span></p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3>📊 CURRENT STATUS</h3>
+                        <div class="print-grid">
+                            <div class="print-box">
+                                <p><strong>Contracts to Date:</strong></p>
+                                <p class="big" id="printActual"></p>
+                            </div>
+                            <div class="print-box">
+                                <p><strong>Glideslope Status:</strong></p>
+                                <p class="big" id="printGlideslope"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3>🎯 THIS WEEK</h3>
+                        <div class="print-box large">
+                            <p style="font-size: 1.2rem; font-weight: bold;">NEEDED:</p>
+                            <p class="big" style="font-size: 2.5rem;" id="printProjections"></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>📋 PATE</h3>
+                        <div class="print-grid">
+                            <div class="print-box">
+                                <p><strong>Contacts:</strong></p>
+                                <p class="big" id="printContacts"></p>
+                            </div>
+                            <div class="print-box">
+                                <p><strong>Appointments:</strong></p>
+                                <p class="big" id="printAppointments"></p>
+                            </div>
+                            <div class="print-box">
+                                <p><strong>Interviews:</strong></p>
+                                <p class="big" id="printInterviews"></p>
+                            </div>
+                            <div class="print-box">
+                                <p><strong>Qualified:</strong></p>
+                                <p class="big" id="printQualified"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; border-top: 2px solid black; padding-top: 20px; margin-top: 30px;">
+                        <p style="font-size: 1.3rem; font-weight: bold; color: black;">🔱 TO THE MOON 🚀</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('todayDate').valueAsDate = new Date();
+
+        let currentData = {};
+        let selectedMission = '';
+
+        // Station select handler
+        document.getElementById('stationSelect').addEventListener('change', function() {
+            const value = this.value;
+            if (value) {
+                const [name, goal] = value.split('|');
+                document.getElementById('orgNameHeader').textContent = name;
+                document.getElementById('annualGoal').value = goal;
+            }
+        });
+
+        // Production days calculation
+        const PROD_DAYS_PER_MONTH = {
+            '2025-10': 21, '2025-11': 17, '2025-12': 14, '2026-01': 20, '2026-02': 19, '2026-03': 21,
+            '2026-04': 22, '2026-05': 20, '2026-06': 21, '2026-07': 22, '2026-08': 20, '2026-09': 20
+        };
+
+        const SPECIFIC_NON_PROD_DAYS = [
+            '2025-10-10', '2025-11-11', '2025-12-05', '2025-12-20', '2025-12-21', '2025-12-22', '2025-12-23',
+            '2025-12-24', '2025-12-25', '2025-12-26', '2025-12-27', '2025-12-28', '2025-12-29', '2025-12-30',
+            '2025-12-31', '2026-01-01'
+        ];
+
+        function getProductionDays() {
+            const FY_START = new Date('2025-10-01');
+            const FY_END = new Date('2026-09-30');
+            const nonProdSet = new Set(SPECIFIC_NON_PROD_DAYS);
+            const days = [];
+            let current = new Date(FY_START);
+            let prodDayIndex = 0;
+            const monthlyProdCounts = {};
+
+            while (current <= FY_END) {
+                const dateStr = current.toISOString().split('T')[0];
+                const monthKey = dateStr.substring(0, 7);
+                const isWeekend = current.getDay() === 0 || current.getDay() === 6;
+                const isProd = !isWeekend && !nonProdSet.has(dateStr);
+
+                if (isProd) {
+                    if (!monthlyProdCounts[monthKey]) monthlyProdCounts[monthKey] = 0;
+                    if (monthlyProdCounts[monthKey] < PROD_DAYS_PER_MONTH[monthKey]) {
+                        prodDayIndex++;
+                        monthlyProdCounts[monthKey]++;
+                    } else {
+                        days.push({ date: new Date(current), isProd: false, prodDayIndex });
+                        current.setDate(current.getDate() + 1);
+                        continue;
+                    }
+                }
+                days.push({ date: new Date(current), isProd, prodDayIndex });
+                current.setDate(current.getDate() + 1);
+            }
+            return days;
+        }
+
+        const productionDays = getProductionDays();
+        const totalProdDays = productionDays[productionDays.length - 1].prodDayIndex;
+
+        function getProdDayForDate(dateStr) {
+            const target = new Date(dateStr);
+            const day = productionDays.find(d => d.date.toDateString() === target.toDateString());
+            return day ? day.prodDayIndex : 0;
+        }
+
+        function assessGlideslope() {
+            const annualGoal = parseInt(document.getElementById('annualGoal').value);
+            const actualToDate = parseInt(document.getElementById('actualToDate').value);
+            const todayDate = document.getElementById('todayDate').value;
+            const orgName = document.getElementById('orgNameHeader').textContent;
+
+            const attrition = 0.03;
+            const adjustedAnnualGoal = annualGoal * (1 + attrition);
+            const currentProdDay = getProdDayForDate(todayDate);
+            const baselineReqToday = (currentProdDay / totalProdDays) * adjustedAnnualGoal;
+            const deltaVsBaseline = actualToDate - baselineReqToday;
+            const currentPace = currentProdDay > 0 ? actualToDate / currentProdDay : 0;
+            const projectedEndTotal = currentPace * totalProdDays;
+            const projectedVsGoal = projectedEndTotal - adjustedAnnualGoal;
+
+            // Determine tier
+            const performancePct = baselineReqToday > 0 ? (actualToDate / baselineReqToday) * 100 : 0;
+            let tier, tierClass, tierIcon;
+            if (performancePct >= 140) {
+                tier = '⚡ Zeus ⚡';
+                tierClass = 'tier-zeus';
+            } else if (performancePct >= 120) {
+                tier = '🔱 Poseidon 🔱';
+                tierClass = 'tier-poseidon';
+            } else if (performancePct >= 100) {
+                tier = 'Triton';
+                tierClass = 'tier-triton';
+            } else {
+                tier = 'Below Triton';
+                tierClass = 'tier-below';
+            }
+
+            // Calculate next tier
+            let nextTierNeeded = 0;
+            let nextTierName = '';
+            if (performancePct < 120) {
+                nextTierNeeded = Math.max(0, Math.ceil((adjustedAnnualGoal * 1.20 * (currentProdDay / totalProdDays)) - actualToDate));
+                nextTierName = 'Poseidon';
+            } else if (performancePct < 140) {
+                nextTierNeeded = Math.max(0, Math.ceil((adjustedAnnualGoal * 1.40 * (currentProdDay / totalProdDays)) - actualToDate));
+                nextTierName = 'Zeus';
+            }
+
+            // Store current data
+            currentData = {
+                annualGoal,
+                actualToDate,
+                todayDate,
+                orgName,
+                adjustedAnnualGoal,
+                currentProdDay,
+                baselineReqToday,
+                deltaVsBaseline,
+                currentPace,
+                projectedEndTotal,
+                projectedVsGoal
+            };
+
+            // Update UI
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = deltaVsBaseline >= 0 ? 'alert alert-success' : 'alert alert-danger';
+            alertBox.innerHTML = `
+                <p style="font-size: 1.5rem; font-weight: bold; margin-bottom: 10px;">
+                    Recruiting Warrior! You are <span style="${deltaVsBaseline >= 0 ? 'color: #34d399' : 'color: #fca5a5'}">${Math.abs(deltaVsBaseline).toFixed(0)} contracts ${deltaVsBaseline >= 0 ? 'ABOVE' : 'BELOW'} glideslope</span> ${deltaVsBaseline >= 0 ? '📈' : '📉'}
+                </p>
+                <p style="font-size: 1.1rem; font-style: italic;">
+                    ${deltaVsBaseline >= 0 ? "You are well on your way to the moon! Keep it up! 🚀" : "You won't make it to the moon with production like that! Let's get you back on track! 🌙"}
+                </p>
+            `;
+
+            document.getElementById('tierBadge').textContent = tier;
+            document.getElementById('tierBadge').className = `tier-badge ${tierClass}`;
+
+            document.getElementById('deltaValue').textContent = (deltaVsBaseline >= 0 ? '+' : '') + deltaVsBaseline.toFixed(0);
+            document.getElementById('deltaValue').style.color = deltaVsBaseline >= 0 ? '#34d399' : '#ef4444';
+            document.getElementById('deltaText').textContent = `${deltaVsBaseline >= 0 ? 'above' : 'below'} (${baselineReqToday.toFixed(1)} req)`;
+
+            document.getElementById('paceValue').textContent = currentPace.toFixed(2);
+            document.getElementById('paceValue').style.color = '#60a5fa';
+
+            document.getElementById('projectedValue').textContent = projectedEndTotal.toFixed(0);
+            document.getElementById('projectedValue').style.color = projectedVsGoal >= 0 ? '#34d399' : '#fbbf24';
+            document.getElementById('projectedText').textContent = (projectedVsGoal >= 0 ? '+' : '') + projectedVsGoal.toFixed(0) + ' vs Goal';
+
+            if (nextTierNeeded > 0) {
+                document.getElementById('nextTierValue').textContent = nextTierNeeded;
+                document.getElementById('nextTierValue').style.color = '#a855f7';
+                document.getElementById('nextTierText').textContent = `more for ${nextTierName}`;
+            } else {
+                document.getElementById('nextTierValue').textContent = '--';
+                document.getElementById('nextTierValue').style.color = '#9ca3af';
+                document.getElementById('nextTierText').textContent = 'At Zeus! 🏆';
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function selectMission(type) {
+            selectedMission = type;
+            
+            // Update button states
+            document.querySelectorAll('.mission-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Show/hide tier select
+            if (type === 'incentive' || type === 'both') {
+                document.getElementById('tierSelectGroup').style.display = 'block';
+            } else {
+                document.getElementById('tierSelectGroup').style.display = 'none';
+            }
+            
+            document.getElementById('missionConfig').classList.remove('hidden');
+        }
+
+        function generateMissionPlan() {
+            const targetDate = document.getElementById('targetDate').value;
+            const targetTier = document.getElementById('targetTier').value;
+            const conversion = parseFloat(document.getElementById('conversion').value);
+            const pateContacts = parseInt(document.getElementById('pateContacts').value);
+            const pateAppointments = parseInt(document.getElementById('pateAppointments').value);
+            const pateInterviews = parseInt(document.getElementById('pateInterviews').value);
+            const pateQualified = parseInt(document.getElementById('pateQualified').value);
+
+            const targetProdDay = getProdDayForDate(targetDate);
+            const remainingDays = Math.max(targetProdDay - currentData.currentProdDay, 0);
+
+            const tierMultipliers = { triton: 1.00, poseidon: 1.20, zeus: 1.40 };
+            let planTargetContracts = 0;
+
+            if (selectedMission === 'recovery') {
+                planTargetContracts = currentData.baselineReqToday + (remainingDays * (currentData.adjustedAnnualGoal / totalProdDays));
+            } else if (selectedMission === 'incentive' || selectedMission === 'both') {
+                const tierPct = tierMultipliers[targetTier];
+                planTargetContracts = (targetProdDay / totalProdDays) * currentData.adjustedAnnualGoal * tierPct;
+            }
+
+            const planContractsPerDay = remainingDays > 0 ? (planTargetContracts - currentData.actualToDate) / remainingDays : 0;
+            const planProjectionsPerDay = conversion > 0 ? planContractsPerDay / conversion : 0;
+            const planContractsPerWeek = planContractsPerDay * 5;
+            const planProjectionsPerWeek = planProjectionsPerDay * 5;
+
+            const pateContactsWeek = planProjectionsPerDay * pateContacts * 5;
+            const pateAppointmentsWeek = planProjectionsPerDay * pateAppointments * 5;
+            const pateInterviewsWeek = planProjectionsPerDay * pateInterviews * 5;
+            const pateQualifiedWeek = planProjectionsPerDay * pateQualified * 5;
+
+            // Update UI
+            let planTitle = '';
+            if (selectedMission === 'recovery') planTitle = '⚡ Recovery Plan';
+            else if (selectedMission === 'incentive') planTitle = `🏆 Incentive Tier Plan - ${targetTier.charAt(0).toUpperCase() + targetTier.slice(1)} (${(tierMultipliers[targetTier] * 100).toFixed(0)}%)`;
+            else planTitle = `🚀 Recovery + Incentive Plan - ${targetTier.charAt(0).toUpperCase() + targetTier.slice(1)} (${(tierMultipliers[targetTier] * 100).toFixed(0)}%)`;
+
+            document.getElementById('planTitle').textContent = planTitle;
+            document.getElementById('planTargetDate').textContent = new Date(targetDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('planDaysRemaining').textContent = `${remainingDays} production days`;
+            document.getElementById('planContractsWeek').textContent = planContractsPerWeek.toFixed(1);
+            document.getElementById('planProjectionsWeek').textContent = planProjectionsPerWeek.toFixed(1);
+            document.getElementById('planConversionText').textContent = `w/ ${(conversion * 100).toFixed(0)}% conversion`;
+            document.getElementById('planProjectionsDay').textContent = planProjectionsPerDay.toFixed(1) + ' projections per day';
+
+            document.getElementById('pateContactsWeek').textContent = pateContactsWeek.toFixed(0);
+            document.getElementById('pateAppointmentsWeek').textContent = pateAppointmentsWeek.toFixed(0);
+            document.getElementById('pateInterviewsWeek').textContent = pateInterviewsWeek.toFixed(0);
+            document.getElementById('pateQualifiedWeek').textContent = pateQualifiedWeek.toFixed(0);
+
+            // Update print section
+            document.getElementById('printOrgName').textContent = currentData.orgName;
+            document.getElementById('printWeekOf').textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('printActual').textContent = currentData.actualToDate;
+            document.getElementById('printGlideslope').textContent = Math.abs(currentData.deltaVsBaseline).toFixed(0) + ' ' + (currentData.deltaVsBaseline >= 0 ? 'ABOVE ✓' : 'BELOW ✗');
+            document.getElementById('printProjections').textContent = planProjectionsPerWeek.toFixed(1) + ' Projections';
+            document.getElementById('printContacts').textContent = pateContactsWeek.toFixed(0);
+            document.getElementById('printAppointments').textContent = pateAppointmentsWeek.toFixed(0);
+            document.getElementById('printInterviews').textContent = pateInterviewsWeek.toFixed(0);
+            document.getElementById('printQualified').textContent = pateQualifiedWeek.toFixed(0);
+
+            document.getElementById('missionResults').classList.remove('hidden');
+            document.getElementById('missionResults').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
