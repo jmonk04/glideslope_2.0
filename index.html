@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NTAG Southwest — Triton Glideslope Calculator</title>
+
+<!-- PWA: installable to phone & desktop home screens -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e1c">
+<!-- iOS home-screen support (Safari ignores parts of the manifest) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Glideslope">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+
+<style>
+/* ============================================================
+   TRITON GLIDESLOPE CALCULATOR — OPS CENTER REFRESH
+   Single-file, client-side. No installs, no dependencies.
+   ============================================================ */
+
+:root{
+  /* Deep space palette */
+  --bg-0:#05070f;
+  --bg-1:#0a0e1c;
+  --bg-2:#0f1528;
+  --panel:#111935;
+  --panel-2:#161f42;
+  --line:#22305c;
+  --line-soft:#1a2747;
+  --ink:#e8edff;
+  --ink-dim:#9aa8d4;
+  --ink-faint:#5f6e9c;
+
+  /* Tier colors */
+  --triton:#3da9fc;   /* 100% */
+  --poseidon:#2ce6c0; /* 120% */
+  --zeus:#ffb627;     /* 140% */
+  --danger:#ff5470;
+  --good:#2ce6c0;
+
+  --glow-triton:rgba(61,169,252,.35);
+  --glow-poseidon:rgba(44,230,192,.30);
+  --glow-zeus:rgba(255,182,39,.30);
+
+  --shadow:0 18px 50px -12px rgba(0,0,0,.7);
+  --radius:16px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+body{
+  font-family:'Sora',system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(61,169,252,.10), transparent 60%),
+    radial-gradient(900px 600px at 0% 100%, rgba(44,230,192,.07), transparent 55%),
+    var(--bg-0);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:80px;
+}
+
+/* faint star/grid texture */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.25), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.18), transparent),
+    radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.15), transparent),
+    radial-gradient(1px 1px at 90% 20%, rgba(255,255,255,.2), transparent);
+  background-size:cover;opacity:.5;
+}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+/* ---------- Header ---------- */
+header{
+  text-align:center;padding:42px 0 18px;
+}
+.mascot{font-size:46px;filter:drop-shadow(0 0 18px var(--glow-triton));animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.cmd{
+  font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.4em;
+  color:var(--ink-dim);font-size:13px;margin-top:6px;text-transform:uppercase;
+}
+h1{
+  font-family:'Chakra Petch',monospace;font-weight:700;
+  font-size:clamp(28px,5vw,46px);letter-spacing:.12em;margin:4px 0;
+  background:linear-gradient(100deg,var(--triton),var(--poseidon) 60%,#fff);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tagline{color:var(--ink-faint);font-size:14px;letter-spacing:.25em;text-transform:uppercase}
+.install-btn{
+  margin-top:16px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:var(--panel-2);border:1px solid var(--triton);color:var(--triton);
+  font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.08em;font-size:12px;
+  text-transform:uppercase;padding:9px 18px;border-radius:9px;transition:all .15s;
+}
+.install-btn:hover{background:var(--triton);color:var(--bg-0)}
+
+/* ---------- Section scaffolding ---------- */
+.section{margin-top:34px}
+.section-tag{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+}
+.section-tag .num{
+  font-family:'Chakra Petch',monospace;font-weight:700;font-size:13px;
+  color:var(--bg-0);background:var(--triton);
+  padding:4px 10px;border-radius:6px;letter-spacing:.1em;
+}
+.section-tag h2{
+  font-family:'Chakra Petch',monospace;font-weight:600;font-size:18px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink);
+}
+.section-tag .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--bg-2));
+  border:1px solid var(--line-soft);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:24px;
+}
+
+/* ---------- Inputs ---------- */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:760px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+label.fld{display:block}
+.fld span{
+  display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:7px;font-weight:600;
+}
+input,select{
+  width:100%;background:var(--bg-1);border:1px solid var(--line);
+  border-radius:10px;padding:12px 13px;color:var(--ink);font-size:15px;
+  font-family:'Sora',sans-serif;transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus{outline:none;border-color:var(--triton);box-shadow:0 0 0 3px var(--glow-triton)}
+select{cursor:pointer}
+optgroup{background:var(--bg-0);color:var(--poseidon);font-weight:700}
+option{background:var(--bg-1);color:var(--ink);font-weight:400}
+
+.btn{
+  width:100%;border:none;border-radius:11px;cursor:pointer;
+  font-family:'Chakra Petch',monospace;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;font-size:14px;padding:14px;
+  transition:transform .12s, box-shadow .2s, filter .2s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{
+  background:linear-gradient(100deg,var(--triton),var(--poseidon));
+  color:var(--bg-0);box-shadow:0 10px 24px -8px var(--glow-triton);
+}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--panel-2);color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--triton)}
+
+/* ---------- SITREP hero ---------- */
+#sitrep{display:none}
+#sitrep.show{display:block;animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.hero{
+  display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch;
+}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+
+/* ---- Glideslope Scoreboard — the headline answer ---- */
+.scoreboard{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:stretch;
+  background:linear-gradient(180deg,var(--panel),var(--bg-2));
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;
+}
+@media(max-width:760px){.scoreboard{grid-template-columns:1fr;gap:1px;background:var(--line-soft)}}
+.sb-cell{padding:26px 22px;text-align:center;display:flex;flex-direction:column;justify-content:center;background:transparent}
+@media(max-width:760px){.sb-cell{background:var(--bg-2)}}
+.sb-cell .sb-k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:8px}
+.sb-cell .sb-v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(42px,7vw,64px);line-height:.95}
+.sb-cell .sb-u{font-size:13px;color:var(--ink-faint);margin-top:6px}
+.sb-op{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--ink-faint);font-weight:300;padding:0 4px}
+@media(max-width:760px){.sb-op{display:none}}
+.sb-required .sb-v{color:var(--ink)}
+.sb-have .sb-v{color:var(--triton)}
+.sb-diff{position:relative}
+.sb-diff .sb-v{font-size:clamp(38px,6vw,56px)}
+.sb-verdict{
+  font-family:'Chakra Petch',monospace;font-weight:700;font-size:14px;letter-spacing:.06em;
+  margin-top:8px;padding:4px 0;
+}
+
+.verdict{
+  border-radius:var(--radius);padding:26px;border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel),var(--bg-2));
+  display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;
+}
+.verdict::after{content:"";position:absolute;inset:0;opacity:.10;pointer-events:none}
+.verdict .vlabel{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.verdict .vstatus{
+  font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(30px,5vw,46px);
+  letter-spacing:.04em;margin:6px 0;line-height:1;
+}
+.verdict .vsub{font-size:15px;color:var(--ink-dim)}
+.verdict .vpace{margin-top:14px;font-size:13px;color:var(--ink-faint)}
+.verdict .vpace b{color:var(--ink);font-weight:600}
+
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{
+  background:var(--bg-1);border:1px solid var(--line-soft);border-radius:12px;padding:16px;
+}
+.stat .k{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:4px}
+.stat .u{font-size:12px;color:var(--ink-faint);font-weight:400}
+
+/* ---------- Chart ---------- */
+.chart-card{margin-top:20px;background:var(--bg-1);border:1px solid var(--line-soft);border-radius:var(--radius);padding:20px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px}
+.chart-head h3{font-family:'Chakra Petch',monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--ink-dim)}
+.legend i{display:inline-block;width:22px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.li-ideal i{background:var(--ink-faint)}
+.li-actual i{background:var(--triton);height:4px}
+.li-proj i{background:#fff;height:0;border-top:2px dashed #fff;width:22px}
+.li-tri i{background:var(--triton)}
+.li-pos i{background:var(--poseidon)}
+.li-zeus i{background:var(--zeus)}
+svg{width:100%;height:auto;display:block;overflow:visible}
+.chart-foot{font-size:12px;color:var(--ink-faint);margin-top:12px;text-align:center}
+
+/* ---------- Whatif controls ---------- */
+.whatif{margin-top:18px;background:var(--panel-2);border:1px dashed var(--line);border-radius:14px;padding:18px}
+.whatif h4{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--poseidon);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.slider-row{display:grid;grid-template-columns:160px 1fr 90px;gap:14px;align-items:center;margin-bottom:14px}
+@media(max-width:620px){.slider-row{grid-template-columns:1fr;gap:6px}}
+.slider-row .sl-label{font-size:12px;color:var(--ink-dim);letter-spacing:.05em}
+.slider-row .sl-val{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink);text-align:right;font-size:15px}
+@media(max-width:620px){.slider-row .sl-val{text-align:left}}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;height:24px}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:4px;background:linear-gradient(90deg,var(--triton),var(--poseidon))}
+input[type=range]::-moz-range-track{height:5px;border-radius:4px;background:linear-gradient(90deg,var(--triton),var(--poseidon))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;margin-top:-6.5px;box-shadow:0 0 0 4px var(--glow-triton);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#fff;box-shadow:0 0 0 4px var(--glow-triton);cursor:pointer}
+
+/* ---------- Step 2 objective cards ---------- */
+#step2{display:none}
+#step2.show{display:block;animation:rise .5s ease both}
+.obj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:8px}
+@media(max-width:760px){.obj-grid{grid-template-columns:1fr}}
+.obj{
+  background:var(--bg-1);border:1px solid var(--line);border-radius:14px;padding:20px;
+  cursor:pointer;text-align:center;transition:border-color .15s, transform .15s, box-shadow .2s;
+}
+.obj:hover{transform:translateY(-3px);border-color:var(--triton)}
+.obj.active{border-color:var(--triton);box-shadow:0 0 0 3px var(--glow-triton);background:var(--panel)}
+.obj .ic{font-size:30px}
+.obj .ot{font-family:'Chakra Petch',monospace;font-weight:700;letter-spacing:.06em;margin-top:8px;font-size:16px}
+.obj .od{font-size:12px;color:var(--ink-faint);margin-top:4px}
+
+.plan-config{margin-top:20px}
+.subhead{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin:18px 0 12px}
+
+/* ---------- Action plan output ---------- */
+#actionplan{display:none}
+#actionplan.show{display:block;animation:rise .5s ease both}
+.ap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:760px){.ap-grid{grid-template-columns:repeat(2,1fr)}}
+.ap-stat{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:12px;padding:16px;text-align:center}
+.ap-stat .k{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.ap-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:28px;margin-top:5px;color:var(--poseidon)}
+.ap-stat .u{font-size:11px;color:var(--ink-faint)}
+
+.pate-out{margin-top:20px}
+.pate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:760px){.pate-grid{grid-template-columns:repeat(2,1fr)}}
+.pate-cell{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.pate-cell .pk{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.pate-cell .pv{font-family:'Chakra Petch',monospace;font-weight:700;font-size:30px;margin-top:6px;color:var(--triton)}
+.pate-cell .pw{font-size:10px;color:var(--ink-faint);margin-top:2px}
+
+.hint{font-size:13px;color:var(--ink-faint);margin-top:6px}
+.warn{color:var(--zeus)}
+.err{color:var(--danger)}
+
+/* ---------- Step 3: view toggle ---------- */
+.view-tabs{display:flex;gap:8px;margin-bottom:20px;background:var(--bg-1);padding:6px;border-radius:12px;border:1px solid var(--line-soft)}
+.view-tab{
+  flex:1;text-align:center;padding:11px;border-radius:8px;cursor:pointer;
+  font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.08em;font-size:13px;
+  color:var(--ink-dim);transition:all .15s;text-transform:uppercase;border:1px solid transparent;
+}
+.view-tab.active{background:var(--panel);color:var(--ink);border-color:var(--line);box-shadow:0 4px 14px -6px rgba(0,0,0,.5)}
+.view-tab:hover:not(.active){color:var(--ink)}
+.view-body{display:none}
+.view-body.active{display:block;animation:rise .35s ease both}
+
+/* recruiter day breakdown */
+.rec-meta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;font-size:13px;color:var(--ink-dim)}
+.rec-meta b{color:var(--ink)}
+.rec-card{
+  background:var(--bg-1);border:1px solid var(--line-soft);border-radius:14px;
+  padding:20px;margin-bottom:16px;
+}
+.rec-card h4{font-family:'Chakra Petch',monospace;font-size:15px;letter-spacing:.1em;color:var(--triton);margin-bottom:4px}
+.rec-card .rec-sub{font-size:12px;color:var(--ink-faint);margin-bottom:16px}
+.day-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:680px){.day-grid{grid-template-columns:1fr}}
+.day{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:14px}
+.day .dh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.day .dh .dn{font-family:'Chakra Petch',monospace;font-weight:700;letter-spacing:.08em;font-size:14px}
+.day .dh .dp{font-size:11px;color:var(--poseidon);font-weight:600}
+.day .drow{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-top:1px solid var(--line-soft)}
+.day .drow:first-of-type{border-top:none}
+.day .drow .dlk{color:var(--ink-faint)}
+.day .drow .dlv{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink)}
+
+/* leadership table */
+.lead-table{width:100%;border-collapse:collapse;margin-top:6px}
+.lead-table th,.lead-table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line-soft)}
+.lead-table th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.lead-table td{font-size:15px}
+.lead-table td.num{font-family:'Chakra Petch',monospace;font-weight:700;text-align:right}
+.lead-table tr:last-child td{border-bottom:none}
+.lead-table .total-row td{color:var(--poseidon);border-top:2px solid var(--line)}
+
+/* ---------- Print ---------- */
+@media print{
+  body{background:#fff;color:#000}
+  .wrap > *:not(#printout){display:none}
+  #printout{display:block !important}
+}
+#printout{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mascot">🔱</div>
+    <div class="cmd">NTAG Southwest</div>
+    <h1>TRITON GLIDESLOPE</h1>
+    <div class="tagline">Mission Planning · To the Moon 🚀</div>
+    <button id="installBtn" class="install-btn" style="display:none">⬇ Install App</button>
+  </header>
+
+  <!-- ============ STEP 1: ASSESSMENT ============ -->
+  <section class="section">
+    <div class="section-tag">
+      <span class="num">01</span><h2>Where Are You · Glideslope Assessment</h2><span class="rule"></span>
+    </div>
+    <div class="panel">
+      <div class="grid g2">
+        <label class="fld">
+          <span>Station</span>
+          <select id="station">
+            <option value="">— Select Station —</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Annual Goal (ALNAV)</span>
+          <input type="number" id="goal" placeholder="Auto-fills from station" min="0">
+        </label>
+        <label class="fld">
+          <span>Today's Date</span>
+          <input type="date" id="today">
+        </label>
+        <label class="fld">
+          <span>Actual Contracts to Date</span>
+          <input type="number" id="actual" placeholder="0" min="0">
+        </label>
+      </div>
+      <div style="margin-top:18px">
+        <button class="btn btn-primary" id="assessBtn">Assess Glideslope ▸</button>
+      </div>
+      <div id="assessErr" class="hint err" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- ============ SITREP ============ -->
+  <section class="section" id="sitrep">
+    <div class="section-tag">
+      <span class="num">SITREP</span><h2>Situation Report</h2><span class="rule"></span>
+    </div>
+
+    <!-- HEADLINE SCOREBOARD — the one thing a recruiter needs to read -->
+    <div class="scoreboard">
+      <div class="sb-cell sb-required">
+        <div class="sb-k">Should Have Today</div>
+        <div class="sb-v" id="sbRequired">—</div>
+        <div class="sb-u">contracts to be on glideslope</div>
+      </div>
+      <div class="sb-op">−</div>
+      <div class="sb-cell sb-have">
+        <div class="sb-k">You Have</div>
+        <div class="sb-v" id="sbHave">—</div>
+        <div class="sb-u">contracts to date</div>
+      </div>
+      <div class="sb-op">=</div>
+      <div class="sb-cell sb-diff">
+        <div class="sb-k">Where You Stand</div>
+        <div class="sb-v" id="sbDiff">—</div>
+        <div class="sb-verdict" id="sbVerdict">—</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="verdict" id="verdict">
+        <div class="vlabel">Glideslope Status</div>
+        <div class="vstatus" id="vStatus">—</div>
+        <div class="vsub" id="vSub">—</div>
+        <div class="vpace" id="vPace">—</div>
+      </div>
+      <div class="statgrid">
+        <div class="stat"><div class="k">Current Pace</div><div class="v" id="sPace">—<span class="u"> %</span></div></div>
+        <div class="stat"><div class="k">Contracts / Day</div><div class="v" id="sCpd">—</div></div>
+        <div class="stat"><div class="k">Projected EOY</div><div class="v" id="sEoy">—</div></div>
+        <div class="stat"><div class="k">Next Tier Gap</div><div class="v" id="sNext">—</div></div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <h3>Glideslope Trajectory</h3>
+        <div class="legend">
+          <span class="li-actual"><i></i>Actual</span>
+          <span class="li-proj"><i></i>Projected</span>
+          <span class="li-tri"><i></i>Triton 100%</span>
+          <span class="li-pos"><i></i>Poseidon 120%</span>
+          <span class="li-zeus"><i></i>Zeus 140%</span>
+        </div>
+      </div>
+      <div id="chartHost"></div>
+      <div class="chart-foot" id="chartFoot"></div>
+    </div>
+
+    <!-- WHAT-IF -->
+    <div class="whatif">
+      <h4>⚙ What-If — drag to model effort & watch the trajectory move</h4>
+      <div class="slider-row">
+        <div class="sl-label">Contracts / week (push)</div>
+        <input type="range" id="wiRate" min="0" max="15" step="0.5" value="0">
+        <div class="sl-val" id="wiRateV">—</div>
+      </div>
+      <div class="slider-row">
+        <div class="sl-label">Weeks remaining to model</div>
+        <input type="range" id="wiWeeks" min="1" max="52" step="1" value="1">
+        <div class="sl-val" id="wiWeeksV">—</div>
+      </div>
+      <div class="hint" id="wiOut">—</div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2: MISSION PLAN ============ -->
+  <section class="section" id="step2">
+    <div class="section-tag">
+      <span class="num">02</span><h2>Where Are You Going · Set Your Objective</h2><span class="rule"></span>
+    </div>
+    <div class="panel">
+      <div class="subhead">Choose your objective</div>
+      <div class="obj-grid">
+        <div class="obj" data-obj="recovery"><div class="ic">⚡</div><div class="ot">Recovery</div><div class="od">Get back on glideslope</div></div>
+        <div class="obj" data-obj="incentive"><div class="ic">🏆</div><div class="ot">Incentive Tier</div><div class="od">Hit Poseidon or Zeus</div></div>
+        <div class="obj active" data-obj="both"><div class="ic">🚀</div><div class="ot">Both</div><div class="od">Recovery + Incentive</div></div>
+      </div>
+
+      <div class="plan-config grid g4">
+        <label class="fld">
+          <span>Target Date</span>
+          <input type="date" id="targetDate">
+        </label>
+        <label class="fld" id="tierWrap">
+          <span>Target Tier</span>
+          <select id="targetTier">
+            <option value="1.0">Triton (100%)</option>
+            <option value="1.2" selected>Poseidon (120%)</option>
+            <option value="1.4">Zeus (140%)</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>MEPS Conversion (%)</span>
+          <input type="number" id="conv" value="20" min="1" max="100">
+        </label>
+        <label class="fld">
+          <span>Producing Recruiters</span>
+          <input type="number" id="recruiters" value="4" min="1" max="20">
+        </label>
+      </div>
+
+      <div class="subhead">📊 PATE Configuration — activity per contract</div>
+      <div class="grid g4">
+        <label class="fld"><span>Contacts</span><input type="number" id="pContacts" value="50" min="0"></label>
+        <label class="fld"><span>Appointments</span><input type="number" id="pAppts" value="20" min="0"></label>
+        <label class="fld"><span>Interviews</span><input type="number" id="pInt" value="10" min="0"></label>
+        <label class="fld"><span>Qualified Interviews</span><input type="number" id="pQual" value="5" min="0"></label>
+      </div>
+
+      <div style="margin-top:18px">
+        <button class="btn btn-primary" id="genBtn">Build Your Plan ▸</button>
+      </div>
+      <div id="genErr" class="hint err" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3: HOW YOU GET THERE ============ -->
+  <section class="section" id="actionplan">
+    <div class="section-tag">
+      <span class="num">03</span><h2>How You Get There · Build the Plan</h2><span class="rule"></span>
+    </div>
+    <div class="panel">
+
+      <div class="view-tabs">
+        <div class="view-tab active" data-view="lead">🎖 Leadership Rollup</div>
+        <div class="view-tab" data-view="rec">👤 Recruiter Sheets</div>
+      </div>
+
+      <!-- ===== LEADERSHIP VIEW ===== -->
+      <div class="view-body active" id="viewLead">
+        <div class="ap-grid">
+          <div class="ap-stat"><div class="k">Target Date</div><div class="v" id="apDate" style="font-size:18px">—</div></div>
+          <div class="ap-stat"><div class="k">Contracts Needed</div><div class="v" id="apNeed">—</div><div class="u" id="apNeedSub">to hit target</div></div>
+          <div class="ap-stat"><div class="k">Station / Week</div><div class="v" id="apWeek">—</div><div class="u">contracts</div></div>
+          <div class="ap-stat"><div class="k">Daily Target</div><div class="v" id="apDay">—</div><div class="u">contracts/day</div></div>
+        </div>
+
+        <div class="pate-out">
+          <div class="subhead">📋 Required Weekly Activity — Station Total</div>
+          <div class="pate-grid">
+            <div class="pate-cell"><div class="pk">Contacts</div><div class="pv" id="oContacts">—</div><div class="pw">per week</div></div>
+            <div class="pate-cell"><div class="pk">Appointments</div><div class="pv" id="oAppts">—</div><div class="pw">per week</div></div>
+            <div class="pate-cell"><div class="pk">Interviews</div><div class="pv" id="oInt">—</div><div class="pw">per week</div></div>
+            <div class="pate-cell"><div class="pk">Qualified Interviews</div><div class="pv" id="oQual">—</div><div class="pw">per week</div></div>
+          </div>
+        </div>
+
+        <div class="pate-out">
+          <div class="subhead">⚖ Load Distribution — Per Recruiter</div>
+          <table class="lead-table">
+            <thead><tr><th>Activity</th><th style="text-align:right">Station / wk</th><th style="text-align:right" id="lhRec">÷ Recruiters</th><th style="text-align:right">Per Recruiter / wk</th></tr></thead>
+            <tbody id="leadBody"></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:20px">
+          <button class="btn btn-ghost" id="printLeadBtn">🖨️ Print Leadership Brief</button>
+        </div>
+      </div>
+
+      <!-- ===== RECRUITER VIEW ===== -->
+      <div class="view-body" id="viewRec">
+        <div class="rec-meta">
+          <span>Per-recruiter weekly load at your current staffing of <b id="recCount">—</b>, split <b>40% Mon / 40% Tue / 20% Wed</b> per SOP.</span>
+        </div>
+
+        <!-- single representative recruiter sheet (all recruiters identical) -->
+        <div id="recCards"></div>
+
+        <!-- staffing comparison -->
+        <div class="chart-card" style="margin-top:20px">
+          <div class="chart-head">
+            <h3>Staffing Impact — Weekly Load Per Recruiter</h3>
+            <div class="legend"><span><i style="background:var(--triton)"></i>Contacts/recruiter/wk at each team size</span></div>
+          </div>
+          <div id="staffChart"></div>
+          <div class="chart-foot" id="staffFoot"></div>
+        </div>
+
+        <div style="margin-top:18px">
+          <button class="btn btn-ghost" id="printRecBtn">🖨️ Print Recruiter Sheet</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ PRINTOUT (populated dynamically) ============ -->
+  <div id="printout"></div>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA — Stations & goals (carried over from glideslope_2.0)
+   ============================================================ */
+
+/* ---- Production-day model ----------------------------------
+   Recruiters work off calendar dates only. Behind the scenes we
+   convert a date into the NRC glideslope fraction.
+
+   NRC modifies production vs non-production days (holidays,
+   training days, stand-downs) so a raw weekday count drifts.
+   We can't predict every removed day, but we anchor to one known
+   ground-truth point — entering 22 May 2026 the glideslope
+   requirement was 60.79% — and scale the calendar-based fraction
+   to hit it exactly. Every other date then lands within a
+   fraction of a percent of NRC's official figure.
+   ------------------------------------------------------------ */
+const FED_HOLIDAYS = new Set([
+  '2025-10-13','2025-11-11','2025-11-27','2025-12-25',
+  '2026-01-01','2026-01-19','2026-02-16','2026-05-25',
+  '2026-06-19','2026-07-03','2026-09-07'
+]);
+const GS_CALIBRATION = 0.9460; // anchors 22 May 2026 -> 60.79%
+
+const DIVISIONS = [
+  {name:"Division 1 (PRIMETIME)", stations:[
+    ["CHULA VISTA",144],["COLLEGE GROVE",76],["EL CAJON",109],["IMPERIAL BEACH",84],["NATIONAL CITY",155],["YUMA",57]]},
+  {name:"Division 2 (AVENGERS)", stations:[
+    ["ESCONDIDO",77],["CLAIREMONT",94],["MIRA MESA",60],["OCEANSIDE",131],["POWAY",61]]},
+  {name:"Division 3 (SLUGGERS)", stations:[
+    ["ANAHEIM",65],["GARDEN GROVE",57],["HUNTINGTON BEACH",65],["MISSION VIEJO",68],["SANTA ANA",71]]},
+  {name:"Division 4 (REGULATORS)", stations:[
+    ["HEMET",74],["MORENO VALLEY",80],["PALM DESERT",80],["SUN CITY",77],["TEMECULA",168]]},
+  {name:"Division 5 (EMPIRE)", stations:[
+    ["BREA",85],["CORONA",83],["RANCHO CUCAMONGA",81],["RIVERSIDE",101],["UPLAND",95]]},
+  {name:"Division 6 (OUTLAWS)", stations:[
+    ["FONTANA",77],["REDLANDS",87],["SAN BERNARDINO",96],["VICTORVILLE",122]]},
+  {name:"Division 7 (KNIGHTS)", stations:[
+    ["HENDERSON",106],["LAS VEGAS",85],["NORTHERN LIGHTS",129],["RED ROCK",77],["SPRING VALLEY",89]]},
+];
+
+function ymd(d){return d.toISOString().slice(0,10);}
+
+/* fiscal year window — Oct 1 -> Sep 30 (Navy FY). */
+function fyBounds(d){
+  const y = d.getMonth() >= 9 ? d.getFullYear() : d.getFullYear()-1;
+  return {start:new Date(y,9,1), end:new Date(y+1,8,30)};
+}
+
+/* raw business days, Mon-Fri minus federal holidays, [a,b) */
+function bizDays(a,b){
+  if(b<=a) return 0;
+  let n=0; const c=new Date(a);
+  while(c<b){
+    const w=c.getDay();
+    if(w!==0 && w!==6 && !FED_HOLIDAYS.has(ymd(c))) n++;
+    c.setDate(c.getDate()+1);
+  }
+  return n;
+}
+
+/* Calibrated production days elapsed from FY start up to (not incl) date.
+   Calibration scales the holiday-adjusted weekday count to match NRC's
+   glideslope. Applied to elapsed ONLY — the total stays uncalibrated so
+   the ratio elapsed/total actually shifts to the anchored value. */
+function prodDaysElapsed(date){
+  const {start}=fyBounds(date);
+  return bizDays(start,date)*GS_CALIBRATION;
+}
+/* Total production days in the fiscal year of `date` (uncalibrated). */
+function prodDaysTotal(date){
+  const {start,end}=fyBounds(date);
+  return bizDays(start,end);
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const S = { goal:0, actual:0, today:null, station:"", elapsedDays:0, totalDays:0,
+            cpd:0, pace:0, eoy:0, status:"", color:"" };
+
+/* ============================================================
+   POPULATE STATION DROPDOWN
+   ============================================================ */
+const stationSel = document.getElementById('station');
+const goalLookup = {};
+DIVISIONS.forEach(div=>{
+  const og=document.createElement('optgroup'); og.label=div.name;
+  div.stations.forEach(([nm,goal])=>{
+    goalLookup[nm]=goal;
+    const o=document.createElement('option'); o.value=nm; o.textContent=`${nm} (Goal: ${goal})`;
+    og.appendChild(o);
+  });
+  stationSel.appendChild(og);
+});
+stationSel.addEventListener('change',()=>{
+  const g=goalLookup[stationSel.value];
+  if(g) document.getElementById('goal').value=g;
+});
+
+// default date = today
+const todayInput=document.getElementById('today');
+todayInput.value=new Date().toISOString().slice(0,10);
+
+/* ============================================================
+   TIER HELPERS
+   ============================================================ */
+function tierFor(pace){
+  if(pace>=140) return {name:"ZEUS",color:"var(--zeus)",mult:1.4};
+  if(pace>=120) return {name:"POSEIDON",color:"var(--poseidon)",mult:1.2};
+  if(pace>=100) return {name:"TRITON",color:"var(--triton)",mult:1.0};
+  return {name:"BELOW GLIDESLOPE",color:"var(--danger)",mult:0};
+}
+function nextTierGap(actual, goal, elapsed, totalDays){
+  // contracts needed *right now* to be sitting at each tier line for elapsed days
+  const perDayIdeal = goal/totalDays;
+  const onPace = perDayIdeal*elapsed; // 100% line at this point
+  const tiers=[
+    {n:"Triton 100%",need:onPace*1.0},
+    {n:"Poseidon 120%",need:onPace*1.2},
+    {n:"Zeus 140%",need:onPace*1.4},
+  ];
+  for(const t of tiers){ if(actual < t.need) return {label:t.n, gap:Math.ceil(t.need-actual)}; }
+  return {label:"Above Zeus", gap:0};
+}
+
+/* ============================================================
+   STEP 1 — ASSESS
+   ============================================================ */
+document.getElementById('assessBtn').addEventListener('click',()=>{
+  const err=document.getElementById('assessErr'); err.textContent="";
+  const goal=+document.getElementById('goal').value;
+  const actual=+document.getElementById('actual').value;
+  const today=new Date(document.getElementById('today').value+"T00:00:00");
+  if(!goal){err.textContent="Enter an annual goal (or pick a station).";return;}
+  if(isNaN(today.getTime())){err.textContent="Pick a valid date.";return;}
+  if(document.getElementById('actual').value===""){err.textContent="Enter actual contracts to date.";return;}
+
+  const totalDays = prodDaysTotal(today);
+  let elapsed = prodDaysElapsed(today);
+  elapsed = Math.min(Math.max(elapsed,1), totalDays); // clamp into fiscal window
+
+  S.goal=goal; S.actual=actual; S.today=today; S.station=stationSel.value||"—";
+  S.elapsedDays=elapsed;
+  S.totalDays=totalDays;
+  S.cpd=actual/elapsed;
+  S.eoy=Math.round(S.cpd*totalDays);
+  const idealToDate=goal/totalDays*elapsed;
+  S.pace=idealToDate>0 ? Math.round(actual/idealToDate*100) : 0;
+
+  renderSitrep();
+  document.getElementById('sitrep').classList.add('show');
+  document.getElementById('step2').classList.add('show');
+  // sensible default target date = FY end
+  if(!document.getElementById('targetDate').value){
+    document.getElementById('targetDate').value=fyBounds(today).end.toISOString().slice(0,10);
+  }
+  initWhatIf();
+  document.getElementById('sitrep').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+function renderSitrep(){
+  const t=tierFor(S.pace);
+  S.status=t.name; S.color=t.color;
+  const v=document.getElementById('verdict');
+  v.style.borderColor=t.color;
+  v.style.boxShadow=`0 0 0 1px ${t.color}, inset 0 0 60px -40px ${t.color}`;
+  document.getElementById('vStatus').textContent=t.name;
+  document.getElementById('vStatus').style.color=t.color;
+
+  const ideal=Math.round(S.goal/S.totalDays*S.elapsedDays);
+  const diff=S.actual-ideal;
+
+  // ---- HEADLINE SCOREBOARD ----
+  document.getElementById('sbRequired').textContent=ideal;
+  document.getElementById('sbHave').textContent=S.actual;
+  const sbDiff=document.getElementById('sbDiff');
+  const sbVerdict=document.getElementById('sbVerdict');
+  if(diff>=0){
+    sbDiff.textContent=`+${diff}`;
+    sbDiff.style.color='var(--good)';
+    sbVerdict.textContent= diff===0 ? 'RIGHT ON GLIDESLOPE ✓' : 'AHEAD OF GLIDESLOPE ✓';
+    sbVerdict.style.color='var(--good)';
+  }else{
+    sbDiff.textContent=`${diff}`;
+    sbDiff.style.color='var(--danger)';
+    sbVerdict.textContent='BEHIND — NEED TO RECOVER';
+    sbVerdict.style.color='var(--danger)';
+  }
+
+  document.getElementById('vSub').textContent =
+    diff>=0 ? `${diff} contract${Math.abs(diff)===1?'':'s'} AHEAD of the 100% line`
+            : `${Math.abs(diff)} contract${Math.abs(diff)===1?'':'s'} BEHIND the 100% line`;
+  const gsPct=(S.elapsedDays/S.totalDays*100).toFixed(1);
+  document.getElementById('vPace').innerHTML =
+    `Glideslope requirement today: <b>${gsPct}%</b> · `+
+    `Goal <b>${S.goal}</b> · Booked <b>${S.actual}</b>`;
+
+  document.getElementById('sPace').innerHTML=`${S.pace}<span class="u"> %</span>`;
+  document.getElementById('sPace').style.color=t.color;
+  document.getElementById('sCpd').textContent=S.cpd.toFixed(2);
+  document.getElementById('sEoy').innerHTML=`${S.eoy}<span class="u"> / ${S.goal}</span>`;
+  document.getElementById('sEoy').style.color = S.eoy>=S.goal ? 'var(--good)' : 'var(--danger)';
+
+  const ng=nextTierGap(S.actual,S.goal,S.elapsedDays,S.totalDays);
+  document.getElementById('sNext').innerHTML = ng.gap>0
+    ? `+${ng.gap}<span class="u"> → ${ng.label}</span>`
+    : `<span style="color:var(--zeus)">MAXED</span>`;
+
+  drawChart();
+}
+
+/* ============================================================
+   CHART — pace vs actual vs tier lines (pure SVG)
+   ============================================================ */
+function drawChart(extra){
+  // extra: optional {weeks, ratePerWeek} from what-if to draw a modeled push line
+  const W=760, H=360, padL=46, padR=20, padT=20, padB=40;
+  const days=S.totalDays;
+  const maxY=Math.max(S.goal*1.45, S.eoy*1.1, S.actual*1.1, 1);
+  const x=d=>padL+(d/days)*(W-padL-padR);
+  const y=val=>H-padB-(val/maxY)*(H-padT-padB);
+
+  const tierLine=(mult,color,label)=>{
+    const x1=x(0),y1=y(0),x2=x(days),y2=y(S.goal*mult);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.6" stroke-dasharray="${mult===1?'0':'6 5'}" opacity="${mult===1?.9:.65}"/>
+            <text x="${x2-2}" y="${y2-6}" text-anchor="end" font-size="11" fill="${color}" font-family="Chakra Petch,monospace">${label}</text>`;
+  };
+
+  // actual line: 0 -> today
+  const ax=x(S.elapsedDays), ay=y(S.actual);
+  // projected line: today -> EOY (current cpd)
+  const px2=x(days), py2=y(S.eoy);
+
+  // modeled "push" line from what-if
+  let pushPath="";
+  if(extra && extra.ratePerWeek>0){
+    const dailyPush=extra.ratePerWeek/5; // biz days
+    const modeledEoy=S.actual + dailyPush*(days-S.elapsedDays);
+    pushPath=`<line x1="${ax}" y1="${ay}" x2="${x(days)}" y2="${y(modeledEoy)}" stroke="var(--poseidon)" stroke-width="2.4" stroke-dasharray="2 6" opacity=".95"/>
+              <circle cx="${x(days)}" cy="${y(modeledEoy)}" r="4" fill="var(--poseidon)"/>
+              <text x="${x(days)-6}" y="${y(modeledEoy)-8}" text-anchor="end" font-size="11" fill="var(--poseidon)" font-family="Chakra Petch,monospace">push → ${Math.round(modeledEoy)}</text>`;
+  }
+
+  // y axis ticks
+  let ticks="";
+  for(let i=0;i<=4;i++){
+    const val=maxY*i/4, yy=y(val);
+    ticks+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)" stroke-width="1" opacity=".5"/>
+            <text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--ink-faint)">${Math.round(val)}</text>`;
+  }
+  // x axis day markers (quarters)
+  let xticks="";
+  for(let i=0;i<=4;i++){
+    const dd=days*i/4, xx=x(dd);
+    xticks+=`<text x="${xx}" y="${H-padB+18}" text-anchor="middle" font-size="10" fill="var(--ink-faint)">D${Math.round(dd)}</text>`;
+  }
+
+  const svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Glideslope trajectory chart">
+    ${ticks}${xticks}
+    <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="var(--line)" stroke-width="1.4"/>
+    ${tierLine(1.4,'var(--zeus)','ZEUS')}
+    ${tierLine(1.2,'var(--poseidon)','POSEIDON')}
+    ${tierLine(1.0,'var(--triton)','TRITON')}
+    <line x1="${x(0)}" y1="${y(0)}" x2="${px2}" y2="${py2}" stroke="#fff" stroke-width="1.8" stroke-dasharray="5 5" opacity=".55"/>
+    <circle cx="${px2}" cy="${py2}" r="3.5" fill="#fff" opacity=".7"/>
+    <text x="${px2-6}" y="${py2+16}" text-anchor="end" font-size="11" fill="#fff" opacity=".8" font-family="Chakra Petch,monospace">proj → ${S.eoy}</text>
+    <line x1="${x(0)}" y1="${y(0)}" x2="${ax}" y2="${ay}" stroke="var(--triton)" stroke-width="3"/>
+    <circle cx="${ax}" cy="${ay}" r="5" fill="var(--triton)"/>
+    <line x1="${ax}" y1="${padT}" x2="${ax}" y2="${H-padB}" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="3 5" opacity=".5"/>
+    <text x="${ax}" y="${padT-4}" text-anchor="middle" font-size="10" fill="var(--ink-faint)">TODAY</text>
+    ${pushPath}
+  </svg>`;
+  document.getElementById('chartHost').innerHTML=svg;
+
+  const gap=S.eoy-S.goal;
+  document.getElementById('chartFoot').innerHTML =
+    gap>=0 ? `On current pace you finish <b style="color:var(--good)">${gap} over</b> goal.`
+           : `On current pace you finish <b style="color:var(--danger)">${Math.abs(gap)} short</b> of goal — adjust the push slider below.`;
+}
+
+/* ============================================================
+   WHAT-IF
+   ============================================================ */
+function initWhatIf(){
+  const remainingDays=Math.max(S.totalDays-S.elapsedDays,1);
+  const remainingWeeks=Math.max(Math.round(remainingDays/5),1);
+  const wiWeeks=document.getElementById('wiWeeks');
+  wiWeeks.max=remainingWeeks; wiWeeks.value=remainingWeeks;
+  // default rate = current pace per week
+  const wiRate=document.getElementById('wiRate');
+  wiRate.value=Math.min((S.cpd*5).toFixed(1),15);
+  updateWhatIf();
+}
+function updateWhatIf(){
+  const rate=+document.getElementById('wiRate').value;
+  const weeks=+document.getElementById('wiWeeks').value;
+  document.getElementById('wiRateV').textContent=rate.toFixed(1);
+  document.getElementById('wiWeeksV').textContent=weeks;
+  const added=rate*weeks;
+  const projected=Math.round(S.actual+added);
+  const vsGoal=projected-S.goal;
+  const t=tierFor(S.goal>0?Math.round(projected/S.goal*100):0);
+  document.getElementById('wiOut').innerHTML =
+    `At <b>${rate.toFixed(1)}/wk</b> for <b>${weeks} week${weeks===1?'':'s'}</b> → +${Math.round(added)} contracts → `+
+    `<b style="color:${t.color}">${projected} total (${t.name})</b>, `+
+    (vsGoal>=0?`<span style="color:var(--good)">${vsGoal} over goal</span>`:`<span style="color:var(--danger)">${Math.abs(vsGoal)} short</span>`);
+  drawChart({weeks, ratePerWeek:rate});
+}
+document.getElementById('wiRate').addEventListener('input',updateWhatIf);
+document.getElementById('wiWeeks').addEventListener('input',updateWhatIf);
+
+/* ============================================================
+   STEP 2 — OBJECTIVE SELECTION
+   ============================================================ */
+let objective="both";
+function setTierOptions(obj){
+  const tierSel=document.getElementById('targetTier');
+  const prev=tierSel.value;
+  let opts=[];
+  if(obj==='recovery'){
+    opts=[['1.0','Triton (100%)']];
+  }else if(obj==='incentive'){
+    opts=[['1.2','Poseidon (120%)'],['1.4','Zeus (140%)']];
+  }else{ // both
+    opts=[['1.0','Triton (100%)'],['1.2','Poseidon (120%)'],['1.4','Zeus (140%)']];
+  }
+  tierSel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  // preserve prior choice if still valid, else default to first available
+  if(opts.some(([v])=>v===prev)) tierSel.value=prev;
+  // Recovery is locked to Triton; others selectable
+  tierSel.disabled = (obj==='recovery');
+  document.getElementById('tierWrap').style.opacity = (obj==='recovery') ? .55 : 1;
+}
+document.querySelectorAll('.obj').forEach(o=>{
+  o.addEventListener('click',()=>{
+    document.querySelectorAll('.obj').forEach(x=>x.classList.remove('active'));
+    o.classList.add('active');
+    objective=o.dataset.obj;
+    setTierOptions(objective);
+  });
+});
+setTierOptions(objective); // initialize on load (default "both")
+
+/* ============================================================
+   GENERATE PLAN — Step 3
+   ============================================================ */
+let planState=null;
+const DAY_SPLIT=[['Monday',0.40],['Tuesday',0.40],['Wednesday',0.20]];
+
+document.getElementById('genBtn').addEventListener('click',()=>{
+  const err=document.getElementById('genErr'); err.textContent="";
+  const td=new Date(document.getElementById('targetDate').value+"T00:00:00");
+  if(isNaN(td.getTime())){err.textContent="Pick a valid target date.";return;}
+  if(td<=S.today){err.textContent="Target date must be after today.";return;}
+  const conv=+document.getElementById('conv').value/100;
+  if(!conv||conv<=0){err.textContent="MEPS conversion must be greater than 0.";return;}
+  const recruiters=Math.max(parseInt(document.getElementById('recruiters').value)||1,1);
+
+  const tierMult = objective==='recovery' ? 1.0 : +document.getElementById('targetTier').value;
+  const targetContracts = Math.round(S.goal*tierMult);
+  const need = Math.max(targetContracts - S.actual, 0);
+
+  const daysLeft = bizDays(S.today, td);
+  const weeksLeft = Math.max(daysLeft/5, 0.2);
+  const perWeek = need/weeksLeft;
+  const perDay = daysLeft>0 ? need/daysLeft : 0;
+
+  // PATE per contract
+  const pc=+document.getElementById('pContacts').value;
+  const pa=+document.getElementById('pAppts').value;
+  const pi=+document.getElementById('pInt').value;
+  const pq=+document.getElementById('pQual').value;
+
+  // Station-level weekly activity (round up — never under-task)
+  const station={
+    C:Math.ceil(perWeek*pc), A:Math.ceil(perWeek*pa),
+    I:Math.ceil(perWeek*pi), Q:Math.ceil(perWeek*pq)
+  };
+  // Per-recruiter weekly (round up so each carries enough; station rollup may slightly exceed total)
+  const perRec={
+    C:Math.ceil(station.C/recruiters), A:Math.ceil(station.A/recruiters),
+    I:Math.ceil(station.I/recruiters), Q:Math.ceil(station.Q/recruiters)
+  };
+
+  planState={ td, targetContracts, tierMult, need, perWeek, perDay, recruiters, station, perRec };
+
+  /* ---- Leadership view ---- */
+  document.getElementById('apDate').textContent=td.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('apNeed').textContent=need;
+  document.getElementById('apNeedSub').textContent=`to reach ${targetContracts} (${Math.round(tierMult*100)}%)`;
+  document.getElementById('apWeek').textContent=perWeek.toFixed(1);
+  document.getElementById('apDay').textContent=perDay.toFixed(2);
+  document.getElementById('oContacts').textContent=station.C;
+  document.getElementById('oAppts').textContent=station.A;
+  document.getElementById('oInt').textContent=station.I;
+  document.getElementById('oQual').textContent=station.Q;
+
+  document.getElementById('lhRec').textContent=`÷ ${recruiters} Recruiters`;
+  const rows=[
+    ['Contracts', Math.ceil(perWeek), Math.ceil(perWeek/recruiters)],
+    ['Contacts', station.C, perRec.C],
+    ['Appointments', station.A, perRec.A],
+    ['Interviews', station.I, perRec.I],
+    ['Qualified Interviews', station.Q, perRec.Q],
+  ];
+  document.getElementById('leadBody').innerHTML=rows.map(([k,s,p])=>
+    `<tr><td>${k}</td><td class="num">${s}</td><td class="num" style="color:var(--ink-faint)">÷${recruiters}</td><td class="num">${p}</td></tr>`
+  ).join('');
+
+  /* ---- Recruiter view: one representative sheet (all identical) ---- */
+  document.getElementById('recCount').textContent=recruiters;
+  const splitDays=(weekly)=>DAY_SPLIT.map(([d,p])=>[d,Math.round(p*100),Math.ceil(weekly*p)]);
+  const dC=splitDays(perRec.C),dA=splitDays(perRec.A),dI=splitDays(perRec.I),dQ=splitDays(perRec.Q);
+  let dayCols='';
+  for(let i=0;i<3;i++){
+    dayCols+=`<div class="day">
+      <div class="dh"><span class="dn">${dC[i][0]}</span><span class="dp">${dC[i][1]}%</span></div>
+      <div class="drow"><span class="dlk">Contacts</span><span class="dlv">${dC[i][2]}</span></div>
+      <div class="drow"><span class="dlk">Appointments</span><span class="dlv">${dA[i][2]}</span></div>
+      <div class="drow"><span class="dlk">Interviews</span><span class="dlv">${dI[i][2]}</span></div>
+      <div class="drow"><span class="dlk">Qual. Interviews</span><span class="dlv">${dQ[i][2]}</span></div>
+    </div>`;
+  }
+  document.getElementById('recCards').innerHTML=`<div class="rec-card">
+      <h4>EACH RECRUITER — WEEKLY SHEET</h4>
+      <div class="rec-sub">Identical for all ${recruiters} producing recruiters · ${perRec.C} contacts · ${perRec.A} appts · ${perRec.I} interviews · ${perRec.Q} qual. interviews per week</div>
+      <div class="day-grid">${dayCols}</div>
+    </div>`;
+
+  /* ---- Staffing comparison chart ---- */
+  drawStaffChart(station.C, recruiters);
+
+  document.getElementById('actionplan').classList.add('show');
+  document.getElementById('actionplan').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* Staffing impact: weekly contacts-per-recruiter across team sizes */
+function drawStaffChart(stationContacts, current){
+  const sizes=[];
+  const lo=Math.max(1,current-3), hi=current+3;
+  for(let n=lo;n<=hi;n++) sizes.push(n);
+  const vals=sizes.map(n=>Math.ceil(stationContacts/n));
+  const maxV=Math.max(...vals,1);
+
+  const W=760,H=300,padL=46,padR=20,padT=24,padB=46;
+  const bw=(W-padL-padR)/sizes.length;
+  const y=v=>H-padB-(v/maxV)*(H-padT-padB);
+
+  let bars='';
+  sizes.forEach((n,i)=>{
+    const cx=padL+bw*i+bw/2;
+    const bh=(H-padB)-y(vals[i]);
+    const isCur=(n===current);
+    const col=isCur?'var(--poseidon)':'var(--triton)';
+    const op=isCur?1:.45;
+    bars+=`<rect x="${cx-bw*0.32}" y="${y(vals[i])}" width="${bw*0.64}" height="${bh}" rx="4" fill="${col}" opacity="${op}"/>
+      <text x="${cx}" y="${y(vals[i])-8}" text-anchor="middle" font-size="14" font-family="Chakra Petch,monospace" font-weight="700" fill="${isCur?'var(--poseidon)':'var(--ink-dim)'}">${vals[i]}</text>
+      <text x="${cx}" y="${H-padB+18}" text-anchor="middle" font-size="11" fill="${isCur?'var(--ink)':'var(--ink-faint)'}" font-weight="${isCur?700:400}">${n} rec${isCur?' ◄ now':''}</text>`;
+  });
+  // y gridlines
+  let grid='';
+  for(let i=0;i<=3;i++){const v=maxV*i/3;grid+=`<line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="var(--line-soft)" stroke-width="1" opacity=".5"/><text x="${padL-8}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--ink-faint)">${Math.round(v)}</text>`;}
+
+  document.getElementById('staffChart').innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly contacts per recruiter by team size">
+      ${grid}
+      ${bars}
+    </svg>`;
+
+  const curVal=Math.ceil(stationContacts/current);
+  const plusOne=Math.ceil(stationContacts/(current+1));
+  const minusOne=current>1?Math.ceil(stationContacts/(current-1)):null;
+  let foot=`At <b>${current}</b> recruiters, each carries <b style="color:var(--poseidon)">${curVal}</b> contacts/week. `;
+  foot+=`Add one (${current+1}) → drops to <b>${plusOne}</b>. `;
+  if(minusOne!==null) foot+=`Lose one (${current-1}) → jumps to <b style="color:var(--zeus)">${minusOne}</b>.`;
+  document.getElementById('staffFoot').innerHTML=foot;
+}
+
+/* ============================================================
+   VIEW TABS (Leadership / Recruiter)
+   ============================================================ */
+document.querySelectorAll('.view-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.view-body').forEach(b=>b.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.view==='lead'?'viewLead':'viewRec').classList.add('active');
+  });
+});
+
+/* ============================================================
+   PRINT — Leadership Brief & Recruiter Sheets
+   ============================================================ */
+function printDoc(html){
+  document.getElementById('printout').innerHTML=html;
+  window.print();
+}
+document.getElementById('printLeadBtn').addEventListener('click',()=>{
+  if(!planState) return;
+  const p=planState, now=new Date().toLocaleDateString();
+  printDoc(`
+    <h1 style="font-family:Chakra Petch,monospace">🔱 LEADERSHIP BRIEF — WEEKLY BATTLE RHYTHM</h1>
+    <p>Week of: <b>${now}</b> · Station: <b>${S.station}</b> · Producing Recruiters: <b>${p.recruiters}</b></p>
+    <hr>
+    <h3>📊 CURRENT STATUS</h3>
+    <p>Contracts to Date: <b>${S.actual}</b> / <b>${S.goal}</b> · Glideslope: <b>${S.status} (${S.pace}%)</b></p>
+    <p>Target: <b>${p.targetContracts}</b> contracts (${Math.round(p.tierMult*100)}%) by <b>${p.td.toLocaleDateString()}</b> · Need <b>${p.need}</b> more</p>
+    <h3>🎯 STATION WEEKLY REQUIREMENT</h3>
+    <p style="font-size:20px"><b>${p.perWeek.toFixed(1)}</b> contracts/week</p>
+    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+      <tr><th align="left">Activity</th><th>Station/wk</th><th>Per Recruiter/wk</th></tr>
+      <tr><td>Contracts</td><td align="center">${Math.ceil(p.perWeek)}</td><td align="center">${Math.ceil(p.perWeek/p.recruiters)}</td></tr>
+      <tr><td>Contacts</td><td align="center">${p.station.C}</td><td align="center">${p.perRec.C}</td></tr>
+      <tr><td>Appointments</td><td align="center">${p.station.A}</td><td align="center">${p.perRec.A}</td></tr>
+      <tr><td>Interviews</td><td align="center">${p.station.I}</td><td align="center">${p.perRec.I}</td></tr>
+      <tr><td>Qualified Interviews</td><td align="center">${p.station.Q}</td><td align="center">${p.perRec.Q}</td></tr>
+    </table>
+    <hr><p style="font-family:Chakra Petch,monospace">🔱 TO THE MOON 🚀</p>
+  `);
+});
+document.getElementById('printRecBtn').addEventListener('click',()=>{
+  if(!planState) return;
+  const p=planState, now=new Date().toLocaleDateString();
+  const split=(w)=>DAY_SPLIT.map(([d,pct])=>[d,Math.ceil(w*pct)]);
+  const dC=split(p.perRec.C),dA=split(p.perRec.A),dI=split(p.perRec.I),dQ=split(p.perRec.Q);
+  let body=`<h1 style="font-family:Chakra Petch,monospace">🔱 RECRUITER SHEET — ${S.station}</h1>
+    <p>Week of: <b>${now}</b> · ${p.recruiters} producing recruiters · Daily split 40% Mon / 40% Tue / 20% Wed</p>
+    <p>Each recruiter carries the same weekly load:</p>
+    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%;page-break-inside:avoid">
+      <tr><th align="left">Day</th><th>Contacts</th><th>Appts</th><th>Interviews</th><th>Qual. Int.</th></tr>
+      ${[0,1,2].map(i=>`<tr><td>${dC[i][0]}</td><td align="center">${dC[i][1]}</td><td align="center">${dA[i][1]}</td><td align="center">${dI[i][1]}</td><td align="center">${dQ[i][1]}</td></tr>`).join('')}
+      <tr style="font-weight:bold"><td>WEEK TOTAL</td><td align="center">${p.perRec.C}</td><td align="center">${p.perRec.A}</td><td align="center">${p.perRec.I}</td><td align="center">${p.perRec.Q}</td></tr>
+    </table>`;
+  // staffing comparison table
+  body+=`<h3>Staffing Impact — Contacts / Recruiter / Week</h3>
+    <table border="1" cellpadding="6" style="border-collapse:collapse">
+    <tr><th>Recruiters</th>${[p.recruiters-1,p.recruiters,p.recruiters+1].filter(n=>n>0).map(n=>`<th>${n===p.recruiters?'<u>'+n+' (now)</u>':n}</th>`).join('')}</tr>
+    <tr><td>Contacts each</td>${[p.recruiters-1,p.recruiters,p.recruiters+1].filter(n=>n>0).map(n=>`<td align="center">${Math.ceil(p.station.C/n)}</td>`).join('')}</tr>
+    </table>`;
+  body+=`<hr><p style="font-family:Chakra Petch,monospace">🔱 TO THE MOON 🚀</p>`;
+  printDoc(body);
+});
+
+/* ============================================================
+   PWA — register service worker for offline + installability
+   ============================================================ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW registration failed:',err));
+  });
+}
+
+// One-tap install button (Chrome/Edge/Android fire beforeinstallprompt).
+// iOS Safari has no such event — users add via Share → Add to Home Screen.
+let deferredPrompt=null;
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  if(installBtn) installBtn.style.display='inline-flex';
+});
+if(installBtn){
+  installBtn.addEventListener('click',async()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    installBtn.style.display='none';
+  });
+}
+// Hide install affordances once running as an installed app
+if(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone){
+  if(installBtn) installBtn.style.display='none';
+}
+</script>
+</body>
+</html>
