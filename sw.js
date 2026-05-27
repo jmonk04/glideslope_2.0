@@ -1,7 +1,7 @@
 /* Triton Glideslope — service worker
    Bump CACHE_VERSION whenever you deploy changes so clients
    pick up the new files instead of serving stale ones. */
-const CACHE_VERSION = 'glideslope-v18';
+const CACHE_VERSION = 'glideslope-v19';
 const ASSETS = [
   './',
   './index.html',
@@ -35,13 +35,31 @@ self.addEventListener('activate', (e) => {
 // Google Fonts (cross-origin) are cached on first successful fetch.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+
+  // NETWORK-FIRST for the data feed: always try the live file so the data
+  // manager's commits reach every recruiter. Fall back to cache only if offline.
+  if (url.origin === location.origin && /\/data\.json(\?.*)?$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(e.request, {cache:'no-store'})
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_VERSION).then((c) => c.put(e.request, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))   // offline → last good copy
+    );
+    return;
+  }
+
+  // CACHE-FIRST for the app shell & assets (instant load, offline-capable)
   e.respondWith(
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
       return fetch(e.request)
         .then((res) => {
-          // cache same-origin and font responses for offline reuse
-          const url = new URL(e.request.url);
           const cacheable =
             url.origin === location.origin ||
             url.hostname.includes('fonts.googleapis.com') ||
@@ -52,7 +70,7 @@ self.addEventListener('fetch', (e) => {
           }
           return res;
         })
-        .catch(() => cached); // offline & uncached → undefined, browser handles
+        .catch(() => cached);
     })
   );
 });
