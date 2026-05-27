@@ -404,6 +404,21 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 }
 .back-home:hover{color:var(--triton)}
 
+/* ---------- Ops Grid heat map ---------- */
+.heat-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;font-size:11px;color:var(--ink-dim);font-family:'Chakra Petch',monospace}
+.hl-item{display:flex;align-items:center;gap:6px}
+.hl-item i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.heat-wrap{display:flex;flex-direction:column;gap:16px}
+.heat-div-label{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:7px}
+.heat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px}
+.heat-tile{border:none;border-radius:9px;padding:11px 6px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;min-height:58px;transition:transform .12s,box-shadow .12s;
+  font-family:'Chakra Petch',monospace;position:relative;overflow:hidden}
+.heat-tile::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.18),transparent 70%);pointer-events:none}
+.heat-tile:hover{transform:scale(1.06);box-shadow:0 6px 20px -6px rgba(0,0,0,.7);z-index:2}
+.ht-n{font-size:9.5px;font-weight:600;letter-spacing:.02em;text-align:center;line-height:1.1;opacity:.85}
+.ht-v{font-size:19px;font-weight:700;line-height:1}
+
 /* ---------- Command Velocity ---------- */
 .vel-toggle{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:14px}
 .vel-tab{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;
@@ -821,6 +836,19 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   <section class="section">
     <div class="section-tag"><span class="num">★</span><h2>Command Scoreboard</h2><span class="rule"></span></div>
     <div class="tier-counts" id="tierCounts"></div>
+  </section>
+
+  <!-- heat-map ops grid -->
+  <section class="section">
+    <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
+    <div class="heat-legend">
+      <span class="hl-item"><i style="background:var(--danger)"></i>&lt;80%</span>
+      <span class="hl-item"><i style="background:#ff9d2e"></i>80–100%</span>
+      <span class="hl-item"><i style="background:var(--triton)"></i>100–120%</span>
+      <span class="hl-item"><i style="background:var(--poseidon)"></i>120–140%</span>
+      <span class="hl-item"><i style="background:var(--zeus)"></i>140%+</span>
+    </div>
+    <div id="heatGrid" class="heat-wrap"></div>
   </section>
 
   <!-- Weekly Warriors -->
@@ -1661,6 +1689,8 @@ function renderAnalyze(){
 
   // command velocity banner
   renderVelocity();
+  // ops grid heat map
+  renderHeatMap();
 
   // tier counts
   const counts={ZEUS:0,POSEIDON:0,TRITON:0,BELOW:0};
@@ -1784,6 +1814,41 @@ document.querySelectorAll('.vel-tab').forEach(t=>{
     renderVelocity();
   });
 });
+
+/* ============================================================
+   OPS GRID — glideslope heat map, grouped by division
+   ============================================================ */
+function heatColor(gs){
+  // continuous-ish bands matching the legend
+  if(gs>=1.40) return 'var(--zeus)';
+  if(gs>=1.20) return 'var(--poseidon)';
+  if(gs>=1.00) return 'var(--triton)';
+  if(gs>=0.80) return '#ff9d2e';
+  return 'var(--danger)';
+}
+function heatText(gs){ return (gs>=1.0)?'#04140f':'#1a0508'; }  // dark text on bright tiles
+function renderHeatMap(){
+  const wrap=document.getElementById('heatGrid');
+  if(!azCurrent.length){ wrap.innerHTML=''; return; }
+  const divs=[...new Set(azCurrent.map(s=>s.division))].sort();
+  wrap.innerHTML=divs.map(div=>{
+    const tiles=azCurrent.filter(s=>s.division===div)
+      .sort((a,b)=>b.glideslope_pct-a.glideslope_pct)
+      .map(s=>{
+        const c=heatColor(s.glideslope_pct);
+        // abbreviate long station names to fit tiles
+        const short=s.name.length>11?s.name.slice(0,10)+'…':s.name;
+        return `<button class="heat-tile" data-station="${s.name}" style="background:${c};color:${heatText(s.glideslope_pct)}" title="${s.name}: ${(s.glideslope_pct*100).toFixed(1)}%">
+          <span class="ht-n">${short}</span>
+          <span class="ht-v">${(s.glideslope_pct*100).toFixed(0)}</span>
+        </button>`;
+      }).join('');
+    return `<div class="heat-div"><div class="heat-div-label">${div}</div><div class="heat-row">${tiles}</div></div>`;
+  }).join('');
+  wrap.querySelectorAll('.heat-tile').forEach(t=>{
+    t.addEventListener('click',()=>showStationModal(t.dataset.station));
+  });
+}
 
 function renderStandings(){
   buildPrevRankMap();
