@@ -404,7 +404,31 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 }
 .back-home:hover{color:var(--triton)}
 
+/* ---------- Command Velocity ---------- */
+.vel-toggle{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:14px}
+.vel-tab{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;
+  font-size:13px;letter-spacing:.04em;padding:8px 18px;border-radius:7px;cursor:pointer;transition:.13s}
+.vel-tab.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
+.vel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:600px){.vel-grid{grid-template-columns:repeat(2,1fr)}}
+.vel-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:15px 14px;text-align:center}
+.vel-card.ahead{border-color:rgba(44,230,192,.5)} .vel-card.behind{border-color:rgba(255,84,112,.4)}
+.vel-ms{font-family:'Chakra Petch',monospace;font-weight:700;font-size:13px;letter-spacing:.1em;color:var(--ink-dim)}
+.vel-rate{font-family:'Chakra Petch',monospace;font-weight:700;font-size:30px;line-height:1.1;margin-top:4px}
+.vel-unit{font-size:13px;color:var(--ink-faint);font-weight:400}
+.vel-vs{font-size:11px;color:var(--ink-faint);margin-top:1px}
+.vel-flag{font-family:'Chakra Petch',monospace;font-weight:700;font-size:13px;margin-top:7px}
+.vel-card.ahead .vel-flag{color:var(--good)} .vel-card.behind .vel-flag{color:var(--danger)}
+.vel-bar{height:5px;background:var(--bg-0);border-radius:3px;margin-top:10px;overflow:hidden}
+.vel-fill{height:100%;border-radius:3px;transition:width .4s}
+.vel-note{font-size:11px;color:var(--ink-faint);margin-top:12px;font-style:italic}
+
 /* ---------- Analyze Performance ---------- */
+.data-stamp{display:flex;align-items:center;gap:9px;background:var(--panel-2);border:1px solid var(--line-soft);
+  border-radius:10px;padding:10px 15px;margin-bottom:20px;font-size:13px;color:var(--ink-dim)}
+.data-stamp b{color:var(--ink);font-family:'Chakra Petch',monospace;letter-spacing:.02em}
+.ds-dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 10px var(--good);flex:none;
+  animation:pulse 2.4s ease-in-out infinite}
 .tier-counts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 @media(max-width:600px){.tier-counts{grid-template-columns:repeat(2,1fr)}}
 .tc{border-radius:14px;padding:18px 14px;text-align:center;border:1px solid var(--line);background:var(--panel-2)}
@@ -426,10 +450,13 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .az-select{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:14px}
 .az-hint{color:var(--ink-faint);font-size:12px}
 .standings{display:flex;flex-direction:column;gap:7px}
-.strow{display:grid;grid-template-columns:34px 1fr auto auto;gap:12px;align-items:center;cursor:pointer;
+.strow{display:grid;grid-template-columns:64px 1fr auto auto;gap:12px;align-items:center;cursor:pointer;
   background:var(--panel-2);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;transition:.13s}
 .strow:hover{border-color:var(--triton);transform:translateX(2px)}
-.strow .rank{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);font-size:15px}
+.strow .rank{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);font-size:15px;white-space:nowrap}
+.arr{font-size:10px;font-weight:700;margin-left:1px}
+.arr.up{color:var(--good)} .arr.dn{color:var(--danger)} .arr.fl{color:var(--ink-faint);opacity:.5}
+.flame{font-size:13px;margin-left:2px}
 .strow .sn{font-family:'Chakra Petch',monospace;font-weight:600;font-size:14px}
 .strow .sn small{display:block;font-family:'Sora',sans-serif;font-weight:400;font-size:11px;color:var(--ink-faint);letter-spacing:0}
 .strow .gs{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;text-align:right;min-width:62px}
@@ -770,11 +797,25 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 <div class="wrap" id="appAnalyze" style="display:none">
   <button id="backHomeA" class="back-home">‹ Home</button>
 
-  <header style="margin-bottom:18px">
+  <header style="margin-bottom:14px">
     <div class="cmd">NTAG Southwest</div>
     <h1 style="font-size:clamp(20px,4vw,28px)">ANALYZE PERFORMANCE</h1>
-    <div class="tagline" id="azMeta">—</div>
   </header>
+  <div class="data-stamp" id="dataStamp">
+    <span class="ds-dot"></span>
+    <span id="dataStampText">Loading data…</span>
+  </div>
+
+  <!-- command velocity: moving-average pace per mission set -->
+  <section class="section">
+    <div class="section-tag"><span class="num">⚡</span><h2>Command Velocity · Pace vs Required</h2><span class="rule"></span></div>
+    <div class="vel-toggle">
+      <button class="vel-tab active" data-win="2">10-Day</button>
+      <button class="vel-tab" data-win="6">30-Day</button>
+    </div>
+    <div class="vel-grid" id="velGrid"></div>
+    <div class="vel-note" id="velNote"></div>
+  </section>
 
   <!-- command scoreboard: tier counts -->
   <section class="section">
@@ -1604,7 +1645,7 @@ let azDivList=[];
 
 function renderAnalyze(){
   if(!DataLayer.hasData()){
-    document.getElementById('azMeta').textContent='No data loaded yet — check back once the data feed is published.';
+    document.getElementById('dataStampText').textContent='No data published yet — check back once the feed is live.';
     document.getElementById('tierCounts').innerHTML='';
     document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
     document.getElementById('standings').innerHTML='';
@@ -1613,7 +1654,13 @@ function renderAnalyze(){
   const snap=DataLayer.latest();
   azCurrent=[...snap.stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
   const m=DataLayer.meta();
-  document.getElementById('azMeta').textContent=`${snap.label||snap.date} · ${azCurrent.length} stations · ${m.count} weeks of history`;
+  // "current as of" freshness stamp — formatted from the latest snapshot date
+  const d=new Date((snap.date||m.latest)+'T00:00:00');
+  const pretty=isNaN(d)?(snap.label||m.latest):d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b> · ${azCurrent.length} stations · ${m.count} weeks of history`;
+
+  // command velocity banner
+  renderVelocity();
 
   // tier counts
   const counts={ZEUS:0,POSEIDON:0,TRITON:0,BELOW:0};
@@ -1646,18 +1693,112 @@ function renderAnalyze(){
   renderStandings();
 }
 
+/* previous-week rank map (computed once per render) */
+let azPrevRankMap={};
+function buildPrevRankMap(){
+  azPrevRankMap={};
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<2) return;
+  const prev=[...snaps[snaps.length-2].stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
+  prev.forEach((s,i)=>{ azPrevRankMap[s.name]=i+1; });
+}
+function rankArrow(name, curRank){
+  const prev=azPrevRankMap[name];
+  if(!prev) return '';
+  const ch=prev-curRank;  // positive = moved up
+  if(ch>0) return `<span class="arr up">▲${ch}</span>`;
+  if(ch<0) return `<span class="arr dn">▼${Math.abs(ch)}</span>`;
+  return `<span class="arr fl">▬</span>`;
+}
+/* consecutive weeks of rising glideslope, counting back from latest */
+function streakLen(name){
+  const series=DataLayer.seriesFor(name).filter(p=>p.value!=null);
+  if(series.length<2) return 0;
+  let streak=0;
+  for(let i=series.length-1;i>0;i--){
+    if(series[i].value>series[i-1].value) streak++;
+    else break;
+  }
+  return streak;
+}
+function flame(name){
+  const s=streakLen(name);
+  if(s>=5) return `<span class="flame" title="${s} weeks rising">🔥🔥</span>`;
+  if(s>=3) return `<span class="flame" title="${s} weeks rising">🔥</span>`;
+  return '';
+}
+
+/* ============================================================
+   COMMAND VELOCITY — moving-average pace per mission set
+   Each weekly snapshot = 5 production days. So N snapshots back
+   = 5N production days. Pace = (Δ cumulative attainment)/(5N).
+   Compared to required/day = annual goal / 233 production days.
+   ============================================================ */
+const PROD_DAYS_YEAR = 233;
+const MISSION_SETS = [
+  {key:'alnav', label:'ALNAV', goal:3166, field:s=>s.attn},
+  {key:'ac',    label:'AC',    goal:3067, field:s=>s.ac?.attn||0},
+  {key:'nso',   label:'NSO',   goal:169,  field:s=>s.nso?.attn||0},
+  {key:'nf',    label:'NF',    goal:203,  field:s=>s.nuke?.attn||0},
+];
+let velWindow = 2;  // snapshots back (2 = 10 prod days, 6 = 30)
+
+function commandAttn(snap, fieldFn){
+  // sum cumulative attainment across all stations for a mission set
+  return snap.stations.reduce((sum,s)=>sum+(fieldFn(s)||0), 0);
+}
+function renderVelocity(){
+  const snaps=DataLayer.allSnapshots();
+  const grid=document.getElementById('velGrid');
+  const note=document.getElementById('velNote');
+  if(snaps.length < velWindow+1){
+    grid.innerHTML=`<div class="az-hint">Need ${velWindow+1} weeks of data for this window — have ${snaps.length}.</div>`;
+    note.textContent=''; return;
+  }
+  const cur=snaps[snaps.length-1];
+  const past=snaps[snaps.length-1-velWindow];
+  const prodDays=5*velWindow;
+  grid.innerHTML = MISSION_SETS.map(ms=>{
+    const delta = commandAttn(cur,ms.field) - commandAttn(past,ms.field);
+    const perDay = delta/prodDays;
+    const required = ms.goal/PROD_DAYS_YEAR;
+    const ahead = perDay>=required;
+    const diff = perDay-required;
+    const pct = required>0 ? (perDay/required) : 0;
+    return `<div class="vel-card ${ahead?'ahead':'behind'}">
+      <div class="vel-ms">${ms.label}</div>
+      <div class="vel-rate">${perDay.toFixed(1)}<span class="vel-unit">/day</span></div>
+      <div class="vel-vs">vs ${required.toFixed(1)} req</div>
+      <div class="vel-flag">${ahead?'▲':'▼'} ${diff>=0?'+':''}${diff.toFixed(1)}/day</div>
+      <div class="vel-bar"><div class="vel-fill" style="width:${Math.min(pct*100,150)/1.5}%;background:${ahead?'var(--good)':'var(--danger)'}"></div></div>
+    </div>`;
+  }).join('');
+  const winDays=5*velWindow;
+  note.textContent = `${winDays}-production-day moving average (last ${velWindow} weekly snapshots). ${velWindow===2?'Short window — sensitive to a single week.':'Steadier signal over ~6 weeks.'}`;
+}
+document.querySelectorAll('.vel-tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.vel-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    velWindow=+t.dataset.win;
+    renderVelocity();
+  });
+});
+
 function renderStandings(){
+  buildPrevRankMap();
   const filter=document.getElementById('azDivFilter').value;
   const rows=azCurrent
     .map((s,i)=>({...s, rank:i+1}))   // rank across ALL stations
     .filter(s=>!filter||s.division===filter);
   document.getElementById('standings').innerHTML=rows.map(s=>{
     const t=tierOf(s.glideslope_pct);
+    const gsColor=t.cls==='pos'?'poseidon':t.cls==='tri'?'triton':t.cls==='zeus'?'zeus':'ink-faint';
     return `<div class="strow" data-station="${s.name}">
-      <span class="rank">#${s.rank}</span>
-      <span class="sn">${s.name}<small>${s.division} · ${s.size||''}</small></span>
+      <span class="rank">#${s.rank} ${rankArrow(s.name,s.rank)}</span>
+      <span class="sn">${s.name} ${flame(s.name)}<small>${s.division} · ${s.size||''}</small></span>
       <span class="badge ${t.badge}">${t.label}</span>
-      <span class="gs" style="color:var(--${t.cls==='pos'?'poseidon':t.cls==='tri'?'triton':t.cls==='zeus'?'zeus':'ink-faint'})">${(s.glideslope_pct*100).toFixed(1)}%</span>
+      <span class="gs" style="color:var(--${gsColor})">${(s.glideslope_pct*100).toFixed(1)}%</span>
     </div>`;
   }).join('');
   document.querySelectorAll('.strow').forEach(r=>{
