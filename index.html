@@ -396,13 +396,70 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .door-d{font-size:13px;color:var(--ink-faint);margin-top:6px}
 .door-soon{display:inline-block;margin-top:12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--zeus);border:1px solid var(--zeus);border-radius:20px;padding:3px 12px;opacity:.8}
-.door[data-door="analyze"]{opacity:.78}
+.door[data-door="analyze"] .door-ic{filter:none}
 .back-home{
   display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin:18px 0 -8px;
   background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;
   font-weight:600;letter-spacing:.08em;font-size:13px;text-transform:uppercase;padding:6px 0;
 }
 .back-home:hover{color:var(--triton)}
+
+/* ---------- Analyze Performance ---------- */
+.tier-counts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:600px){.tier-counts{grid-template-columns:repeat(2,1fr)}}
+.tc{border-radius:14px;padding:18px 14px;text-align:center;border:1px solid var(--line);background:var(--panel-2)}
+.tc .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:34px;line-height:1}
+.tc .k{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-top:6px;color:var(--ink-dim)}
+.tc.zeus{border-color:var(--zeus);box-shadow:inset 0 0 40px -32px var(--zeus)} .tc.zeus .v{color:var(--zeus)}
+.tc.pos{border-color:var(--poseidon);box-shadow:inset 0 0 40px -32px var(--poseidon)} .tc.pos .v{color:var(--poseidon)}
+.tc.tri{border-color:var(--triton);box-shadow:inset 0 0 40px -32px var(--triton)} .tc.tri .v{color:var(--triton)}
+.tc.below .v{color:var(--ink-faint)}
+
+.warriors{display:flex;flex-direction:column;gap:8px}
+.warrior{display:flex;align-items:center;gap:12px;background:linear-gradient(100deg,rgba(44,230,192,.08),var(--panel-2));border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px}
+.warrior .medal{font-size:22px}
+.warrior .wn{flex:1;font-family:'Chakra Petch',monospace;font-weight:600;font-size:15px}
+.warrior .wc{font-family:'Chakra Petch',monospace;font-weight:700;font-size:20px;color:var(--good)}
+.warrior .wnow{font-size:12px;color:var(--ink-faint);min-width:74px;text-align:right}
+
+.az-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.az-select{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:14px}
+.az-hint{color:var(--ink-faint);font-size:12px}
+.standings{display:flex;flex-direction:column;gap:7px}
+.strow{display:grid;grid-template-columns:34px 1fr auto auto;gap:12px;align-items:center;cursor:pointer;
+  background:var(--panel-2);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;transition:.13s}
+.strow:hover{border-color:var(--triton);transform:translateX(2px)}
+.strow .rank{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);font-size:15px}
+.strow .sn{font-family:'Chakra Petch',monospace;font-weight:600;font-size:14px}
+.strow .sn small{display:block;font-family:'Sora',sans-serif;font-weight:400;font-size:11px;color:var(--ink-faint);letter-spacing:0}
+.strow .gs{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;text-align:right;min-width:62px}
+.strow .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-family:'Chakra Petch',monospace;font-weight:600}
+.b-zeus{background:var(--zeus);color:#1a1305} .b-pos{background:var(--poseidon);color:#04221c}
+.b-tri{background:var(--triton);color:#04121f} .b-below{background:#33415c;color:var(--ink-dim)}
+
+/* modal */
+.az-modal{position:fixed;inset:0;z-index:200;background:rgba(3,6,14,.82);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:18px}
+.az-modal.show{display:flex;animation:splashIn .25s ease both}
+.az-modal-card{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);
+  border-radius:18px;padding:26px 22px;max-width:680px;width:100%;max-height:88vh;overflow:auto}
+.az-modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--ink-faint);font-size:20px;cursor:pointer}
+.az-modal-close:hover{color:var(--ink)}
+.azm-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:22px}
+.azm-badges{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.azm-badge{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:20px;font-family:'Chakra Petch',monospace;font-weight:600}
+.azm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:520px){.azm-stats{grid-template-columns:repeat(2,1fr)}}
+.azm-stat{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:11px;padding:13px;text-align:center}
+.azm-stat .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.azm-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:3px}
+.azm-stat .s{font-size:11px;color:var(--ink-faint);margin-top:2px}
+.azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
+.azm-prog{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.azm-prog .p{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:11px;text-align:center}
+.azm-prog .pk{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+.azm-prog .pv{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;margin-top:3px}
+.azm-trend{background:var(--bg-0);border:1px solid var(--line-soft);border-radius:12px;padding:18px;margin-bottom:6px}
 
 /* ---------- Print ---------- */
 @media print{
@@ -439,7 +496,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
         <div class="door-ic">📊</div>
         <div class="door-t">Analyze Performance</div>
         <div class="door-d">Station &amp; division metrics</div>
-        <div class="door-soon">Coming soon</div>
       </button>
       <button class="door" data-door="planning">
         <div class="door-ic">🎯</div>
@@ -710,7 +766,49 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
 </div>
 
+<!-- ============ ANALYZE PERFORMANCE ============ -->
+<div class="wrap" id="appAnalyze" style="display:none">
+  <button id="backHomeA" class="back-home">‹ Home</button>
+
+  <header style="margin-bottom:18px">
+    <div class="cmd">NTAG Southwest</div>
+    <h1 style="font-size:clamp(20px,4vw,28px)">ANALYZE PERFORMANCE</h1>
+    <div class="tagline" id="azMeta">—</div>
+  </header>
+
+  <!-- command scoreboard: tier counts -->
+  <section class="section">
+    <div class="section-tag"><span class="num">★</span><h2>Command Scoreboard</h2><span class="rule"></span></div>
+    <div class="tier-counts" id="tierCounts"></div>
+  </section>
+
+  <!-- Weekly Warriors -->
+  <section class="section">
+    <div class="section-tag"><span class="num">🏆</span><h2>Weekly Warriors · Top Movers</h2><span class="rule"></span></div>
+    <div id="warriors" class="warriors"></div>
+  </section>
+
+  <!-- standings -->
+  <section class="section">
+    <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
+    <div class="az-controls">
+      <select id="azDivFilter" class="az-select"><option value="">All Divisions</option></select>
+      <div class="az-hint">Tap any station for its trend &amp; detail</div>
+    </div>
+    <div id="standings" class="standings"></div>
+  </section>
+</div>
+
+<!-- station detail modal -->
+<div id="azModal" class="az-modal">
+  <div class="az-modal-card">
+    <button class="az-modal-close" id="azModalClose">✕</button>
+    <div id="azModalBody"></div>
+  </div>
+</div>
+
 <script>
+
 /* ============================================================
    DATA LAYER — the spine of the everything app
    ------------------------------------------------------------
@@ -1435,6 +1533,7 @@ let splashTimer=setTimeout(showHome, 7500);
 splashEl.addEventListener('click',()=>{ clearTimeout(splashTimer); showHome(); });
 
 // door selection
+const analyzeEl=document.getElementById('appAnalyze');
 document.querySelectorAll('.door').forEach(d=>{
   d.addEventListener('click',()=>{
     const which=d.dataset.door;
@@ -1443,18 +1542,213 @@ document.querySelectorAll('.door').forEach(d=>{
       toolEl.style.display='block';
       window.scrollTo(0,0);
     }else{
-      // Analyze Performance — coming soon (wired during the merge)
-      alert('Analyze Performance is coming soon — it activates once the station data is connected.');
+      // Analyze Performance — reads the shared data spine
+      homeEl.classList.remove('show'); homeEl.style.display='none';
+      analyzeEl.style.display='block';
+      window.scrollTo(0,0);
+      renderAnalyze();
     }
   });
 });
 
-// back to home from the tool
+// back to home from either screen
 document.getElementById('backHome').addEventListener('click',()=>{
   toolEl.style.display='none';
   homeEl.style.display='flex'; homeEl.classList.add('show');
   window.scrollTo(0,0);
 });
+document.getElementById('backHomeA').addEventListener('click',()=>{
+  analyzeEl.style.display='none';
+  homeEl.style.display='flex'; homeEl.classList.add('show');
+  window.scrollTo(0,0);
+});
+
+/* ============================================================
+   ANALYZE PERFORMANCE — reads the shared spine (DataLayer)
+   Ports the incentive tool's tier engine, Weekly Warriors,
+   rank-change and per-station trend, fed by committed data.
+   ============================================================ */
+const TIER = {
+  ZEUS:{key:'ZEUS',label:'Zeus',cls:'zeus',badge:'b-zeus',min:1.40,icon:'⚡'},
+  POSEIDON:{key:'POSEIDON',label:'Poseidon',cls:'pos',badge:'b-pos',min:1.20,icon:'🔱'},
+  TRITON:{key:'TRITON',label:'Triton',cls:'tri',badge:'b-tri',min:1.00,icon:'🛡️'},
+  BELOW:{key:'BELOW',label:'On the Cusp',cls:'below',badge:'b-below',min:0,icon:'⚠️'}
+};
+function tierOf(gs){
+  if(gs>=1.40) return TIER.ZEUS;
+  if(gs>=1.20) return TIER.POSEIDON;
+  if(gs>=1.00) return TIER.TRITON;
+  return TIER.BELOW;
+}
+/* multi-program level + reward (ported from incentive generator) */
+function tierLevelReward(s){
+  const a=s.glideslope_pct, ac=s.ac?.glideslope_pct||0, nso=s.nso?.glideslope_pct||0, nf=s.nuke?.glideslope_pct||0;
+  const t=tierOf(a);
+  let level=0, reward='';
+  if(t.key==='ZEUS'){
+    if(ac>=1.40&&nso>=1.40&&nf>=1.40){level=3;reward='Recurring 96-hour special liberty';}
+    else if(((ac>=1?1:0)+(nso>=1?1:0)+(nf>=1?1:0))>=2){level=2;reward='Recurring 72-hour special liberty';}
+    else {level=1;reward='96-hour special liberty (1x/quarter)';}
+  }else if(t.key==='POSEIDON'){
+    if(ac>=1.20&&nso>=1.20&&nf>=1.20){level=2;reward='Recurring 72-hour special liberty';}
+    else {level=1;reward='96-hour special liberty (1x/quarter)';}
+  }else if(t.key==='TRITON'){
+    if(ac>=1.0&&nso>=1.0&&nf>=1.0){level=2;reward='1x 72-hour special liberty';}
+    else {level=1;reward='Polo Mondays';}
+  }
+  return {tier:t, level, reward};
+}
+
+let azCurrent=[];     // current snapshot stations, ranked
+let azDivList=[];
+
+function renderAnalyze(){
+  if(!DataLayer.hasData()){
+    document.getElementById('azMeta').textContent='No data loaded yet — check back once the data feed is published.';
+    document.getElementById('tierCounts').innerHTML='';
+    document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
+    document.getElementById('standings').innerHTML='';
+    return;
+  }
+  const snap=DataLayer.latest();
+  azCurrent=[...snap.stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
+  const m=DataLayer.meta();
+  document.getElementById('azMeta').textContent=`${snap.label||snap.date} · ${azCurrent.length} stations · ${m.count} weeks of history`;
+
+  // tier counts
+  const counts={ZEUS:0,POSEIDON:0,TRITON:0,BELOW:0};
+  azCurrent.forEach(s=>counts[tierOf(s.glideslope_pct).key]++);
+  document.getElementById('tierCounts').innerHTML=`
+    <div class="tc zeus"><div class="v">${counts.ZEUS}</div><div class="k">⚡ Zeus</div></div>
+    <div class="tc pos"><div class="v">${counts.POSEIDON}</div><div class="k">🔱 Poseidon</div></div>
+    <div class="tc tri"><div class="v">${counts.TRITON}</div><div class="k">🛡️ Triton</div></div>
+    <div class="tc below"><div class="v">${counts.BELOW}</div><div class="k">On the Cusp</div></div>`;
+
+  // Weekly Warriors — top 5 week-over-week glideslope gains
+  const movers=azCurrent.map(s=>{
+    const d=DataLayer.deltaFor(s.name);
+    return d?{name:s.name, change:d.delta, now:s.glideslope_pct}:null;
+  }).filter(w=>w&&w.change>0).sort((a,b)=>b.change-a.change).slice(0,5);
+  const medals=['🥇','🥈','🥉','⭐','⭐'];
+  document.getElementById('warriors').innerHTML = movers.length
+    ? movers.map((w,i)=>`<div class="warrior"><span class="medal">${medals[i]}</span>
+        <span class="wn">${w.name}</span>
+        <span class="wc">+${(w.change*100).toFixed(1)}%</span>
+        <span class="wnow">now ${(w.now*100).toFixed(1)}%</span></div>`).join('')
+    : '<div class="az-hint">No week-over-week gains to show yet (need at least 2 weeks of data).</div>';
+
+  // division filter
+  azDivList=[...new Set(azCurrent.map(s=>s.division))].sort();
+  const sel=document.getElementById('azDivFilter');
+  if(sel.options.length<=1){
+    azDivList.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
+  }
+  renderStandings();
+}
+
+function renderStandings(){
+  const filter=document.getElementById('azDivFilter').value;
+  const rows=azCurrent
+    .map((s,i)=>({...s, rank:i+1}))   // rank across ALL stations
+    .filter(s=>!filter||s.division===filter);
+  document.getElementById('standings').innerHTML=rows.map(s=>{
+    const t=tierOf(s.glideslope_pct);
+    return `<div class="strow" data-station="${s.name}">
+      <span class="rank">#${s.rank}</span>
+      <span class="sn">${s.name}<small>${s.division} · ${s.size||''}</small></span>
+      <span class="badge ${t.badge}">${t.label}</span>
+      <span class="gs" style="color:var(--${t.cls==='pos'?'poseidon':t.cls==='tri'?'triton':t.cls==='zeus'?'zeus':'ink-faint'})">${(s.glideslope_pct*100).toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.strow').forEach(r=>{
+    r.addEventListener('click',()=>showStationModal(r.dataset.station));
+  });
+}
+document.getElementById('azDivFilter').addEventListener('change',renderStandings);
+
+function showStationModal(name){
+  const s=DataLayer.station(name); if(!s) return;
+  const {tier,level,reward}=tierLevelReward(s);
+  const rank=azCurrent.findIndex(x=>x.name===name)+1;
+
+  // rank change vs previous week
+  let rankTxt='—', rankColor='var(--ink-faint)';
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length>=2){
+    const prev=snaps[snaps.length-2];
+    const prevSorted=[...prev.stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
+    const prevRank=prevSorted.findIndex(x=>x.name===name)+1;
+    if(prevRank>0){
+      const ch=prevRank-rank;
+      rankTxt = ch>0?`↑ ${ch}`:ch<0?`↓ ${Math.abs(ch)}`:'→ 0';
+      rankColor = ch>0?'var(--good)':ch<0?'var(--danger)':'var(--ink-faint)';
+    }
+  }
+  const delta=DataLayer.deltaFor(name);
+
+  const tierColor = tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--ink-faint)';
+  let html=`<div class="azm-name">${s.name}</div>
+    <div class="azm-badges">
+      <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}${level?` · L${level}`:''}</span>
+      ${reward?`<span class="azm-badge" style="background:var(--poseidon);color:#04221c">🎯 ${reward}</span>`:''}
+    </div>
+    <div class="azm-stats">
+      <div class="azm-stat"><div class="l">ALNAV Glideslope</div><div class="v" style="color:${tierColor}">${(s.glideslope_pct*100).toFixed(1)}%</div><div class="s">${s.attn} of ${s.goal} goal</div></div>
+      <div class="azm-stat"><div class="l">Current Rank</div><div class="v">#${rank}</div><div class="s">of ${azCurrent.length}</div></div>
+      <div class="azm-stat"><div class="l">vs Last Week</div><div class="v" style="color:${rankColor};font-size:30px">${rankTxt}</div><div class="s">${delta?((delta.delta>0?'+':'')+(delta.delta*100).toFixed(1)+'% gs'):'rank move'}</div></div>
+    </div>
+    <div class="azm-section">Program Breakdown</div>
+    <div class="azm-prog">
+      <div class="p"><div class="pk">AC</div><div class="pv" style="color:${progColor(s.ac?.glideslope_pct)}">${pct(s.ac?.glideslope_pct)}</div></div>
+      <div class="p"><div class="pk">NSO</div><div class="pv" style="color:${progColor(s.nso?.glideslope_pct)}">${pct(s.nso?.glideslope_pct)}</div></div>
+      <div class="p"><div class="pk">NUKE</div><div class="pv" style="color:${progColor(s.nuke?.glideslope_pct)}">${pct(s.nuke?.glideslope_pct)}</div></div>
+    </div>`;
+
+  // trend chart from the series
+  const series=DataLayer.seriesFor(name).filter(p=>p.value!=null);
+  if(series.length>=2){
+    html+=`<div class="azm-section">📈 ${series.length}-Week Trend</div><div class="azm-trend">${trendSVG(series)}</div>`;
+  }else{
+    html+=`<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history for a trend.</div></div>`;
+  }
+
+  document.getElementById('azModalBody').innerHTML=html;
+  document.getElementById('azModal').classList.add('show');
+}
+function pct(v){ return v==null?'—':(v*100).toFixed(1)+'%'; }
+function progColor(v){ if(v==null)return 'var(--ink-faint)'; return v>=1.4?'var(--zeus)':v>=1.2?'var(--poseidon)':v>=1.0?'var(--triton)':'var(--danger)'; }
+
+/* responsive SVG trend line, auto-scaled, 100% reference line */
+function trendSVG(series){
+  const W=600,H=170,padL=42,padR=12,padT=14,padB=26;
+  const vals=series.map(p=>p.value);
+  let mn=Math.min(...vals), mx=Math.max(...vals);
+  const rng=(mx-mn)||0.1, pad=rng*0.2; mn=Math.max(0,mn-pad); mx=mx+pad;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const xStep=plotW/(series.length-1);
+  const yOf=v=>padT+(plotH-((v-mn)/(mx-mn))*plotH);
+  let path='', pts='';
+  series.forEach((p,i)=>{
+    const x=padL+i*xStep, y=yOf(p.value);
+    path+=(i===0?'M':' L')+x.toFixed(1)+','+y.toFixed(1);
+    const col=p.value>=1.0?'var(--good)':'var(--danger)';
+    pts+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${col}" stroke="var(--bg-0)" stroke-width="2"><title>${p.date}: ${(p.value*100).toFixed(1)}%</title></circle>`;
+  });
+  const lineCol=series[series.length-1].value>=1.0?'var(--good)':'var(--danger)';
+  let ref='';
+  if(mn<=1&&mx>=1){ const ry=yOf(1).toFixed(1); ref=`<line x1="${padL}" y1="${ry}" x2="${W-padR}" y2="${ry}" stroke="rgba(176,190,197,.45)" stroke-width="1.5" stroke-dasharray="5,5"/><text x="${W-padR}" y="${(+ry-4)}" fill="var(--ink-faint)" font-size="9" text-anchor="end">100%</text>`; }
+  const yLabels=[mx,(mn+mx)/2,mn].map((v,i)=>`<text x="6" y="${(yOf(v)+3).toFixed(1)}" fill="var(--ink-faint)" font-size="9">${(v*100).toFixed(0)}%</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="overflow:visible">
+    <line x1="${padL}" y1="${padT}" x2="${W-padR}" y2="${padT}" stroke="rgba(176,190,197,.15)"/>
+    <line x1="${padL}" y1="${padT+plotH}" x2="${W-padR}" y2="${padT+plotH}" stroke="rgba(176,190,197,.15)"/>
+    ${ref}${yLabels}
+    <path d="${path}" stroke="${lineCol}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts}
+  </svg>`;
+}
+
+document.getElementById('azModalClose').addEventListener('click',()=>document.getElementById('azModal').classList.remove('show'));
+document.getElementById('azModal').addEventListener('click',e=>{ if(e.target.id==='azModal') document.getElementById('azModal').classList.remove('show'); });
 </script>
 </body>
 </html>
