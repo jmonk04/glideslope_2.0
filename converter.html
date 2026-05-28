@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Converter · Mission Planning Module</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sora:wght@400;500;600&display=swap');
+:root{
+  --bg-0:#05070f; --bg-1:#0a1020; --bg-2:#0e1628;
+  --panel:#111a2e; --panel-2:#0c1424;
+  --line:#1e2c45; --line-soft:#172238;
+  --ink:#e8eef7; --ink-dim:#9fb0c8; --ink-faint:#6b7d99;
+  --triton:#3da9fc; --poseidon:#2ce6c0; --zeus:#ffb020;
+  --good:#2ce6c0; --danger:#ff5470;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:
+  radial-gradient(1100px 700px at 50% -10%, rgba(61,169,252,.10), transparent 60%),var(--bg-0);
+  color:var(--ink);min-height:100vh;padding:32px 20px;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto}
+header{text-align:center;margin-bottom:30px}
+.cmd{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.36em;color:var(--ink-dim);font-size:11px;text-transform:uppercase}
+h1{font-family:'Chakra Petch',monospace;font-weight:700;letter-spacing:.08em;font-size:clamp(22px,4vw,30px);margin:6px 0;
+  background:linear-gradient(100deg,var(--triton),var(--poseidon) 60%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--ink-faint);font-size:13px}
+.panel{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px}
+.step-tag{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--poseidon);margin-bottom:6px}
+.panel h2{font-family:'Chakra Petch',monospace;font-size:18px;font-weight:700;margin-bottom:6px}
+.panel p.desc{color:var(--ink-dim);font-size:13px;margin-bottom:16px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:36px 20px;text-align:center;cursor:pointer;transition:.15s;background:var(--bg-1)}
+.drop:hover,.drop.over{border-color:var(--triton);background:rgba(61,169,252,.06)}
+.drop.drop-eom:hover,.drop.drop-eom.over{border-color:var(--zeus);background:rgba(255,176,32,.06)}
+.drop .ic{font-size:40px}
+.drop .t{font-family:'Chakra Petch',monospace;font-weight:600;margin-top:8px}
+.drop .h{color:var(--ink-faint);font-size:12px;margin-top:4px}
+.filerow .eom-badge{font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.1em;padding:2px 8px;border-radius:20px;color:var(--zeus);border:1px solid var(--zeus);text-transform:uppercase}
+input[type=file]{display:none}
+.btn{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.04em;border:none;border-radius:12px;padding:14px 22px;font-size:15px;cursor:pointer;transition:.15s}
+.btn-primary{background:linear-gradient(100deg,var(--triton),var(--poseidon));color:#04121f;width:100%}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink-dim)}
+.btn-ghost:hover{border-color:var(--triton);color:var(--ink)}
+.filelist{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.filerow{display:flex;align-items:center;gap:12px;background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:10px 14px;font-size:13px}
+.filerow .seq{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--poseidon);min-width:28px}
+.filerow .nm{flex:1;color:var(--ink)}
+.filerow .dt{color:var(--ink-faint);font-family:'Chakra Petch',monospace}
+.filerow .st{font-size:11px;padding:2px 8px;border-radius:20px}
+.filerow .ok{color:var(--good);border:1px solid var(--good)}
+.filerow .err{color:var(--danger);border:1px solid var(--danger)}
+.log{font-family:'Chakra Petch',monospace;font-size:12px;background:var(--bg-0);border:1px solid var(--line-soft);border-radius:10px;padding:14px;margin-top:14px;max-height:240px;overflow:auto;white-space:pre-wrap;color:var(--ink-dim)}
+.log .ok{color:var(--good)}.log .err{color:var(--danger)}.log .warn{color:var(--zeus)}
+.hidden{display:none}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+.stat{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:12px;padding:14px;text-align:center}
+.stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;color:var(--poseidon)}
+.stat .k{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+code{background:var(--bg-0);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--poseidon)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="cmd">NTAG Southwest</div>
+    <h1>DATA CONVERTER</h1>
+    <div class="sub">Turn weekly Excel sheets into the app's data feed · runs entirely in your browser</div>
+  </header>
+
+  <div class="panel">
+    <div class="step-tag">Step 1 · Select Files</div>
+    <h2>Drop your Excel sheets</h2>
+    <p class="desc">Select one or many <code>.xlsx</code> files named like <code>2_15OCT25.xlsx</code>. The converter reads the <code>Annual Goals &amp; Attn</code> tab from each, pulls the date &amp; sequence from the filename, and builds one clean JSON snapshot per file. Nothing leaves your computer.</p>
+    <p class="desc"><b style="color:var(--ink)">Two drop zones:</b> use <b style="color:var(--triton)">Weekly</b> for normal daily/weekly sheets. Use <b style="color:var(--zeus)">Month-End (EOM)</b> for the snapshot taken on the last production day of a month — those become the official monthly records the Leaderboard reads from.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <label class="drop" id="drop">
+        <div class="ic">📂</div>
+        <div class="t">Weekly Sheets</div>
+        <div class="h">Click or drag .xlsx files here</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" multiple>
+      </label>
+      <label class="drop drop-eom" id="dropEom">
+        <div class="ic">🏛️</div>
+        <div class="t">Month-End (EOM)</div>
+        <div class="h">Last production day of the month</div>
+        <input type="file" id="fileInputEom" accept=".xlsx,.xls" multiple>
+      </label>
+    </div>
+
+    <div class="filelist" id="filelist"></div>
+  </div>
+
+  <div class="panel hidden" id="convertPanel">
+    <div class="step-tag">Step 2 · Convert</div>
+    <h2>Build the data feed</h2>
+    <p class="desc">Produces one <code>YYYY-MM-DD.json</code> per sheet plus an <code>index.json</code> manifest. Download them, then commit the whole set to the repo's <code>data/</code> folder.</p>
+    <button class="btn btn-primary" id="convertBtn">Convert &amp; Build Feed ▸</button>
+    <div class="log hidden" id="log"></div>
+  </div>
+
+  <div class="panel hidden" id="resultPanel">
+    <div class="step-tag">Step 3 · Download &amp; Deploy</div>
+    <h2>Your data feed is ready</h2>
+    <div class="summary" id="summary"></div>
+    <div style="margin-top:18px">
+      <button class="btn btn-primary" id="downloadOneBtn">⬇ Download data.json (single file)</button>
+      <p class="desc" style="margin-top:10px">This <b>one file</b> holds all weeks. Upload it to the repo root the same way you upload <code>index.html</code> — single file, no folders. <b>This is the recommended path.</b></p>
+    </div>
+    <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line-soft)">
+      <button class="btn btn-ghost" id="downloadAllBtn">⬇ Download folder version (ZIP)</button>
+      <p class="desc" style="margin-top:10px">Optional — only if you're using GitHub Desktop later. Produces a <code>data/</code> folder of separate weekly files.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const SHEET_NAME = 'Annual Goals & Attn';
+const RECRUITER_SHEET_NAME = 'Recruiter Annual stats';
+const MONTH_CODES = ['OCT','NOV','DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP'];
+const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+let selectedFiles = [];   // {file, seq, dateISO, dateLabel, valid, error}
+let snapshots = [];       // {dateISO, seq, label, stations:[...]}
+
+const $ = id => document.getElementById(id);
+
+/* ---- filename parsing: "2_15OCT25" -> seq 2, date 2025-10-15 ---- */
+function parseFilename(name){
+  const base = name.replace(/\.(xlsx|xls)$/i,'');
+  const m = base.match(/^(\d+)[_\-\s]*(\d{2})([A-Z]{3})(\d{2})$/i)
+        || base.match(/(\d{2})([A-Z]{3})(\d{2})/i);  // fallback: just the date
+  if(!m) return {valid:false, error:'no date in filename'};
+  let seq, dd, mon, yy;
+  if(m.length===5){ [,seq,dd,mon,yy]=m; } else { [,dd,mon,yy]=m; seq=null; }
+  const mi = MONTHS[mon.toUpperCase()];
+  if(mi===undefined) return {valid:false, error:'bad month "'+mon+'"'};
+  const year = 2000 + parseInt(yy,10);
+  const month = String(mi+1).padStart(2,'0');
+  const day = String(parseInt(dd,10)).padStart(2,'0');
+  return {
+    valid:true,
+    seq: seq!==null?parseInt(seq,10):null,
+    dateISO:`${year}-${month}-${day}`,
+    dateLabel:`${dd} ${mon.toUpperCase()} ${yy}`
+  };
+}
+
+function cleanPct(v){
+  if(v===null||v===undefined||v==='') return 0;
+  v = parseFloat(v); if(isNaN(v)) return 0;
+  if(v>10) v=v/100;   // 118.3 -> 1.183
+  return Math.round(v*10000)/10000;
+}
+function num(v){ const n=parseFloat(v); return isNaN(n)?0:Math.round(n); }
+function dec(v,p=2){ const n=parseFloat(v); return isNaN(n)?0:Math.round(n*10**p)/10**p; }
+
+/* ---- parse the recruiter annual stats tab (may be missing in old files) ---- */
+function parseRecruiterTab(wb){
+  const sheet = wb.Sheets[RECRUITER_SHEET_NAME];
+  if(!sheet) return [];   // not an error — historical files may not have it
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  const recruiters = [];
+  for(const row of rows){
+    const fullName = row['RECRUITERS'];
+    if(!fullName || String(fullName).trim()==='') continue;
+    const div = row['DIV'];
+    if(!div || !/^DIV \d/.test(String(div).trim())) continue;
+    // Display name = "Rate LastName" (drop the first name). Full string is "RATE LastName FirstName".
+    const parts = String(fullName).trim().split(/\s+/);
+    const rate = parts[0] || '';
+    const lastName = parts[1] || '';
+    const display = (rate + ' ' + lastName).trim();
+    // Pull monthly columns that exist on this sheet
+    const months = {};
+    for(const m of MONTH_CODES){
+      if(row[m] !== undefined && row[m] !== null && row[m] !== ''){
+        const v = parseFloat(row[m]);
+        if(!isNaN(v)) months[m] = Math.round(v);
+      }
+    }
+    recruiters.push({
+      name: display,
+      fullName: String(fullName).trim(),   // internal unique key
+      rsid: row['RSID'] ? String(row['RSID']).trim() : '',
+      division: String(div).trim(),
+      station: String(row['STATION']||'').trim(),
+      months,
+      sum: num(row['SUM']),
+      ppr: dec(row['PPR'], 3)
+    });
+  }
+  return recruiters;
+}
+
+/* ---- parse one workbook: stations + recruiters ---- */
+function parseWorkbook(wb){
+  const sheet = wb.Sheets[SHEET_NAME];
+  if(!sheet) throw new Error(`no "${SHEET_NAME}" tab`);
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  const stations = [];
+  for(const row of rows){
+    const name = row['STATIONS'];
+    if(!name || String(name).trim()==='') continue;
+    const div = row['DIVISION'];
+    if(!div || !/^DIV \d/.test(String(div).trim())) continue;  // skip summary rows
+    stations.push({
+      name: String(name).trim(),
+      division: String(div).trim(),
+      size: String(row['SIZE']||'').trim(),
+      status: String(row['STATUS']||'').trim(),
+      // ALNAV (overall) — used by both doors
+      goal: num(row['ALNAV GOAL']),
+      gross: num(row['ALNAV GROSS']),
+      loss: num(row['ALNAV LOSS']),
+      attn: num(row['ALNAV ATTN']),
+      alnav_pct: cleanPct(row['ALNAV %']),
+      glideslope_pct: cleanPct(row['ALNAV GLIDESLOPE %']),
+      requirement: dec(row['ALNAV GLIDESLOPE REQUIREMENT']),
+      pace: dec(row['±']),
+      // Program families — used by the analysis tier engine (Zeus/Poseidon/Triton levels)
+      ac:   { goal:num(row['AC GOAL']),   attn:num(row['AC ATTN']),   glideslope_pct:cleanPct(row['AC GLIDESLOPE %']) },
+      nso:  { goal:num(row['NSO GOAL']),  attn:num(row['NSO ATTN']),  glideslope_pct:cleanPct(row['NSO GLIDESLOPE %']) },
+      nuke: { goal:num(row['NUKE GOAL']), attn:num(row['NUKE ATTN']), glideslope_pct:cleanPct(row['NUKE GLIDESLOPE %']) }
+    });
+  }
+  if(stations.length===0) throw new Error('0 stations parsed (check tab/columns)');
+  const recruiters = parseRecruiterTab(wb);
+  return { stations, recruiters };
+}
+
+/* ---- file selection UI ---- */
+function renderFileList(){
+  const fl = $('filelist'); fl.innerHTML='';
+  selectedFiles.sort((a,b)=>(a.seq??9999)-(b.seq??9999) || a.dateISO.localeCompare(b.dateISO));
+  selectedFiles.forEach(f=>{
+    const row=document.createElement('div'); row.className='filerow';
+    row.innerHTML = `<span class="seq">${f.seq??'–'}</span>
+      <span class="nm">${f.file.name}</span>
+      <span class="dt">${f.valid?f.dateLabel:''}</span>
+      ${f.isEOM?'<span class="eom-badge">EOM</span>':''}
+      <span class="st ${f.valid?'ok':'err'}">${f.valid?'✓ '+f.dateISO:'✕ '+f.error}</span>`;
+    fl.appendChild(row);
+  });
+  const anyValid = selectedFiles.some(f=>f.valid);
+  $('convertPanel').classList.toggle('hidden', !anyValid);
+}
+
+function addFiles(files, isEOM=false){
+  for(const file of files){
+    if(!/\.(xlsx|xls)$/i.test(file.name)) continue;
+    const p = parseFilename(file.name);
+    selectedFiles.push({file, isEOM, ...p});
+  }
+  renderFileList();
+}
+
+$('fileInput').addEventListener('change', e=>addFiles(e.target.files, false));
+$('fileInputEom').addEventListener('change', e=>addFiles(e.target.files, true));
+
+function wireDrop(elId, isEOM){
+  const el = $(elId);
+  ['dragover','dragenter'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();el.classList.remove('over');}));
+  el.addEventListener('drop',e=>addFiles(e.dataTransfer.files, isEOM));
+}
+wireDrop('drop', false);
+wireDrop('dropEom', true);
+
+/* ---- convert ---- */
+function logLine(msg,cls=''){ const l=$('log'); l.classList.remove('hidden'); l.innerHTML+=`<span class="${cls}">${msg}</span>\n`; l.scrollTop=l.scrollHeight; }
+
+const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function monthCodeFromISO(iso){
+  // 2025-10-31 -> "OCT25"
+  const [y,m] = iso.split('-');
+  return MONTH_NAMES[parseInt(m,10)-1] + y.slice(2);
+}
+
+$('convertBtn').addEventListener('click', async ()=>{
+  snapshots=[]; $('log').innerHTML=''; $('log').classList.remove('hidden');
+  const valid = selectedFiles.filter(f=>f.valid);
+  const eomCount = valid.filter(f=>f.isEOM).length;
+  logLine(`Converting ${valid.length} file(s)… (${eomCount} EOM)`);
+  for(const f of valid){
+    try{
+      const buf = await f.file.arrayBuffer();
+      const wb = XLSX.read(buf,{type:'array'});
+      const { stations, recruiters } = parseWorkbook(wb);
+      const snap = {dateISO:f.dateISO, seq:f.seq, label:f.dateLabel, stations, recruiters};
+      if(f.isEOM) snap.eom = monthCodeFromISO(f.dateISO);
+      snapshots.push(snap);
+      const rTag = recruiters.length ? ` · ${recruiters.length} recruiters` : ' · no recruiter tab';
+      logLine(`  ✓ ${f.file.name} → ${stations.length} stations${rTag}${f.isEOM?` · EOM ${snap.eom}`:''}`,'ok');
+    }catch(err){
+      logLine(`  ✕ ${f.file.name}: ${err.message}`,'err');
+    }
+  }
+  if(snapshots.length===0){ logLine('No snapshots produced.','err'); return; }
+  snapshots.sort((a,b)=>(a.seq??9999)-(b.seq??9999) || a.dateISO.localeCompare(b.dateISO));
+  const finalEomCount = snapshots.filter(s=>s.eom).length;
+  const finalRecCount = snapshots[snapshots.length-1].recruiters ? snapshots[snapshots.length-1].recruiters.length : 0;
+  logLine(`Done. ${snapshots.length} snapshot(s) ready · ${finalEomCount} month-end · ${finalRecCount} recruiters in latest.`,'ok');
+  showResults();
+});
+
+function buildIndex(){
+  return {
+    generated: new Date().toISOString(),
+    latest: snapshots[snapshots.length-1].dateISO,
+    count: snapshots.length,
+    snapshots: snapshots.map(s=>({date:s.dateISO, seq:s.seq, label:s.label, stations:s.stations.length}))
+  };
+}
+
+function showResults(){
+  $('resultPanel').classList.remove('hidden');
+  const idx = buildIndex();
+  const totalStations = snapshots[snapshots.length-1].stations.length;
+  const eomCount = snapshots.filter(s=>s.eom).length;
+  const recCount = snapshots[snapshots.length-1].recruiters ? snapshots[snapshots.length-1].recruiters.length : 0;
+  $('summary').innerHTML = `
+    <div class="stat"><div class="v">${snapshots.length}</div><div class="k">Snapshots</div></div>
+    <div class="stat"><div class="v">${totalStations}</div><div class="k">Stations</div></div>
+    <div class="stat"><div class="v" style="color:var(--zeus)">${eomCount}</div><div class="k">Month-End</div></div>
+    <div class="stat"><div class="v" style="color:var(--triton)">${recCount}</div><div class="k">Recruiters</div></div>`;
+  $('resultPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function buildBundle(){
+  return {
+    generated: new Date().toISOString(),
+    latest: snapshots[snapshots.length-1].dateISO,
+    count: snapshots.length,
+    snapshots: snapshots.map(s=>{
+      const out = { date: s.dateISO, seq: s.seq, label: s.label, stations: s.stations };
+      if(s.eom) out.eom = s.eom;
+      if(s.recruiters && s.recruiters.length) out.recruiters = s.recruiters;
+      return out;
+    })
+  };
+}
+
+$('downloadOneBtn').addEventListener('click',()=>{
+  downloadJSON('data.json', buildBundle());
+});
+$('downloadAllBtn').addEventListener('click', async ()=>{
+  const zip = new JSZip();
+  const folder = zip.folder('data');
+  folder.file('index.json', JSON.stringify(buildIndex(),null,2));
+  for(const s of snapshots){
+    const fileObj = {date:s.dateISO, seq:s.seq, label:s.label, stations:s.stations};
+    if(s.eom) fileObj.eom = s.eom;
+    if(s.recruiters && s.recruiters.length) fileObj.recruiters = s.recruiters;
+    folder.file(`${s.dateISO}.json`, JSON.stringify(fileObj,null,2));
+  }
+  const blob = await zip.generateAsync({type:'blob'});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='data.zip'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+function downloadJSON(name,obj){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
