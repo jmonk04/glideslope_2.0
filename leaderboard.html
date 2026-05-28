@@ -284,9 +284,8 @@ body::before{
       </div>
 
       <div class="scaffold-note">
-        Personal records, built from authoritative month-end (EOM) snapshots. Each month = the change between
-        consecutive month-end snapshots. Tap any category to see the top 5. Recruiter PRs are phase two
-        (pending recruiter data in the spine).
+        Personal records, built from authoritative month-end (EOM) snapshots for stations, and from the
+        latest snapshot's recruiter stats. Tap any category to see the top 5.
       </div>
 
       <div class="record-book">
@@ -690,6 +689,30 @@ function topMonthGlideslopeJumps(n=5){
   return all.sort((a,b)=>b.val-a.val).slice(0,n);
 }
 
+// Top N single-month recruiter performances. Reads the latest snapshot's
+// recruiters[] array — each recruiter carries a months{} keyed by month code,
+// e.g. {OCT:5, NOV:1, ...}. Per the design call, we include ALL months
+// (including in-progress current month) — see ADR-A "include the current month".
+// Values are NET (NCO is net per spreadsheet); ≤0 entries are skipped.
+function topRecruiterMonths(n=5){
+  const cur = DataLayer.latest();
+  if(!cur || !cur.recruiters || !cur.recruiters.length) return [];
+  const all = [];
+  for(const r of cur.recruiters){
+    if(!r.months) continue;
+    for(const [mo, val] of Object.entries(r.months)){
+      if(val == null || val <= 0) continue;
+      all.push({
+        name: r.name,               // "RATE LastName" display label
+        station: r.station || '',
+        val: val,
+        month: mo
+      });
+    }
+  }
+  return all.sort((a,b)=>b.val - a.val).slice(0, n);
+}
+
 function fmtPRVal(kind, val){
   return kind==='jump' ? `+${(val*100).toFixed(1)}%` : `+${val}`;
 }
@@ -704,38 +727,53 @@ function renderRecords(){
   }
 
   const cats = [
-    { id:'gross', label:'Best Gross Month (ALNAV)', kind:'count', field:'attn' },
-    { id:'jump',  label:'Biggest Monthly GS Jump',  kind:'jump' },
-    { id:'nuke',  label:'Best NF / NUKE Month',      kind:'count', field:'nuke.attn' },
-    { id:'nso',   label:'Best NSO Month',            kind:'count', field:'nso.attn' },
-    { id:'rec',   label:'Recruiter Gross — Top 5',   kind:'phase2' }
+    { id:'gross', label:'Best Gross Month (ALNAV)',     kind:'count', field:'attn' },
+    { id:'jump',  label:'Biggest Monthly GS Jump',      kind:'jump' },
+    { id:'nuke',  label:'Best NF / NUKE Month',          kind:'count', field:'nuke.attn' },
+    { id:'nso',   label:'Best NSO Month',                kind:'count', field:'nso.attn' },
+    { id:'rec',   label:'Best Recruiter Month (Net)',    kind:'recruiter' }
   ];
 
   const html = cats.map(c=>{
-    if(c.kind === 'phase2'){
+    let top;
+    if(c.kind === 'jump')           top = topMonthGlideslopeJumps(5);
+    else if(c.kind === 'recruiter') top = topRecruiterMonths(5);
+    else                            top = topMonthsByCount(c.field, 5);
+
+    // empty-data fallback: render disabled placeholder
+    if(!top.length){
+      const note = c.kind==='recruiter'
+        ? 'No recruiter data in latest snapshot'
+        : 'No qualifying months yet';
       return `<div class="pr-cat disabled">
         <div class="pr-cat-head">
           <span class="chev">▶</span>
           <span class="cat">${c.label}</span>
-          <span class="holder">Phase 2<span class="when">pending recruiter data</span></span>
+          <span class="holder">—<span class="when">${note}</span></span>
           <span class="val">—</span>
         </div>
       </div>`;
     }
 
-    const top = c.kind==='jump' ? topMonthGlideslopeJumps(5) : topMonthsByCount(c.field, 5);
     const winner = top[0];
-    const headHolder = winner ? `${winner.name}<span class="when">${winner.month}</span>` : `—`;
-    const headVal = winner ? fmtPRVal(c.kind, winner.val) : '—';
+    const headSub = c.kind==='recruiter' && winner.station
+      ? `${winner.station} · ${winner.month}`
+      : winner.month;
+    const headHolder = `${winner.name}<span class="when">${headSub}</span>`;
+    const headVal = fmtPRVal(c.kind, winner.val);
 
-    const bodyRows = top.length ? top.map((t,i)=>`
-      <div class="pr-row ${i===0?'r1':''}">
+    const bodyRows = top.map((t,i)=>{
+      const sub = (c.kind==='recruiter' && t.station)
+        ? `${t.station} · ${t.month}`
+        : t.month;
+      return `<div class="pr-row ${i===0?'r1':''}">
         <span class="rk">#${i+1}</span>
         <span class="medal">${['🥇','🥈','🥉','⭐','⭐'][i]}</span>
         <span class="nm">${t.name}</span>
-        <span class="when">${t.month}</span>
+        <span class="when">${sub}</span>
         <span class="val">${fmtPRVal(c.kind, t.val)}</span>
-      </div>`).join('') : '<div class="empty" style="padding:8px">No qualifying months yet.</div>';
+      </div>`;
+    }).join('');
 
     return `<div class="pr-cat" data-id="${c.id}">
       <div class="pr-cat-head" onclick="togglePRCat('${c.id}')">
