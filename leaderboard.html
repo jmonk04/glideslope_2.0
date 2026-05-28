@@ -101,6 +101,15 @@ body::before{
 .row.tri .val{color:var(--triton)}
 .row.below .val{color:var(--ink-dim)}
 
+/* Flames on Trending rows — sit inline next to the +X.X% value */
+.row .flames{
+  font-size:13px;
+  letter-spacing:-2px;
+  margin-left:4px;
+  vertical-align:middle;
+  filter:drop-shadow(0 0 4px rgba(255,84,112,.45));
+}
+
 /* Highlights for top 3 */
 .row.r1{background:linear-gradient(100deg, rgba(255,182,39,.14), var(--panel-2));border-color:rgba(255,182,39,.35)}
 .row.r2{background:linear-gradient(100deg, rgba(154,168,212,.10), var(--panel-2));border-color:rgba(154,168,212,.30)}
@@ -495,10 +504,11 @@ function renderTrending(){
   const chain = [];
   let cursor = all[all.length-1];
   chain.push(cursor);
-  while(chain.length < 8){  // cap depth so a really long history doesn't explode
+  // No streak cap — walk back as far as the data goes. Hard ceiling at 60
+  // weeks just to prevent a pathological loop, well beyond any real streak.
+  while(chain.length < 60){
     const prev = DataLayer.snapshotNearestWeekBefore(cursor.date);
     if(!prev) break;
-    // guard against picking the same snapshot twice (very short history edge case)
     if(prev.date === cursor.date) break;
     chain.push(prev);
     cursor = prev;
@@ -545,10 +555,11 @@ function renderTrending(){
   }
   host.innerHTML = trending.map((t,i)=>{
     const tier = tierOf(t.now);
+    const flames = '🔥'.repeat(t.streak);
     return `<div class="row ${rowClass(i)} ${tier.cls}">
       <span class="medal">${medalFor(i)}</span>
       <span class="nm">${t.name}<span class="div">${t.division||''}</span></span>
-      <span class="val">+${(t.totalGain*100).toFixed(1)}%</span>
+      <span class="val">+${(t.totalGain*100).toFixed(1)}% <span class="flames">${flames}</span></span>
       <span class="sub">${t.streak} wks · since ${t.fromDate}</span>
     </div>`;
   }).join('');
