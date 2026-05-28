@@ -314,8 +314,44 @@ const DataLayer = (function(){
     if(av==null||bv==null) return null;
     return {from:bv, to:av, delta:Math.round((av-bv)*10000)/10000};
   }
+  // days between two ISO dates (YYYY-MM-DD)
+  function _daysBetween(isoA, isoB){
+    return Math.round((new Date(isoA) - new Date(isoB)) / 86400000);
+  }
+  // find the snapshot whose date is CLOSEST to (referenceISO - 7 days).
+  // works in both cadences: in 5-day-batch data the closest is usually the
+  // previous snapshot; in daily data it skips the intervening dailies.
+  function snapshotNearestWeekBefore(referenceISO){
+    const all = _sorted();
+    if(!all.length) return null;
+    const targetMs = new Date(referenceISO).getTime() - 7*86400000;
+    let best=null, bestDiff=Infinity;
+    for(const sn of all){
+      if(sn.date >= referenceISO) continue;       // must be strictly earlier
+      const diff = Math.abs(new Date(sn.date).getTime() - targetMs);
+      if(diff < bestDiff){ best = sn; bestDiff = diff; }
+    }
+    return best;
+  }
+  // week-over-week delta using the 7-day-prior rule. Returns the actual
+  // comparison date used so the UI can be transparent about it.
+  function weekDeltaFor(name, field='glideslope_pct'){
+    const cur = latest(); if(!cur) return null;
+    const prev = snapshotNearestWeekBefore(cur.date); if(!prev) return null;
+    const a = cur.stations.find(x=>x.name===name);
+    const b = prev.stations.find(x=>x.name===name);
+    if(!a||!b) return null;
+    const av=_resolve(a,field), bv=_resolve(b,field);
+    if(av==null||bv==null) return null;
+    return {
+      from: bv, to: av,
+      delta: Math.round((av-bv)*10000)/10000,
+      fromDate: prev.date, toDate: cur.date,
+      daysApart: _daysBetween(cur.date, prev.date)
+    };
+  }
   function meta(){ return bundle?{generated:bundle.generated, latest:bundle.latest, count:bundle.count}:null; }
-  return { init, onReady, hasData, latest, allSnapshots, station, stations, seriesFor, deltaFor, meta };
+  return { init, onReady, hasData, latest, allSnapshots, station, stations, seriesFor, deltaFor, weekDeltaFor, snapshotNearestWeekBefore, meta };
 })();
 
 /* ============================================================
@@ -338,15 +374,21 @@ function rowClass(i){ return i===0?'r1':i===1?'r2':i===2?'r3':''; }
 function renderWarriors(){
   const stations = DataLayer.stations();
   const movers = stations.map(s=>{
-    const d = DataLayer.deltaFor(s.name);
-    return d ? {name:s.name, division:s.division, change:d.delta, now:s.glideslope_pct} : null;
+    const d = DataLayer.weekDeltaFor(s.name);
+    return d ? {name:s.name, division:s.division, change:d.delta, now:s.glideslope_pct, fromDate:d.fromDate, daysApart:d.daysApart} : null;
   }).filter(w=>w && w.change>0)
     .sort((a,b)=>b.change-a.change)
     .slice(0,5);
 
+  // surface the comparison window in the board subtitle, so it's clear
+  const head = document.querySelector('#board-warriors .board-sub');
+  if(head && movers.length){
+    head.textContent = `vs ${movers[0].fromDate} (${movers[0].daysApart}d back)`;
+  }
+
   const host = document.getElementById('rows-warriors');
   if(!movers.length){
-    host.innerHTML = '<div class="empty">No week-over-week gains yet (need 2+ weeks of data).</div>';
+    host.innerHTML = '<div class="empty">No week-over-week gains yet (need a snapshot ~7 days back).</div>';
     return;
   }
   host.innerHTML = movers.map((w,i)=>{
@@ -365,21 +407,60 @@ function renderWarriors(){
    ranked by TOTAL GAIN across the streak (per spec).
    ============================================================ */
 function renderTrending(){
+  // Build a "weekly chain" by walking back from the latest snapshot in
+  // ~7-day jumps. At each step, find the snapshot closest to (current date - 7d).
+  // This makes the rule cadence-agnostic: in old 5-day-batch data the chain
+  // is the same as snapshot-by-snapshot; in new daily data it skips intervening
+  // dailies and lands on roughly the same weekday a week prior.
+  const all = DataLayer.allSnapshots();
+  if(all.length < 3){
+    document.getElementById('rows-trending').innerHTML =
+      '<div class="empty">Need at least 3 weekly anchor points to detect a streak.</div>';
+    return;
+  }
+
+  // weekly chain of snapshots, newest first
+  const chain = [];
+  let cursor = all[all.length-1];
+  chain.push(cursor);
+  while(chain.length < 8){  // cap depth so a really long history doesn't explode
+    const prev = DataLayer.snapshotNearestWeekBefore(cursor.date);
+    if(!prev) break;
+    // guard against picking the same snapshot twice (very short history edge case)
+    if(prev.date === cursor.date) break;
+    chain.push(prev);
+    cursor = prev;
+  }
+  if(chain.length < 3){
+    document.getElementById('rows-trending').innerHTML =
+      '<div class="empty">Need 3 weekly anchor points (≈ 14 days of history) to detect a 2-week streak.</div>';
+    return;
+  }
+  // chain[0] = newest, chain[chain.length-1] = oldest
+
   const stations = DataLayer.stations();
   const trending = stations.map(s=>{
-    const series = DataLayer.seriesFor(s.name).filter(p=>p.value!=null);
-    if(series.length<3) return null;  // need at least 3 points to have 2 consecutive rises
+    // build this station's weekly value series, OLDEST → NEWEST, from the chain
+    const vals = [];
+    for(let i=chain.length-1; i>=0; i--){
+      const st = chain[i].stations.find(x=>x.name===s.name);
+      if(!st || st.glideslope_pct==null){ vals.push(null); continue; }
+      vals.push({date:chain[i].date, v:st.glideslope_pct});
+    }
+    // count consecutive weekly rises ending at the newest anchor
     let streak = 0;
-    for(let i=series.length-1; i>0; i--){
-      if(series[i].value > series[i-1].value) streak++;
+    for(let i=vals.length-1; i>0; i--){
+      if(!vals[i] || !vals[i-1]) break;
+      if(vals[i].v > vals[i-1].v) streak++;
       else break;
     }
     if(streak < 2) return null;
-    const startIdx = series.length - 1 - streak;
-    const totalGain = series[series.length-1].value - series[startIdx].value;
+    const startIdx = vals.length - 1 - streak;
+    const totalGain = vals[vals.length-1].v - vals[startIdx].v;
     return {
       name:s.name, division:s.division,
-      streak, totalGain, now:s.glideslope_pct
+      streak, totalGain, now:s.glideslope_pct,
+      fromDate: vals[startIdx].date
     };
   }).filter(Boolean)
     .sort((a,b)=>b.totalGain - a.totalGain)
@@ -396,7 +477,7 @@ function renderTrending(){
       <span class="medal">${medalFor(i)}</span>
       <span class="nm">${t.name}<span class="div">${t.division||''}</span></span>
       <span class="val">+${(t.totalGain*100).toFixed(1)}%</span>
-      <span class="sub">${t.streak} wks · now ${pctTxt(t.now)}</span>
+      <span class="sub">${t.streak} wks · since ${t.fromDate}</span>
     </div>`;
   }).join('');
 }
