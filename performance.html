@@ -138,28 +138,6 @@ h1{
 .tc.tri{border-color:var(--triton);box-shadow:inset 0 0 40px -32px var(--triton)} .tc.tri .v{color:var(--triton)}
 .tc.below .v{color:var(--ink-faint)}
 
-/* ---------- Command Velocity ---------- */
-.vel-toggle{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:14px}
-.vel-tab{
-  background:transparent;border:none;color:var(--ink-dim);
-  font-family:'Chakra Petch',monospace;font-weight:600;
-  font-size:13px;letter-spacing:.04em;padding:8px 18px;border-radius:7px;cursor:pointer;transition:.13s
-}
-.vel-tab.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
-.vel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:600px){.vel-grid{grid-template-columns:repeat(2,1fr)}}
-.vel-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:15px 14px;text-align:center}
-.vel-card.ahead{border-color:rgba(44,230,192,.5)} .vel-card.behind{border-color:rgba(255,84,112,.4)}
-.vel-ms{font-family:'Chakra Petch',monospace;font-weight:700;font-size:13px;letter-spacing:.1em;color:var(--ink-dim)}
-.vel-rate{font-family:'Chakra Petch',monospace;font-weight:700;font-size:30px;line-height:1.1;margin-top:4px}
-.vel-unit{font-size:13px;color:var(--ink-faint);font-weight:400}
-.vel-vs{font-size:11px;color:var(--ink-faint);margin-top:1px}
-.vel-flag{font-family:'Chakra Petch',monospace;font-weight:700;font-size:13px;margin-top:7px}
-.vel-card.ahead .vel-flag{color:var(--good)} .vel-card.behind .vel-flag{color:var(--danger)}
-.vel-bar{height:5px;background:var(--bg-0);border-radius:3px;margin-top:10px;overflow:hidden}
-.vel-fill{height:100%;border-radius:3px;transition:width .4s}
-.vel-note{font-size:11px;color:var(--ink-faint);margin-top:12px;font-style:italic}
-
 /* ---------- Heat Map ---------- */
 .heat-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;font-size:11px;color:var(--ink-dim);font-family:'Chakra Petch',monospace}
 .hl-item{display:flex;align-items:center;gap:6px}
@@ -281,21 +259,6 @@ h1{
     <span class="ds-dot"></span>
     <span id="dataStampText">Loading data…</span>
   </div>
-
-  <!-- ⚡ Command Velocity -->
-  <section class="section">
-    <div class="section-tag">
-      <span class="num">⚡</span>
-      <h2>Command Velocity · Pace vs Required</h2>
-      <span class="rule"></span>
-    </div>
-    <div class="vel-toggle">
-      <button class="vel-tab active" data-win="2">10-Day</button>
-      <button class="vel-tab" data-win="6">30-Day</button>
-    </div>
-    <div class="vel-grid" id="velGrid"></div>
-    <div class="vel-note" id="velNote"></div>
-  </section>
 
   <!-- ★ Command Scoreboard -->
   <section class="section">
@@ -451,58 +414,6 @@ function tierLevelReward(s){
   }
   return {tier:t, level, reward};
 }
-
-/* ============================================================
-   COMMAND VELOCITY
-   ============================================================ */
-const PROD_DAYS_YEAR = 233;
-const MISSION_SETS = [
-  {key:'alnav', label:'ALNAV', goal:3166, field:s=>s.attn},
-  {key:'ac',    label:'AC',    goal:3067, field:s=>s.ac?.attn||0},
-  {key:'nso',   label:'NSO',   goal:169,  field:s=>s.nso?.attn||0},
-  {key:'nf',    label:'NF',    goal:203,  field:s=>s.nuke?.attn||0},
-];
-let velWindow = 2;
-
-function commandAttn(snap, fieldFn){
-  return snap.stations.reduce((sum,s)=>sum+(fieldFn(s)||0),0);
-}
-function renderVelocity(){
-  const snaps = DataLayer.allSnapshots();
-  const grid  = document.getElementById('velGrid');
-  const note  = document.getElementById('velNote');
-  if(snaps.length < velWindow+1){
-    grid.innerHTML=`<div class="az-hint-msg">Need ${velWindow+1} weeks of data for this window — have ${snaps.length}.</div>`;
-    note.textContent=''; return;
-  }
-  const cur  = snaps[snaps.length-1];
-  const past = snaps[snaps.length-1-velWindow];
-  const prodDays = 5*velWindow;
-  grid.innerHTML = MISSION_SETS.map(ms=>{
-    const delta  = commandAttn(cur,ms.field) - commandAttn(past,ms.field);
-    const perDay = delta/prodDays;
-    const required = ms.goal/PROD_DAYS_YEAR;
-    const ahead = perDay>=required;
-    const diff  = perDay-required;
-    const pct   = required>0?(perDay/required):0;
-    return `<div class="vel-card ${ahead?'ahead':'behind'}">
-      <div class="vel-ms">${ms.label}</div>
-      <div class="vel-rate">${perDay.toFixed(1)}<span class="vel-unit">/day</span></div>
-      <div class="vel-vs">vs ${required.toFixed(1)} req</div>
-      <div class="vel-flag">${ahead?'▲':'▼'} ${diff>=0?'+':''}${diff.toFixed(1)}/day</div>
-      <div class="vel-bar"><div class="vel-fill" style="width:${Math.min(pct*100,150)/1.5}%;background:${ahead?'var(--good)':'var(--danger)'}"></div></div>
-    </div>`;
-  }).join('');
-  note.textContent = `${5*velWindow}-production-day moving average (last ${velWindow} weekly snapshots). ${velWindow===2?'Short window — sensitive to a single week.':'Steadier signal over ~6 weeks.'}`;
-}
-document.querySelectorAll('.vel-tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.vel-tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    velWindow=+t.dataset.win;
-    if(DataLayer.hasData()) renderVelocity();
-  });
-});
 
 /* ============================================================
    HEAT MAP
@@ -708,9 +619,6 @@ function renderAll(){
   const d = new Date((snap.date||m.latest)+'T00:00:00');
   const pretty = isNaN(d)?(snap.label||m.latest):d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
   document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b> · ${azCurrent.length} stations · ${m.count} weeks of history`;
-
-  // velocity
-  renderVelocity();
 
   // heat map
   renderHeatMap();
