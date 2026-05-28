@@ -127,6 +127,52 @@ body::before{
 .record-row .holder .when{display:block;font-size:10px;color:var(--ink-faint);font-weight:400;margin-top:2px;letter-spacing:.5px}
 .record-row .val{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;color:var(--zeus);min-width:60px;text-align:right}
 
+/* Expandable PR category */
+.pr-cat{
+  background:rgba(255,182,39,.05);
+  border:1px solid rgba(255,182,39,.18);border-radius:12px;
+  margin-bottom:6px;overflow:hidden;
+  transition:background .15s;
+}
+.pr-cat:hover{background:rgba(255,182,39,.08)}
+.pr-cat.open{background:rgba(255,182,39,.09);border-color:rgba(255,182,39,.35)}
+.pr-cat-head{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;cursor:pointer;user-select:none;
+}
+.pr-cat-head .chev{font-size:11px;color:var(--ink-faint);transition:transform .2s;width:14px;text-align:center}
+.pr-cat.open .pr-cat-head .chev{transform:rotate(90deg);color:var(--zeus)}
+.pr-cat-head .cat{flex:1;font-family:'Chakra Petch',monospace;font-weight:600;font-size:13px;color:var(--ink-dim);letter-spacing:.5px;text-transform:uppercase}
+.pr-cat-head .holder{font-family:'Chakra Petch',monospace;font-weight:700;font-size:14px;color:var(--ink);text-align:right;min-width:130px}
+.pr-cat-head .holder .when{display:block;font-size:10px;color:var(--ink-faint);font-weight:400;margin-top:2px;letter-spacing:.5px}
+.pr-cat-head .val{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;color:var(--zeus);min-width:60px;text-align:right}
+.pr-cat.disabled{opacity:.55}
+.pr-cat.disabled .pr-cat-head{cursor:default}
+.pr-cat.disabled .pr-cat-head .chev{visibility:hidden}
+
+.pr-cat-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .25s ease;
+  border-top:0 solid rgba(255,182,39,.15);
+}
+.pr-cat.open .pr-cat-body{
+  max-height:400px;
+  border-top:1px solid rgba(255,182,39,.15);
+}
+.pr-cat-body .inner{padding:8px 14px 12px}
+.pr-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:8px;
+  font-size:13px;
+}
+.pr-row + .pr-row{margin-top:2px}
+.pr-row .rk{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);min-width:22px;font-size:12px}
+.pr-row .medal{font-size:14px;min-width:20px;text-align:center}
+.pr-row .nm{flex:1;font-family:'Chakra Petch',monospace;font-weight:600;color:var(--ink)}
+.pr-row .when{font-size:10px;color:var(--ink-faint);font-family:'Chakra Petch',monospace;min-width:60px;text-align:right}
+.pr-row .val{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--zeus);min-width:60px;text-align:right}
+.pr-row.r1{background:rgba(255,182,39,.10)}
+
 /* Scaffold banner */
 .scaffold-note{
   background:rgba(255,84,112,.06);border:1px dashed rgba(255,84,112,.25);
@@ -233,19 +279,20 @@ body::before{
     <div class="section">
       <div class="section-tag">
         <span class="num">🏛️</span>
-        <h2>Record Book · YTD</h2>
+        <h2>PR Board · YTD</h2>
         <span class="rule"></span>
       </div>
 
       <div class="scaffold-note">
-        Records are built from authoritative month-end (EOM) snapshots. Each month = the change between
-        consecutive month-end snapshots. Recruiter PRs are phase two (pending recruiter data in the spine).
+        Personal records, built from authoritative month-end (EOM) snapshots. Each month = the change between
+        consecutive month-end snapshots. Tap any category to see the top 5. Recruiter PRs are phase two
+        (pending recruiter data in the spine).
       </div>
 
       <div class="record-book">
         <div class="board-head">
-          <div class="board-name"><span class="ic">🏆</span>Best Performances · This Year</div>
-          <div class="board-sub">Largest single 4-week run by category</div>
+          <div class="board-name"><span class="ic">🏆</span>PR Board · This Year</div>
+          <div class="board-sub">Tap a category to reveal the top 5</div>
         </div>
         <div id="records"></div>
       </div>
@@ -599,10 +646,11 @@ function eomMonths(){
   return months;
 }
 
-// Best single month for a counting field (e.g. 'attn', 'nuke.attn').
-function bestMonthByCount(field){
+// Returns top N months for a counting field, sorted descending by value.
+// No per-station cap — if a station holds multiple slots, they earned them.
+function topMonthsByCount(field, n=5){
   const months = eomMonths();
-  let best = null;
+  const all = [];
   for(const m of months){
     for(const s of m.cur.stations){
       const curV = field.split('.').reduce((o,k)=>(o&&o[k]!==undefined)?o[k]:null, s);
@@ -615,35 +663,35 @@ function bestMonthByCount(field){
         if(prevV==null) continue;
         monthVal = curV - prevV;
       }else{
-        monthVal = curV;  // first month-end: YTD stands in
+        monthVal = curV;  // first month-end: YTD == that month (Oct-start year)
       }
       if(monthVal <= 0) continue;
-      if(!best || monthVal > best.val){
-        best = { name:s.name, val:monthVal, month:m.label };
-      }
+      all.push({ name:s.name, val:monthVal, month:m.label });
     }
   }
-  return best;
+  return all.sort((a,b)=>b.val-a.val).slice(0,n);
 }
 
-// Best single-month glideslope jump between consecutive month-ends.
-function bestMonthGlideslopeJump(){
+// Top N single-month glideslope jumps between consecutive month-ends.
+function topMonthGlideslopeJumps(n=5){
   const months = eomMonths();
-  let best = null;
+  const all = [];
   for(const m of months){
-    if(!m.prev) continue;  // need a prior month-end to measure a jump
+    if(!m.prev) continue;
     for(const s of m.cur.stations){
       if(s.glideslope_pct==null) continue;
       const before = m.prev.stations.find(x=>x.name===s.name);
       if(!before || before.glideslope_pct==null) continue;
       const jump = s.glideslope_pct - before.glideslope_pct;
       if(jump <= 0) continue;
-      if(!best || jump > best.val){
-        best = { name:s.name, val:jump, month:m.label };
-      }
+      all.push({ name:s.name, val:jump, month:m.label });
     }
   }
-  return best;
+  return all.sort((a,b)=>b.val-a.val).slice(0,n);
+}
+
+function fmtPRVal(kind, val){
+  return kind==='jump' ? `+${(val*100).toFixed(1)}%` : `+${val}`;
 }
 
 function renderRecords(){
@@ -656,36 +704,57 @@ function renderRecords(){
   }
 
   const cats = [
-    { label:'Best Gross Month (ALNAV)',  kind:'count', field:'attn' },
-    { label:'Biggest Monthly GS Jump',   kind:'jump' },
-    { label:'Best NF / NUKE Month',       kind:'count', field:'nuke.attn' },
-    { label:'Best NSO Month',             kind:'count', field:'nso.attn' },
-    { label:'Recruiter Gross — Top 5',    kind:'phase2' }
+    { id:'gross', label:'Best Gross Month (ALNAV)', kind:'count', field:'attn' },
+    { id:'jump',  label:'Biggest Monthly GS Jump',  kind:'jump' },
+    { id:'nuke',  label:'Best NF / NUKE Month',      kind:'count', field:'nuke.attn' },
+    { id:'nso',   label:'Best NSO Month',            kind:'count', field:'nso.attn' },
+    { id:'rec',   label:'Recruiter Gross — Top 5',   kind:'phase2' }
   ];
 
-  const out = cats.map(c=>{
+  const html = cats.map(c=>{
     if(c.kind === 'phase2'){
-      return `<div class="record-row" style="opacity:.55">
-        <span class="cat">${c.label}</span>
-        <span class="holder">Phase 2<span class="when">pending recruiter data in spine</span></span>
-        <span class="val">—</span>
+      return `<div class="pr-cat disabled">
+        <div class="pr-cat-head">
+          <span class="chev">▶</span>
+          <span class="cat">${c.label}</span>
+          <span class="holder">Phase 2<span class="when">pending recruiter data</span></span>
+          <span class="val">—</span>
+        </div>
       </div>`;
     }
-    const rec = c.kind==='jump' ? bestMonthGlideslopeJump() : bestMonthByCount(c.field);
-    let holder='—', val='—', when='';
-    if(rec){
-      holder = rec.name;
-      when = rec.month;
-      val = c.kind==='jump' ? `+${(rec.val*100).toFixed(1)}%` : `+${rec.val}`;
-    }
-    return `<div class="record-row">
-      <span class="cat">${c.label}</span>
-      <span class="holder">${holder}<span class="when">${when}</span></span>
-      <span class="val">${val}</span>
-    </div>`;
-  });
 
-  host.innerHTML = out.join('');
+    const top = c.kind==='jump' ? topMonthGlideslopeJumps(5) : topMonthsByCount(c.field, 5);
+    const winner = top[0];
+    const headHolder = winner ? `${winner.name}<span class="when">${winner.month}</span>` : `—`;
+    const headVal = winner ? fmtPRVal(c.kind, winner.val) : '—';
+
+    const bodyRows = top.length ? top.map((t,i)=>`
+      <div class="pr-row ${i===0?'r1':''}">
+        <span class="rk">#${i+1}</span>
+        <span class="medal">${['🥇','🥈','🥉','⭐','⭐'][i]}</span>
+        <span class="nm">${t.name}</span>
+        <span class="when">${t.month}</span>
+        <span class="val">${fmtPRVal(c.kind, t.val)}</span>
+      </div>`).join('') : '<div class="empty" style="padding:8px">No qualifying months yet.</div>';
+
+    return `<div class="pr-cat" data-id="${c.id}">
+      <div class="pr-cat-head" onclick="togglePRCat('${c.id}')">
+        <span class="chev">▶</span>
+        <span class="cat">${c.label}</span>
+        <span class="holder">${headHolder}</span>
+        <span class="val">${headVal}</span>
+      </div>
+      <div class="pr-cat-body"><div class="inner">${bodyRows}</div></div>
+    </div>`;
+  }).join('');
+
+  host.innerHTML = html;
+}
+
+function togglePRCat(id){
+  const el = document.querySelector(`.pr-cat[data-id="${id}"]`);
+  if(!el || el.classList.contains('disabled')) return;
+  el.classList.toggle('open');
 }
 
 /* ============================================================
