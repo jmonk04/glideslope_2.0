@@ -238,9 +238,8 @@ body::before{
       </div>
 
       <div class="scaffold-note">
-        <b>Scaffold:</b> Records below are computed from existing weekly history (best 4-week net window).
-        When the converter starts ingesting authoritative EOM sheets, this section will read those directly
-        and become a true monthly record book. Recruiter PRs are phase two (pending converter change).
+        Records are built from authoritative month-end (EOM) snapshots. Each month = the change between
+        consecutive month-end snapshots. Recruiter PRs are phase two (pending recruiter data in the spine).
       </div>
 
       <div class="record-book">
@@ -351,7 +350,9 @@ const DataLayer = (function(){
     };
   }
   function meta(){ return bundle?{generated:bundle.generated, latest:bundle.latest, count:bundle.count}:null; }
-  return { init, onReady, hasData, latest, allSnapshots, station, stations, seriesFor, deltaFor, weekDeltaFor, snapshotNearestWeekBefore, meta };
+  // all month-end-tagged snapshots, oldest → newest
+  function eomSnapshots(){ return _sorted().filter(s=>s.eom); }
+  return { init, onReady, hasData, latest, allSnapshots, station, stations, seriesFor, deltaFor, weekDeltaFor, snapshotNearestWeekBefore, eomSnapshots, meta };
 })();
 
 /* ============================================================
@@ -483,49 +484,60 @@ function renderTrending(){
 }
 
 /* ============================================================
-   BOARD: Monthly Leaders — biggest "month" measured as
-   NET contracts over the last ~4 weeks ÷ annual goal.
-   NOTE: attn is YTD cumulative; attrition can reduce it.
-         Excluding ≤0 results so a net-negative month doesn't
-         crown garbage. Replace with authoritative EOM gross
-         when converter starts ingesting it.
+   BOARD: Monthly Leaders — biggest month, measured between the
+   two most recent EOM (month-end) snapshots.
+   Month's contracts = latest EOM attn − prior EOM attn, ÷ annual goal.
+   This is authoritative: bounded by real month-end snapshots, not
+   an approximated 4-week window. attn is YTD cumulative; attrition
+   can pull a month negative, so ≤0 results are excluded.
    ============================================================ */
 function renderMonthly(){
-  const snaps = DataLayer.allSnapshots();
-  if(snaps.length < 5){
-    document.getElementById('rows-monthly').innerHTML =
-      '<div class="empty">Need at least 5 weeks of history to compute a ~4-week monthly window.</div>';
+  const eoms = DataLayer.eomSnapshots();
+  const host = document.getElementById('rows-monthly');
+  const sub = document.querySelector('#board-monthly .board-sub');
+
+  if(eoms.length < 1){
+    host.innerHTML = '<div class="empty">No month-end (EOM) snapshots in the data yet.</div>';
     return;
   }
-  const cur = snaps[snaps.length-1];
-  const ref = snaps[snaps.length-5];  // ~4 weeks back (5 snapshots = current + 4 prior)
 
-  const stations = cur.stations.map(s=>{
-    const prev = ref.stations.find(x=>x.name===s.name);
-    if(!prev || s.goal==null || s.attn==null || prev.attn==null) return null;
-    const netMonth = s.attn - prev.attn;
-    if(netMonth <= 0) return null;
-    const goalPctMonth = netMonth / s.goal;
-    return {
-      name:s.name, division:s.division,
-      netMonth, goal:s.goal, goalPctMonth, now:s.glideslope_pct
-    };
+  const cur = eoms[eoms.length-1];
+  const prev = eoms.length >= 2 ? eoms[eoms.length-2] : null;
+
+  if(sub){
+    sub.textContent = prev
+      ? `${prev.eom} → ${cur.eom} · contracts ÷ annual goal`
+      : `${cur.eom} YTD ÷ annual goal (no prior month yet)`;
+  }
+
+  const ranked = cur.stations.map(s=>{
+    if(s.goal==null || s.attn==null || s.goal===0) return null;
+    let monthCount;
+    if(prev){
+      const before = prev.stations.find(x=>x.name===s.name);
+      if(!before || before.attn==null) return null;
+      monthCount = s.attn - before.attn;       // this month's net contracts
+    }else{
+      monthCount = s.attn;                       // only one EOM: YTD as the "month"
+    }
+    if(monthCount <= 0) return null;
+    const goalPct = monthCount / s.goal;
+    return { name:s.name, division:s.division, monthCount, goal:s.goal, goalPct, now:s.glideslope_pct };
   }).filter(Boolean)
-    .sort((a,b)=>b.goalPctMonth - a.goalPctMonth)
+    .sort((a,b)=>b.goalPct - a.goalPct)
     .slice(0,5);
 
-  const host = document.getElementById('rows-monthly');
-  if(!stations.length){
+  if(!ranked.length){
     host.innerHTML = '<div class="empty">No qualifying monthly performances (net contracts ≤ 0 for all stations).</div>';
     return;
   }
-  host.innerHTML = stations.map((m,i)=>{
+  host.innerHTML = ranked.map((m,i)=>{
     const t = tierOf(m.now);
     return `<div class="row ${rowClass(i)} ${t.cls}">
       <span class="medal">${medalFor(i)}</span>
       <span class="nm">${m.name}<span class="div">${m.division||''}</span></span>
-      <span class="val">${(m.goalPctMonth*100).toFixed(1)}%</span>
-      <span class="sub">${m.netMonth} of ${m.goal} goal</span>
+      <span class="val">${(m.goalPct*100).toFixed(1)}%</span>
+      <span class="sub">${m.monthCount} of ${m.goal} goal</span>
     </div>`;
   }).join('');
 }
@@ -566,91 +578,111 @@ function renderProgramTop(field, hostId, label){
 }
 
 /* ============================================================
-   RECORD BOOK — scaffold using existing weekly history.
-   Walks all 4-week sliding windows of net contracts (per station)
-   for each category and surfaces the single best result.
-   This is the placeholder until EOM sheets land.
+   RECORD BOOK — authoritative, built from EOM (month-end) snapshots.
+   For each consecutive pair of month-ends, a "month" = later.attn −
+   earlier.attn (per category). The first EOM's month uses its YTD attn
+   as that month's figure (no earlier month-end to subtract).
+   Surfaces the single best month per category across all months.
    ============================================================ */
-function bestNetWindowAcrossStations(field /* 'attn' | 'ac.attn' | 'nso.attn' | 'nuke.attn' */){
-  const snaps = DataLayer.allSnapshots();
-  if(snaps.length < 5) return null;
+
+// Returns [{eom, prevEom, monthLabel}] describing each computable month.
+function eomMonths(){
+  const eoms = DataLayer.eomSnapshots();
+  const months = [];
+  for(let i=0; i<eoms.length; i++){
+    months.push({
+      cur: eoms[i],
+      prev: i>0 ? eoms[i-1] : null,
+      label: eoms[i].eom
+    });
+  }
+  return months;
+}
+
+// Best single month for a counting field (e.g. 'attn', 'nuke.attn').
+function bestMonthByCount(field){
+  const months = eomMonths();
   let best = null;
-  // for each station that appears in the latest snapshot
-  const names = new Set(snaps[snaps.length-1].stations.map(s=>s.name));
-  names.forEach(name=>{
-    // build YTD attn series for this station over this field
-    const series = snaps.map(sn=>{
-      const st = sn.stations.find(x=>x.name===name);
-      if(!st) return null;
-      const v = field.split('.').reduce((o,k)=>(o&&o[k]!==undefined)?o[k]:null, st);
-      return v==null ? null : {date:sn.date, seq:sn.seq, val:v};
-    }).filter(Boolean);
-    if(series.length < 5) return;
-    // slide 5-point window (current + 4 back = 4-week net)
-    for(let i=4; i<series.length; i++){
-      const net = series[i].val - series[i-4].val;
-      if(net <= 0) continue;
-      if(!best || net > best.val){
-        best = { name, val:net, endDate:series[i].date, endSeq:series[i].seq };
+  for(const m of months){
+    for(const s of m.cur.stations){
+      const curV = field.split('.').reduce((o,k)=>(o&&o[k]!==undefined)?o[k]:null, s);
+      if(curV==null) continue;
+      let monthVal;
+      if(m.prev){
+        const before = m.prev.stations.find(x=>x.name===s.name);
+        if(!before) continue;
+        const prevV = field.split('.').reduce((o,k)=>(o&&o[k]!==undefined)?o[k]:null, before);
+        if(prevV==null) continue;
+        monthVal = curV - prevV;
+      }else{
+        monthVal = curV;  // first month-end: YTD stands in
+      }
+      if(monthVal <= 0) continue;
+      if(!best || monthVal > best.val){
+        best = { name:s.name, val:monthVal, month:m.label };
       }
     }
-  });
+  }
   return best;
 }
 
-function bestSingleWeekGlideslopeJump(){
-  const snaps = DataLayer.allSnapshots();
-  if(snaps.length < 2) return null;
+// Best single-month glideslope jump between consecutive month-ends.
+function bestMonthGlideslopeJump(){
+  const months = eomMonths();
   let best = null;
-  const names = new Set(snaps[snaps.length-1].stations.map(s=>s.name));
-  names.forEach(name=>{
-    for(let i=1; i<snaps.length; i++){
-      const a = snaps[i].stations.find(x=>x.name===name);
-      const b = snaps[i-1].stations.find(x=>x.name===name);
-      if(!a||!b||a.glideslope_pct==null||b.glideslope_pct==null) continue;
-      const jump = a.glideslope_pct - b.glideslope_pct;
+  for(const m of months){
+    if(!m.prev) continue;  // need a prior month-end to measure a jump
+    for(const s of m.cur.stations){
+      if(s.glideslope_pct==null) continue;
+      const before = m.prev.stations.find(x=>x.name===s.name);
+      if(!before || before.glideslope_pct==null) continue;
+      const jump = s.glideslope_pct - before.glideslope_pct;
       if(jump <= 0) continue;
       if(!best || jump > best.val){
-        best = { name, val:jump, endDate:snaps[i].date, endSeq:snaps[i].seq };
+        best = { name:s.name, val:jump, month:m.label };
       }
     }
-  });
+  }
   return best;
 }
 
 function renderRecords(){
   const host = document.getElementById('records');
-  const out = [];
+  const eoms = DataLayer.eomSnapshots();
+
+  if(eoms.length < 1){
+    host.innerHTML = '<div class="empty">No month-end (EOM) snapshots in the data yet. Records appear once month-end data lands.</div>';
+    return;
+  }
 
   const cats = [
-    { label:'Best Gross Month (ALNAV net)', kind:'count', field:'attn' },
-    { label:'Best Single-Week GS Jump',     kind:'jump' },
-    { label:'Best NF / NUKE Month',          kind:'count', field:'nuke.attn' },
-    { label:'Best NSO Month',                kind:'count', field:'nso.attn' },
-    { label:'Recruiter Gross — Top 5',       kind:'phase2' }
+    { label:'Best Gross Month (ALNAV)',  kind:'count', field:'attn' },
+    { label:'Biggest Monthly GS Jump',   kind:'jump' },
+    { label:'Best NF / NUKE Month',       kind:'count', field:'nuke.attn' },
+    { label:'Best NSO Month',             kind:'count', field:'nso.attn' },
+    { label:'Recruiter Gross — Top 5',    kind:'phase2' }
   ];
 
-  cats.forEach(c=>{
-    let holder='—', val='—', when='';
+  const out = cats.map(c=>{
     if(c.kind === 'phase2'){
-      out.push(`<div class="record-row" style="opacity:.55">
+      return `<div class="record-row" style="opacity:.55">
         <span class="cat">${c.label}</span>
-        <span class="holder">Phase 2<span class="when">pending converter change</span></span>
+        <span class="holder">Phase 2<span class="when">pending recruiter data in spine</span></span>
         <span class="val">—</span>
-      </div>`);
-      return;
+      </div>`;
     }
-    const rec = c.kind==='jump' ? bestSingleWeekGlideslopeJump() : bestNetWindowAcrossStations(c.field);
+    const rec = c.kind==='jump' ? bestMonthGlideslopeJump() : bestMonthByCount(c.field);
+    let holder='—', val='—', when='';
     if(rec){
       holder = rec.name;
-      when = `week of ${rec.endDate}`;
+      when = rec.month;
       val = c.kind==='jump' ? `+${(rec.val*100).toFixed(1)}%` : `+${rec.val}`;
     }
-    out.push(`<div class="record-row">
+    return `<div class="record-row">
       <span class="cat">${c.label}</span>
       <span class="holder">${holder}<span class="when">${when}</span></span>
       <span class="val">${val}</span>
-    </div>`);
+    </div>`;
   });
 
   host.innerHTML = out.join('');
