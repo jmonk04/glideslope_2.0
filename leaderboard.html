@@ -350,7 +350,16 @@ const DataLayer = (function(){
   function hasData(){ return ready && !!bundle; }
   function _sorted(){
     if(!bundle) return [];
-    return [...bundle.snapshots].sort((a,b)=>(a.seq??9999)-(b.seq??9999) || String(a.date).localeCompare(String(b.date)));
+    // Sort by DATE primarily (works regardless of seq). Use seq only as a
+    // tiebreaker when two snapshots share a date. Previously this sorted by
+    // seq first, which silently pushed all eom-tagged snapshots (seq=null)
+    // to the end of the array regardless of their actual dates — making the
+    // "latest" snapshot a stale month-end instead of the newest weekly.
+    return [...bundle.snapshots].sort((a,b)=>{
+      const dc = String(a.date).localeCompare(String(b.date));
+      if(dc !== 0) return dc;
+      return (a.seq??9999) - (b.seq??9999);
+    });
   }
   function latest(){ const s=_sorted(); return s.length?s[s.length-1]:null; }
   function allSnapshots(){ return _sorted(); }
