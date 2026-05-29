@@ -299,7 +299,11 @@ $('convertBtn').addEventListener('click', async ()=>{
     }
   }
   if(snapshots.length===0){ logLine('No snapshots produced.','err'); return; }
-  snapshots.sort((a,b)=>(a.seq??9999)-(b.seq??9999) || a.dateISO.localeCompare(b.dateISO));
+  snapshots.sort((a,b)=>{
+    const dateCompare = a.dateISO.localeCompare(b.dateISO);
+    if(dateCompare) return dateCompare;
+    return (a.seq??9999)-(b.seq??9999);
+  });
   const finalEomCount = snapshots.filter(s=>s.eom).length;
   const finalRecCount = snapshots[snapshots.length-1].recruiters ? snapshots[snapshots.length-1].recruiters.length : 0;
   logLine(`Done. ${snapshots.length} snapshot(s) ready · ${finalEomCount} month-end · ${finalRecCount} recruiters in latest.`,'ok');
