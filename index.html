@@ -921,10 +921,15 @@ const DataLayer = (function(){
   function onReady(fn){ if(ready) fn(); else listeners.push(fn); }
   function hasData(){ return ready && !!bundle; }
 
-  // snapshots sorted oldest→newest (seq then date)
+  // snapshots sorted oldest→newest. Month-end snapshots do not always have a
+  // seq, so date must decide freshness and seq is only a same-day tie-breaker.
   function _sorted(){
     if(!bundle) return [];
-    return [...bundle.snapshots].sort((a,b)=>(a.seq??9999)-(b.seq??9999) || String(a.date).localeCompare(String(b.date)));
+    return [...bundle.snapshots].sort((a,b)=>{
+      const dateCompare = String(a.date).localeCompare(String(b.date));
+      if(dateCompare) return dateCompare;
+      return (a.seq??9999)-(b.seq??9999);
+    });
   }
   function latest(){ const s=_sorted(); return s.length?s[s.length-1]:null; }
   function allSnapshots(){ return _sorted(); }

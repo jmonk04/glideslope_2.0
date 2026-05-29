@@ -358,7 +358,11 @@ const DataLayer = (function(){
 
   function _sorted(){
     if(!bundle) return [];
-    return [...bundle.snapshots].sort((a,b)=>(a.seq??9999)-(b.seq??9999) || String(a.date).localeCompare(String(b.date)));
+    return [...bundle.snapshots].sort((a,b)=>{
+      const dateCompare = String(a.date).localeCompare(String(b.date));
+      if(dateCompare) return dateCompare;
+      return (a.seq??9999)-(b.seq??9999);
+    });
   }
   function latest(){ const s=_sorted(); return s.length?s[s.length-1]:null; }
   function allSnapshots(){ return _sorted(); }
