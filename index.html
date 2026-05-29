@@ -373,18 +373,39 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   margin-top:18px;opacity:.6;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.8}}
 
-.home{min-height:100vh;display:none;align-items:center;justify-content:center;padding:32px 22px;
+.home{min-height:100vh;display:none;align-items:center;justify-content:center;padding:32px 22px;position:relative;overflow:hidden;
   background:radial-gradient(1000px 700px at 50% 0%, rgba(61,169,252,.10), transparent 60%)}
+/* full-bleed crescent moon as the entire home background.
+   A dark scrim sits over it so the tiles and text stay legible. */
+.home::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:url('moon.jpg') no-repeat center center/cover;
+  animation:moonDrift 30s ease-in-out infinite alternate;
+}
+.home::before{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 30%, transparent 0%, rgba(5,7,15,.45) 60%, rgba(5,7,15,.82) 100%),
+    linear-gradient(180deg, rgba(5,7,15,.30), rgba(5,7,15,.55));
+}
+@keyframes moonDrift{from{transform:scale(1.08) translateY(0)}to{transform:scale(1.08) translateY(18px)}}
+.home-inner{position:relative;z-index:1}
 .home.show{display:flex;animation:splashIn .5s ease both}
-.home-inner{max-width:640px;width:100%}
+
+/* moon-zoom transition overlay — fires when a door is tapped */
+.moon-transition{position:fixed;inset:0;z-index:200;display:none;background:#05070f}
+.moon-transition.show{display:block;animation:splashIn .25s ease both}
+.moon-transition video{width:100%;height:100%;object-fit:cover}
+.moon-transition::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 60% 45%, transparent 40%, rgba(5,7,15,.85) 100%)}
+.home-inner{position:relative;z-index:1;max-width:640px;width:100%}
 .home-brand{text-align:center;margin-bottom:30px}
 .home-logo{width:130px;height:auto;border-radius:24px;box-shadow:0 20px 50px -16px rgba(61,169,252,.45)}
 .home-cmd{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.4em;color:var(--ink-dim);font-size:12px;margin-top:14px;text-transform:uppercase}
 .home-h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,5vw,32px);letter-spacing:.1em;margin:6px 0;
   background:linear-gradient(100deg,var(--triton),var(--poseidon) 60%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .home-tag{color:var(--ink-faint);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
-.door-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:560px){.door-grid{grid-template-columns:1fr}}
+.door-grid{display:grid;grid-template-columns:1fr;gap:16px}
 .door{
   position:relative;text-align:center;cursor:pointer;border-radius:18px;padding:30px 20px;
   background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);
@@ -396,7 +417,41 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .door-d{font-size:13px;color:var(--ink-faint);margin-top:6px}
 .door-soon{display:inline-block;margin-top:12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--zeus);border:1px solid var(--zeus);border-radius:20px;padding:3px 12px;opacity:.8}
-.door[data-door="analyze"] .door-ic{filter:none}
+
+/* ---- Module-card doors (sleek HUD row layout) ---- */
+.module-card{
+  display:flex;align-items:center;gap:20px;text-align:left;
+  padding:24px;border-radius:24px;width:100%;
+  background:linear-gradient(145deg,rgba(12,26,54,.95),rgba(5,12,24,.98));
+  border:1px solid rgba(70,170,255,.25);
+  box-shadow:0 20px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);
+  transition:transform .15s,border-color .15s,box-shadow .2s;
+}
+.module-card:hover{transform:translateY(-3px);border-color:rgba(70,170,255,.5);
+  box-shadow:0 24px 48px -16px var(--glow-triton),inset 0 1px 0 rgba(255,255,255,.05)}
+.hud-icon{
+  width:96px;height:96px;flex:none;border-radius:50%;
+  display:flex;justify-content:center;align-items:center;position:relative;
+  background:radial-gradient(circle,rgba(50,180,255,.18),rgba(10,20,40,.85));
+  border:1px solid rgba(70,170,255,.3);
+  box-shadow:inset 0 0 24px -6px rgba(70,170,255,.4);
+}
+.hud-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 6px rgba(70,170,255,.35))}
+.hud-rings{transform-origin:50% 50%;animation:hudSpin 36s linear infinite}
+.module-card:hover .hud-rings{animation-duration:14s}
+@keyframes hudSpin{to{transform:rotate(360deg)}}
+.hud-glyph{filter:drop-shadow(0 0 4px rgba(93,180,255,.6))}
+.module-copy{flex:1}
+.module-copy h2{font-family:'Chakra Petch',monospace;text-transform:uppercase;letter-spacing:1px;font-size:1rem;margin:0 0 4px}
+.module-copy p{color:rgba(255,255,255,.65);font-size:13px;margin:0}
+.launch-button{
+  width:42px;height:42px;flex:none;border-radius:50%;
+  display:flex;justify-content:center;align-items:center;color:var(--triton);
+  background:rgba(70,170,255,.08);border:1px solid rgba(70,170,255,.25);
+  transition:transform .15s,background .15s,color .15s;
+}
+.module-card:hover .launch-button{transform:translateX(4px);background:var(--triton);color:var(--bg-0)}
+
 .back-home{
   display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin:18px 0 -8px;
   background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;
@@ -534,19 +589,90 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
       <div class="home-tag">To the Moon 🚀</div>
     </div>
     <div class="door-grid">
-      <button class="door" data-door="analyze">
-        <div class="door-ic">📊</div>
-        <div class="door-t">Analyze Performance</div>
-        <div class="door-d">Station &amp; division metrics</div>
+      <button class="door module-card" data-door="analyze">
+        <div class="hud-icon">
+          <svg class="hud-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+            <g class="hud-rings">
+              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(70,170,255,.22)" stroke-width="1" stroke-dasharray="2 5"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(70,170,255,.35)" stroke-width="1"/>
+              <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(70,170,255,.15)" stroke-width="1" stroke-dasharray="1 4"/>
+            </g>
+            <g class="hud-ticks" stroke="rgba(120,200,255,.5)" stroke-width="1.4" stroke-linecap="round">
+              <line x1="50" y1="4" x2="50" y2="10"/><line x1="50" y1="90" x2="50" y2="96"/>
+              <line x1="4" y1="50" x2="10" y2="50"/><line x1="90" y1="50" x2="96" y2="50"/>
+              <line x1="18" y1="18" x2="22" y2="22"/><line x1="82" y1="82" x2="78" y2="78"/>
+              <line x1="82" y1="18" x2="78" y2="22"/><line x1="18" y1="82" x2="22" y2="78"/>
+            </g>
+            <g class="hud-dots" fill="rgba(120,200,255,.55)">
+              <circle cx="24" cy="34" r="1.1"/><circle cx="74" cy="28" r="1.4"/>
+              <circle cx="78" cy="62" r="1"/><circle cx="30" cy="72" r="1.3"/><circle cx="68" cy="74" r="1"/>
+            </g>
+            <g class="hud-glyph" fill="url(#barGrad)">
+              <rect x="34" y="55" width="7" height="13" rx="1.5"/>
+              <rect x="46" y="46" width="7" height="22" rx="1.5"/>
+              <rect x="58" y="38" width="7" height="30" rx="1.5"/>
+            </g>
+            <defs>
+              <linearGradient id="barGrad" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#1d5fa8"/><stop offset="1" stop-color="#5db4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="module-copy">
+          <h2>Analyze Performance</h2>
+          <p>Station &amp; division metrics at a glance.</p>
+        </div>
+        <div class="launch-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
       </button>
-      <button class="door" data-door="planning">
-        <div class="door-ic">🎯</div>
-        <div class="door-t">Mission Planning</div>
-        <div class="door-d">Assess glideslope &amp; build the plan</div>
+      <button class="door module-card" data-door="planning">
+        <div class="hud-icon">
+          <svg class="hud-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+            <g class="hud-rings">
+              <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(70,170,255,.22)" stroke-width="1" stroke-dasharray="2 5"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(70,170,255,.35)" stroke-width="1"/>
+              <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(70,170,255,.15)" stroke-width="1" stroke-dasharray="1 4"/>
+            </g>
+            <g class="hud-ticks" stroke="rgba(120,200,255,.5)" stroke-width="1.4" stroke-linecap="round">
+              <line x1="50" y1="4" x2="50" y2="10"/><line x1="50" y1="90" x2="50" y2="96"/>
+              <line x1="4" y1="50" x2="10" y2="50"/><line x1="90" y1="50" x2="96" y2="50"/>
+              <line x1="18" y1="18" x2="22" y2="22"/><line x1="82" y1="82" x2="78" y2="78"/>
+              <line x1="82" y1="18" x2="78" y2="22"/><line x1="18" y1="82" x2="22" y2="78"/>
+            </g>
+            <path class="hud-arc" d="M30 70 A28 28 0 0 1 38 34" fill="none" stroke="rgba(120,200,255,.45)" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 4"/>
+            <g class="hud-dots" fill="rgba(120,200,255,.55)">
+              <circle cx="72" cy="32" r="1.2"/><circle cx="76" cy="58" r="1"/><circle cx="28" cy="40" r="1.1"/>
+            </g>
+            <g class="hud-glyph">
+              <path d="M38 64 L64 36 L52 66 L48 54 Z" fill="url(#navGrad)" stroke="#7cc4ff" stroke-width="1.2" stroke-linejoin="round"/>
+            </g>
+            <defs>
+              <linearGradient id="navGrad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#1d5fa8"/><stop offset="1" stop-color="#5db4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="module-copy">
+          <h2>Mission Planning</h2>
+          <p>Assess glideslope &amp; build the plan.</p>
+        </div>
+        <div class="launch-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
       </button>
     </div>
     <button id="installBtn2" class="install-btn" style="display:none;margin:18px auto 0">⬇ Install App</button>
   </div>
+</div>
+
+<!-- ============ MOON-ZOOM TRANSITION OVERLAY ============ -->
+<div id="moonTransition" class="moon-transition">
+  <video id="moonVideo" muted playsinline preload="auto" poster="moon.jpg">
+    <source src="moon.mp4" type="video/mp4">
+  </video>
 </div>
 
 <div class="wrap" id="appTool" style="display:none">
@@ -924,7 +1050,19 @@ const DataLayer = (function(){
   // snapshots sorted oldest→newest (seq then date)
   function _sorted(){
     if(!bundle) return [];
-    return [...bundle.snapshots].sort((a,b)=>(a.seq??9999)-(b.seq??9999) || String(a.date).localeCompare(String(b.date)));
+    // Sort oldest→newest by DATE first. On a tie (e.g. an EOM snapshot and a
+    // weekly snapshot sharing the same date), the EOM (no seq) sorts BEFORE the
+    // weekly so the weekly stays "latest". Do NOT fall back to seq??9999 — that
+    // pushes seq-less EOM files to the end and makes them wrongly appear current.
+    return [...bundle.snapshots].sort((a,b)=>{
+      const dateCmp = String(a.date).localeCompare(String(b.date));
+      if(dateCmp !== 0) return dateCmp;
+      const sa = a.seq??null, sb = b.seq??null;
+      if(sa===null && sb!==null) return -1;
+      if(sa!==null && sb===null) return 1;
+      if(sa!==null && sb!==null) return sa-sb;
+      return 0;
+    });
   }
   function latest(){ const s=_sorted(); return s.length?s[s.length-1]:null; }
   function allSnapshots(){ return _sorted(); }
@@ -1036,7 +1174,8 @@ function prodDaysTotal(date){
    STATE
    ============================================================ */
 const S = { goal:0, actual:0, today:null, station:"", elapsedDays:0, totalDays:0,
-            cpd:0, pace:0, eoy:0, status:"", color:"" };
+            cpd:0, pace:0, eoy:0, status:"", color:"",
+            dsrRequirement:null, dsrGlideslopePct:null, dsrDate:null };
 
 /* ============================================================
    POPULATE STATION DROPDOWN
@@ -1057,6 +1196,8 @@ stationSel.addEventListener('change',()=>{
   if(!nm) return;
   // baseline goal from the built-in table (always available)
   let g = goalLookup[nm];
+  // reset any previously stashed DSR figures
+  S.dsrRequirement = null; S.dsrGlideslopePct = null; S.dsrDate = null;
   // if live data is loaded, prefer it — fills goal AND actual contracts
   if(DataLayer.hasData()){
     const live = DataLayer.station(nm);
@@ -1064,6 +1205,11 @@ stationSel.addEventListener('change',()=>{
       if(live.goal) g = live.goal;
       // ALNAV ATTN = net contracts that count = the "actual" the SITREP needs
       document.getElementById('actual').value = live.attn;
+      // Stash NRC's authoritative figures from the DSR so the SITREP uses
+      // the official glideslope rather than a calendar approximation.
+      if(live.requirement != null) S.dsrRequirement = live.requirement;
+      if(live.glideslope_pct != null) S.dsrGlideslopePct = live.glideslope_pct;
+      S.dsrDate = DataLayer.latest() ? DataLayer.latest().date : null;
     }
   }
   if(g) document.getElementById('goal').value = g;
@@ -1118,8 +1264,24 @@ document.getElementById('assessBtn').addEventListener('click',()=>{
   S.totalDays=totalDays;
   S.cpd=actual/elapsed;
   S.eoy=Math.round(S.cpd*totalDays);
-  const idealToDate=goal/totalDays*elapsed;
-  S.pace=idealToDate>0 ? Math.round(actual/idealToDate*100) : 0;
+
+  // CURRENT GLIDESLOPE ASSESSMENT — prefer NRC's authoritative DSR figures.
+  // The DSR carries `requirement` (contracts you should have by now) and
+  // `glideslope_pct` (= attn / requirement), computed on NRC's real
+  // production calendar. We trust those over the local calendar model,
+  // which only approximates NRC's calendar and can drift ~1 point.
+  // The calendar model (idealToDate) is the FALLBACK for manual entry or
+  // stations absent from the data feed.
+  const usingDSR = (S.dsrRequirement != null && S.dsrRequirement > 0);
+  const idealToDate = usingDSR
+    ? S.dsrRequirement                       // NRC's official should-have count
+    : goal/totalDays*elapsed;                // calendar approximation (fallback)
+  S.requiredToDate = idealToDate;            // expose for renderSitrep
+  S.usingDSR = usingDSR;
+  // % of glideslope: prefer the DSR's own figure; else derive from fallback
+  S.pace = usingDSR
+    ? Math.round(S.dsrGlideslopePct * 100)
+    : (idealToDate>0 ? Math.round(actual/idealToDate*100) : 0);
 
   renderSitrep();
   document.getElementById('sitrep').classList.add('show');
@@ -1140,7 +1302,7 @@ function renderSitrep(){
   document.getElementById('vStatus').textContent=t.name;
   document.getElementById('vStatus').style.color=t.color;
 
-  const ideal=Math.round(S.goal/S.totalDays*S.elapsedDays);
+  const ideal=Math.round(S.requiredToDate);
   const diff=S.actual-ideal;
 
   // ---- HEADLINE SCOREBOARD ----
@@ -1163,10 +1325,13 @@ function renderSitrep(){
   document.getElementById('vSub').textContent =
     diff>=0 ? `${diff} contract${Math.abs(diff)===1?'':'s'} AHEAD of the 100% line`
             : `${Math.abs(diff)} contract${Math.abs(diff)===1?'':'s'} BEHIND the 100% line`;
-  const gsPct=(S.elapsedDays/S.totalDays*100).toFixed(1);
+  const gsPct = S.usingDSR && S.requiredToDate>0
+    ? (S.requiredToDate/S.goal*100).toFixed(1)
+    : (S.elapsedDays/S.totalDays*100).toFixed(1);
+  const srcTag = S.usingDSR ? `NRC DSR ${S.dsrDate||''}` : 'calendar estimate';
   document.getElementById('vPace').innerHTML =
     `Glideslope requirement today: <b>${gsPct}%</b> · `+
-    `Goal <b>${S.goal}</b> · Booked <b>${S.actual}</b>`;
+    `Goal <b>${S.goal}</b> · Booked <b>${S.actual}</b> · <span style="color:var(--ink-faint)">${srcTag}</span>`;
 
   // TOP LEFT — % of Glideslope
   document.getElementById('sPace').innerHTML=`${S.pace}<span class="u"> %</span>`;
@@ -1179,8 +1344,9 @@ function renderSitrep(){
   document.getElementById('sPaceSub').textContent = diff>=0 ? 'ahead of glideslope' : 'behind glideslope';
 
   // BOTTOM — contracts needed to be AT the next two tiers' lines TODAY
-  // tier line today = goal/totalDays * elapsed * multiplier
-  const lineToday = m => S.goal/S.totalDays*S.elapsedDays*m;
+  // tier line today = (today's required count) × multiplier.
+  // Uses the DSR requirement when available so tiers match the SITREP.
+  const lineToday = m => S.requiredToDate*m;
   const tiers=[
     {name:'Triton',   mult:1.0, color:'var(--triton)'},
     {name:'Poseidon', mult:1.2, color:'var(--poseidon)'},
@@ -1603,21 +1769,49 @@ splashEl.addEventListener('click',()=>{ clearTimeout(splashTimer); showHome(); }
 
 // door selection
 const analyzeEl=document.getElementById('appAnalyze');
+const moonTransition=document.getElementById('moonTransition');
+const moonVideo=document.getElementById('moonVideo');
+
+// the actual view swap, factored out so the transition can call it
+function goToDoor(which){
+  if(which==='planning'){
+    homeEl.classList.remove('show'); homeEl.style.display='none';
+    toolEl.style.display='block';
+    window.scrollTo(0,0);
+  }else{
+    // Analyze Performance — reads the shared data spine
+    homeEl.classList.remove('show'); homeEl.style.display='none';
+    analyzeEl.style.display='block';
+    window.scrollTo(0,0);
+    renderAnalyze();
+  }
+}
+
+// play the moon-zoom (~1.2s), then swap views. Always navigates even if video fails.
+const TRANSITION_MS=1200;
+function playTransition(which){
+  let handed=false;
+  const hand=()=>{
+    if(handed) return; handed=true;
+    goToDoor(which);
+    // hide overlay just after the view is up, then reset the clip
+    setTimeout(()=>{
+      moonTransition.classList.remove('show');
+      try{ moonVideo.pause(); moonVideo.currentTime=0; }catch(e){}
+    },120);
+  };
+  moonTransition.classList.add('show');
+  try{
+    moonVideo.currentTime=0;
+    const p=moonVideo.play();
+    if(p&&p.catch) p.catch(()=>{ /* autoplay blocked — timer still hands off */ });
+  }catch(e){ /* fall through to timer */ }
+  // hard handoff at TRANSITION_MS regardless of video state
+  setTimeout(hand, TRANSITION_MS);
+}
+
 document.querySelectorAll('.door').forEach(d=>{
-  d.addEventListener('click',()=>{
-    const which=d.dataset.door;
-    if(which==='planning'){
-      homeEl.classList.remove('show'); homeEl.style.display='none';
-      toolEl.style.display='block';
-      window.scrollTo(0,0);
-    }else{
-      // Analyze Performance — reads the shared data spine
-      homeEl.classList.remove('show'); homeEl.style.display='none';
-      analyzeEl.style.display='block';
-      window.scrollTo(0,0);
-      renderAnalyze();
-    }
-  });
+  d.addEventListener('click',()=> playTransition(d.dataset.door));
 });
 
 // back to home from either screen
