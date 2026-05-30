@@ -11,26 +11,19 @@
 :root{
   --bg-0:#04070f; --bg-1:#070d1a; --panel:#0c1830; --panel-2:#0a1426;
   --line:rgba(70,130,200,.18); --line-soft:rgba(70,130,200,.10);
-  --ink:#e8f0fb; --ink-soft:#9fb3cd;
-  --ink-faint:#5d72a0;
+  --ink:#e8f0fb; --ink-soft:#9fb3cd; --ink-faint:#5d72a0;
   --triton:#3da9fc; --triton-glow:rgba(61,169,252,.35);
   --zeus:#ffb74d; --poseidon:#8b7cf6;
   --good:#2ce6c0; --danger:#ff5470; --warn:#ffb74d;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg-0);color:var(--ink);font-family:'Sora',sans-serif;-webkit-font-smoothing:antialiased}
-body{
-  min-height:100vh;padding:24px 16px 60px;
-  background:
-    radial-gradient(900px 500px at 85% -5%, rgba(61,169,252,.10), transparent 60%),
-    radial-gradient(700px 500px at 0% 100%, rgba(139,124,246,.07), transparent 55%),
-    var(--bg-0);
-}
-.wrap{max-width:1100px;margin:0 auto}
-
-/* header */
-.dash-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px}
-.dash-kicker{font-family:'Chakra Petch',monospace;letter-spacing:.42em;font-size:11px;color:var(--triton);text-transform:uppercase;opacity:.9}
+body{min-height:100vh;padding:24px 16px 60px;
+  background:radial-gradient(900px 500px at 85% -5%, rgba(61,169,252,.10), transparent 60%),
+    radial-gradient(700px 500px at 0% 100%, rgba(139,124,246,.07), transparent 55%),var(--bg-0);}
+.wrap{max-width:1140px;margin:0 auto}
+.dash-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dash-kicker{font-family:'Chakra Petch',monospace;letter-spacing:.42em;font-size:11px;color:var(--triton);text-transform:uppercase}
 .dash-title{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(26px,5vw,40px);letter-spacing:.02em;line-height:1.02;text-transform:uppercase}
 .dash-title span{color:var(--triton)}
 .dash-meta{text-align:right;font-size:12px;color:var(--ink-soft);line-height:1.5}
@@ -39,15 +32,14 @@ body{
 .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 10px var(--good);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.4}}
 .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:18px 0 22px}
-
-/* section titles */
 .sec{margin:30px 0 14px;display:flex;align-items:center;gap:12px}
 .sec-ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(61,169,252,.22),rgba(10,20,40,.6));border:1px solid var(--line)}
 .sec-ic svg{width:17px;height:17px;stroke:var(--triton);fill:none;stroke-width:2}
-.sec h2{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.16em;font-size:13px;text-transform:uppercase;color:var(--ink)}
-.sec .sub{font-size:11px;color:var(--ink-faint);letter-spacing:.04em}
-
-/* hero KPI row */
+.sec h2{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.16em;font-size:13px;text-transform:uppercase}
+.sec .sub{font-size:11px;color:var(--ink-faint)}
+.tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;gap:3px;margin-left:auto}
+.tab{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);background:none;border:0;padding:7px 15px;border-radius:8px;cursor:pointer;transition:.15s}
+.tab.active{background:linear-gradient(160deg,rgba(61,169,252,.3),rgba(61,169,252,.12));color:var(--ink)}
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px}
 .kpi{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:16px;padding:18px 17px}
 .kpi::after{content:"";position:absolute;inset:0;background:radial-gradient(120px 60px at 100% 0%,var(--triton-glow),transparent 70%);opacity:.5;pointer-events:none}
@@ -56,9 +48,25 @@ body{
 .kpi .sub{font-size:11px;color:var(--ink-faint);margin-top:3px}
 .kpi .tag{margin-top:9px;font-family:'Chakra Petch',monospace;font-size:12px;font-weight:600}
 .kpi.good .tag{color:var(--good)} .kpi.bad .tag{color:var(--danger)}
-.kpi .spark{position:absolute;right:12px;bottom:10px;opacity:.5}
-
-/* mission set grid */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h3{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.card h3 .pip{width:8px;height:8px;border-radius:2px}
+.alert-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.alert-row:last-child{border-bottom:0}
+.alert-rank{width:20px;font-family:'Chakra Petch',monospace;font-size:13px;color:var(--ink-faint)}
+.alert-name{flex:1;font-size:13px;font-family:'Chakra Petch',monospace;letter-spacing:.02em}
+.alert-name small{display:block;color:var(--ink-faint);font-size:10px;letter-spacing:.06em}
+.alert-gs{font-family:'Chakra Petch',monospace;font-weight:600;font-size:14px;min-width:46px;text-align:right}
+.alert-ask{font-size:11px;color:var(--ink-soft);min-width:78px;text-align:right}
+.alert-ask b{color:var(--warn);font-family:'Chakra Petch',monospace}
+.mv{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.mv:last-child{border-bottom:0}
+.mv-name{flex:1;font-size:13px;font-family:'Chakra Petch',monospace}
+.mv-chg{font-family:'Chakra Petch',monospace;font-weight:600;font-size:13px}
+.mv.up .mv-chg{color:var(--good)} .mv.down .mv-chg{color:var(--danger)}
+.mv-spark{width:54px;height:18px}
 .ms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px}
 .ms{position:relative;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:15px 14px;text-align:center;transition:transform .15s,border-color .15s}
 .ms:hover{transform:translateY(-3px);border-color:var(--triton)}
@@ -71,15 +79,8 @@ body{
 .ms.ahead .ms-flag{color:var(--good)} .ms.behind .ms-flag{color:var(--danger)}
 .ms .ms-bar{margin-top:10px;height:5px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden}
 .ms .ms-fill{height:100%;border-radius:4px}
-
-/* tabs */
-.tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;gap:3px;margin-left:auto}
-.tab{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);background:none;border:0;padding:7px 15px;border-radius:8px;cursor:pointer;transition:.15s}
-.tab.active{background:linear-gradient(160deg,rgba(61,169,252,.3),rgba(61,169,252,.12));color:var(--ink)}
-
-/* tier / glideslope */
-.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px}
-.tier{position:relative;overflow:hidden;border-radius:16px;padding:17px;background:var(--panel-2);border:1px solid var(--line)}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px}
+.tier{border-radius:16px;padding:17px;background:var(--panel-2);border:1px solid var(--line)}
 .tier .tn{font-family:'Chakra Petch',monospace;letter-spacing:.1em;font-size:12px;text-transform:uppercase}
 .tier .tc{font-family:'Chakra Petch',monospace;font-weight:700;font-size:30px;margin-top:7px}
 .tier .td{font-size:11px;color:var(--ink-faint);margin-top:2px}
@@ -87,12 +88,7 @@ body{
 .tier.poseidon{border-color:rgba(139,124,246,.5)} .tier.poseidon .tn{color:var(--poseidon)}
 .tier.triton{border-color:rgba(61,169,252,.5)} .tier.triton .tn{color:var(--triton)}
 .tier.below{border-color:rgba(255,84,112,.4)} .tier.below .tn{color:var(--danger)}
-
-/* trend chart */
-.chart-card{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:18px 16px 10px}
 svg.trend{width:100%;height:200px;display:block}
-
-/* division table */
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{font-family:'Chakra Petch',monospace;font-weight:500;letter-spacing:.08em;font-size:11px;text-transform:uppercase;color:var(--ink-soft);text-align:right;padding:9px 10px;border-bottom:1px solid var(--line)}
 .tbl th:first-child{text-align:left}
@@ -102,33 +98,22 @@ svg.trend{width:100%;height:200px;display:block}
 .gs-chip{display:inline-block;min-width:54px;padding:3px 9px;border-radius:20px;font-family:'Chakra Petch',monospace;font-size:12px;font-weight:600}
 .gs-z{background:rgba(255,183,77,.16);color:var(--zeus)} .gs-p{background:rgba(139,124,246,.16);color:var(--poseidon)}
 .gs-t{background:rgba(61,169,252,.16);color:var(--triton)} .gs-b{background:rgba(255,84,112,.14);color:var(--danger)}
-
 .proto-badge{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:50;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.2em;color:var(--zeus);background:rgba(255,183,77,.1);border:1px solid rgba(255,183,77,.4);padding:4px 14px;border-radius:20px;text-transform:uppercase}
 .loading,.errbox{text-align:center;padding:50px 20px;color:var(--ink-soft);font-family:'Chakra Petch',monospace;letter-spacing:.1em}
 .errbox{color:var(--danger)}
 .fade{animation:fade .5s ease both}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}}
-.src-row{margin-top:14px;display:flex;gap:8px;align-items:center;font-size:11px;color:var(--ink-faint)}
+.src-row{margin-top:24px;display:flex;gap:8px;align-items:center;font-size:11px;color:var(--ink-faint)}
 .src-row input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:'Chakra Petch',monospace;font-size:11px}
 .src-row button{background:var(--triton);color:var(--bg-0);border:0;border-radius:8px;padding:7px 14px;font-family:'Chakra Petch',monospace;font-size:11px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
 <div class="proto-badge">◆ Prototype · Not Live</div>
-<div class="wrap" id="root">
-  <div class="loading">LOADING COMMAND DATA…</div>
-</div>
-
+<div class="wrap" id="root"><div class="loading">LOADING COMMAND DATA…</div></div>
 <script>
 var FY26_PROD_DAYS = {"2025-10-01":0,"2025-10-02":1,"2025-10-03":2,"2025-10-06":3,"2025-10-07":4,"2025-10-08":5,"2025-10-14":6,"2025-10-15":7,"2025-10-16":8,"2025-10-17":9,"2025-10-20":10,"2025-10-21":11,"2025-10-22":12,"2025-10-23":13,"2025-10-24":14,"2025-10-27":15,"2025-10-28":16,"2025-10-29":17,"2025-10-30":18,"2025-10-31":19,"2025-11-03":20,"2025-11-04":21,"2025-11-05":22,"2025-11-06":23,"2025-11-07":24,"2025-11-12":25,"2025-11-13":26,"2025-11-14":27,"2025-11-17":28,"2025-11-18":29,"2025-11-19":30,"2025-11-20":31,"2025-11-21":32,"2025-11-24":33,"2025-11-25":34,"2025-11-26":35,"2025-12-01":36,"2025-12-02":37,"2025-12-03":38,"2025-12-04":39,"2025-12-08":40,"2025-12-09":41,"2025-12-10":42,"2025-12-11":43,"2025-12-12":44,"2025-12-15":45,"2025-12-16":46,"2025-12-17":47,"2025-12-18":48,"2025-12-19":49,"2026-01-05":50,"2026-01-06":51,"2026-01-07":52,"2026-01-08":53,"2026-01-09":54,"2026-01-12":55,"2026-01-13":56,"2026-01-14":57,"2026-01-15":58,"2026-01-16":59,"2026-01-20":60,"2026-01-21":61,"2026-01-22":62,"2026-01-23":63,"2026-01-26":64,"2026-01-27":65,"2026-01-28":66,"2026-01-29":67,"2026-01-30":68,"2026-02-02":69,"2026-02-03":70,"2026-02-04":71,"2026-02-05":72,"2026-02-06":73,"2026-02-09":74,"2026-02-10":75,"2026-02-11":76,"2026-02-12":77,"2026-02-13":78,"2026-02-17":79,"2026-02-18":80,"2026-02-19":81,"2026-02-20":82,"2026-02-23":83,"2026-02-24":84,"2026-02-25":85,"2026-02-26":86,"2026-02-27":87,"2026-03-02":88,"2026-03-03":89,"2026-03-04":90,"2026-03-05":91,"2026-03-09":92,"2026-03-10":93,"2026-03-11":94,"2026-03-12":95,"2026-03-13":96,"2026-03-16":97,"2026-03-17":98,"2026-03-18":99,"2026-03-19":100,"2026-03-20":101,"2026-03-23":102,"2026-03-24":103,"2026-03-25":104,"2026-03-26":105,"2026-03-27":106,"2026-03-30":107,"2026-03-31":108,"2026-04-01":109,"2026-04-02":110,"2026-04-03":111,"2026-04-06":112,"2026-04-07":113,"2026-04-08":114,"2026-04-09":115,"2026-04-10":116,"2026-04-13":117,"2026-04-14":118,"2026-04-15":119,"2026-04-16":120,"2026-04-17":121,"2026-04-20":122,"2026-04-21":123,"2026-04-22":124,"2026-04-23":125,"2026-04-24":126,"2026-04-27":127,"2026-04-28":128,"2026-04-29":129,"2026-04-30":130,"2026-05-01":131,"2026-05-04":132,"2026-05-05":133,"2026-05-06":134,"2026-05-07":135,"2026-05-08":136,"2026-05-11":137,"2026-05-12":138,"2026-05-13":139,"2026-05-14":140,"2026-05-15":141,"2026-05-18":142,"2026-05-19":143,"2026-05-20":144,"2026-05-21":145,"2026-05-22":146,"2026-05-26":147,"2026-05-27":148,"2026-05-28":149,"2026-05-29":150,"2026-06-01":151,"2026-06-02":152,"2026-06-03":153,"2026-06-04":154,"2026-06-05":155,"2026-06-08":156,"2026-06-09":157,"2026-06-10":158,"2026-06-11":159,"2026-06-12":160,"2026-06-15":161,"2026-06-16":162,"2026-06-17":163,"2026-06-18":164,"2026-06-22":165,"2026-06-23":166,"2026-06-24":167,"2026-06-25":168,"2026-06-26":169,"2026-06-29":170,"2026-06-30":171,"2026-07-01":172,"2026-07-02":173,"2026-07-06":174,"2026-07-07":175,"2026-07-08":176,"2026-07-09":177,"2026-07-10":178,"2026-07-13":179,"2026-07-14":180,"2026-07-15":181,"2026-07-16":182,"2026-07-17":183,"2026-07-20":184,"2026-07-21":185,"2026-07-22":186,"2026-07-23":187,"2026-07-24":188,"2026-07-27":189,"2026-07-28":190,"2026-07-29":191,"2026-07-30":192,"2026-08-03":194,"2026-08-04":195,"2026-08-05":196,"2026-08-06":197,"2026-08-10":198,"2026-08-11":199,"2026-08-12":200,"2026-08-13":201,"2026-08-14":202,"2026-08-17":203,"2026-08-18":204,"2026-08-19":205,"2026-08-20":206,"2026-08-21":207,"2026-08-24":208,"2026-08-25":209,"2026-08-26":210,"2026-08-27":211,"2026-08-28":212,"2026-08-31":213,"2026-09-01":214,"2026-09-02":215,"2026-09-03":216,"2026-09-08":217,"2026-09-09":218,"2026-09-10":219,"2026-09-11":220,"2026-09-14":221,"2026-09-15":222,"2026-09-16":223,"2026-09-17":224,"2026-09-18":225,"2026-09-21":226,"2026-09-22":227,"2026-09-23":228,"2026-09-24":229,"2026-09-25":230,"2026-09-28":231,"2026-09-29":232,"2026-09-30":233};
-
-/* ---- production-day index (authoritative FY26 calendar) ---- */
-function prodDayIndex(iso){
-  if(FY26_PROD_DAYS[iso]!==undefined) return FY26_PROD_DAYS[iso];
-  const keys=Object.keys(FY26_PROD_DAYS).sort(); let best=null;
-  for(const k of keys){ if(k<=iso) best=FY26_PROD_DAYS[k]; else break; }
-  return best;
-}
+function prodDayIndex(iso){if(FY26_PROD_DAYS[iso]!==undefined)return FY26_PROD_DAYS[iso];const k=Object.keys(FY26_PROD_DAYS).sort();let b=null;for(const x of k){if(x<=iso)b=FY26_PROD_DAYS[x];else break;}return b;}
 const PROD_DAYS_YEAR=233;
 const MISSION_SETS=[
   {key:'alnav',label:'ALNAV',goal:3166,field:s=>s.attn},
@@ -138,207 +123,156 @@ const MISSION_SETS=[
   {key:'nns',label:'NNS',goal:203,field:s=>(s.nns&&s.nns.attn)||0},
 ];
 const sum=(snap,f)=>snap.stations.reduce((a,s)=>a+(f(s)||0),0);
-const fmt=n=>n.toLocaleString();
+const fmt=n=>Math.round(n).toLocaleString();
+const tierOf=gs=>gs>=1.4?'zeus':gs>=1.2?'poseidon':gs>=1.0?'triton':'below';
+var CURRENT_URL='data.json', BUNDLE=null;
 
-/* ---- data load ---- */
-let BUNDLE=null;
 async function load(url){
+  CURRENT_URL=url;
   const root=document.getElementById('root');
   root.innerHTML='<div class="loading">LOADING COMMAND DATA…</div>';
   try{
-    const res=await fetch(url,{cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    BUNDLE=await res.json();
-    render();
+    const res=await fetch(url,{cache:'no-store'}); if(!res.ok)throw new Error('HTTP '+res.status);
+    BUNDLE=await res.json(); render();
   }catch(e){
-    root.innerHTML='<div class="errbox">COULD NOT LOAD data.json<br><br>'+e.message+
-      '<br><br>This prototype must run from the same site as your data.json (e.g. the Vercel app), or paste a full URL below.</div>'+srcRow(url);
+    root.innerHTML='<div class="errbox">COULD NOT LOAD data.json<br><br>'+e.message+'</div>'+srcRow();
     wireSrc();
   }
 }
-function srcRow(url){
-  return '<div class="wrap"><div class="src-row"><span>Source:</span>'+
-    '<input id="srcUrl" value="'+url+'"><button id="srcGo">Load</button></div></div>';
-}
-function wireSrc(){
-  const go=document.getElementById('srcGo');
-  if(go) go.onclick=()=>load(document.getElementById('srcUrl').value.trim());
-}
+function srcRow(){return '<div class="src-row"><span>Source:</span><input id="srcUrl" value="'+CURRENT_URL+'"><button id="srcGo">Reload</button></div>';}
+function wireSrc(){const g=document.getElementById('srcGo'); if(g)g.onclick=()=>load(document.getElementById('srcUrl').value.trim());}
 
-/* ---- velocity (walk back to >= target prod days) ---- */
 function velocity(snaps,target){
-  const dated=snaps.map(s=>({s,idx:prodDayIndex(s.date)})).filter(o=>o.idx!=null);
-  if(dated.length<2) return null;
-  dated.sort((a,b)=>a.idx-b.idx);
-  const cur=dated[dated.length-1];
-  for(let i=dated.length-2;i>=0;i--){
-    if(cur.idx-dated[i].idx>=target) return {cur:cur.s,past:dated[i].s,span:cur.idx-dated[i].idx,curIdx:cur.idx};
-  }
+  const d=snaps.map(s=>({s,idx:prodDayIndex(s.date)})).filter(o=>o.idx!=null);
+  if(d.length<2)return null; d.sort((a,b)=>a.idx-b.idx);
+  const cur=d[d.length-1];
+  for(let i=d.length-2;i>=0;i--){if(cur.idx-d[i].idx>=target)return{cur:cur.s,past:d[i].s,span:cur.idx-d[i].idx};}
   return null;
 }
 
-/* ---- glideslope tier classification (ALNAV) ---- */
-function tierOf(gs){ if(gs>=1.4)return'zeus'; if(gs>=1.2)return'poseidon'; if(gs>=1.0)return'triton'; return'below'; }
-
 function render(){
   const snaps=[...BUNDLE.snapshots].filter(s=>s.stations&&s.stations.length)
-    .map(s=>({...s,idx:prodDayIndex(s.date)}))
-    .sort((a,b)=>(a.idx??-1)-(b.idx??-1));
-  const cur=snaps[snaps.length-1];
-  const curIdx=prodDayIndex(cur.date);
-  const v10=velocity(snaps,10), v30=velocity(snaps,30);
+    .map(s=>({...s,idx:prodDayIndex(s.date)})).sort((a,b)=>(a.idx??-1)-(b.idx??-1));
+  const cur=snaps[snaps.length-1], prev=snaps[snaps.length-2]||cur, curIdx=prodDayIndex(cur.date);
+  const frac=curIdx/PROD_DAYS_YEAR, daysLeft=PROD_DAYS_YEAR-curIdx;
+  const totGoal=sum(cur,s=>s.goal), totAttn=sum(cur,s=>s.attn);
+  const overallGS=totAttn/(totGoal*frac)||0, reqToDate=totGoal*frac;
+  const projEOY=frac>0?totAttn/frac:0;
 
-  // command totals
-  const totGoal=cur.stations.reduce((a,s)=>a+(s.goal||0),0);
-  const totAttn=cur.stations.reduce((a,s)=>a+(s.attn||0),0);
-  const overallGS = (totAttn/ (totGoal * (curIdx/PROD_DAYS_YEAR))) || 0;
-  const reqToDate = totGoal*(curIdx/PROD_DAYS_YEAR);
-  const projEOY = curIdx>0 ? Math.round(totAttn/ (curIdx/PROD_DAYS_YEAR)) : 0;
-
-  // division rollup (ALNAV)
-  const divs={};
-  for(const s of cur.stations){
-    const d=s.division||'—';
-    if(!divs[d])divs[d]={goal:0,attn:0};
-    divs[d].goal+=s.goal||0; divs[d].attn+=s.attn||0;
-  }
-
-  const html=[];
-  html.push('<div class="dash-head fade">'+
-    '<div><div class="dash-kicker">NTAG Southwest</div>'+
+  const H=[];
+  H.push('<div class="dash-head fade"><div><div class="dash-kicker">NTAG Southwest</div>'+
     '<div class="dash-title">Command <span>Dashboard</span></div>'+
-    '<div class="dash-pill"><span class="dot"></span>'+cur.label+' · '+curIdx+' / 233 PD</div></div>'+
-    '<div class="dash-meta">Production day <b>'+curIdx+'</b> of 233<br>'+
-    Math.round(curIdx/PROD_DAYS_YEAR*100)+'% through FY26<br><b>'+snaps.length+'</b> snapshots loaded</div>'+
-    '</div><div class="hr"></div>');
+    '<div class="dash-pill"><span class="dot"></span>'+cur.label+' · PD '+curIdx+'/233</div></div>'+
+    '<div class="dash-meta">Production day <b>'+curIdx+'</b> of 233<br>'+Math.round(frac*100)+'% through FY26<br><b>'+snaps.length+'</b> snapshots loaded</div></div><div class="hr"></div>');
 
-  // hero KPIs
-  const gsTier=tierOf(overallGS);
-  const gsClass = overallGS>=1 ? 'good':'bad';
-  html.push('<div class="kpi-row fade">');
-  html.push(kpi('Command Glideslope',(overallGS*100).toFixed(1)+'%',
-    'ALNAV attainment vs required pace', (overallGS>=1?'▲ ON/AHEAD':'▼ BEHIND'), gsClass));
-  html.push(kpi('ALNAV Attained',fmt(totAttn),'of '+fmt(totGoal)+' goal · '+Math.round(totAttn/totGoal*100)+'%','vs '+Math.round(reqToDate)+' req to date',
-    totAttn>=reqToDate?'good':'bad', totAttn>=reqToDate?'▲ +'+Math.round(totAttn-reqToDate):'▼ '+Math.round(totAttn-reqToDate)));
-  html.push(kpi('Projected EOY',fmt(projEOY),'at current pace','vs '+fmt(totGoal)+' goal',
-    projEOY>=totGoal?'good':'bad', projEOY>=totGoal?'▲ +'+fmt(projEOY-totGoal):'▼ '+fmt(projEOY-totGoal)));
-  const alnavV = v10 ? (sum(v10.cur,x=>x.attn)-sum(v10.past,x=>x.attn))/v10.span : null;
-  html.push(kpi('ALNAV Velocity',alnavV!=null?alnavV.toFixed(1):'N/A','contracts/day (10 PD)',
-    alnavV!=null?('vs '+(3166/233).toFixed(1)+' req'):'', alnavV!=null&&alnavV>=3166/233?'good':'bad',
-    alnavV!=null?(alnavV>=3166/233?'▲ ahead':'▼ behind'):''));
-  html.push('</div>');
+  // KPIs
+  H.push('<div class="kpi-row fade">');
+  H.push(kpi('Command Glideslope',(overallGS*100).toFixed(1)+'%','ALNAV attainment vs required pace',overallGS>=1?'good':'bad',overallGS>=1?'▲ ON / AHEAD':'▼ BEHIND PACE'));
+  H.push(kpi('ALNAV Attained',fmt(totAttn),'of '+fmt(totGoal)+' · '+Math.round(totAttn/totGoal*100)+'% of goal',totAttn>=reqToDate?'good':'bad',(totAttn>=reqToDate?'▲ +':'▼ ')+fmt(totAttn-reqToDate)+' vs req'));
+  H.push(kpi('Projected EOY',fmt(projEOY),'at current pace · goal '+fmt(totGoal),projEOY>=totGoal?'good':'bad',(projEOY>=totGoal?'▲ +':'▼ ')+fmt(projEOY-totGoal)));
+  const v10=velocity(snaps,10); const av=v10?(sum(v10.cur,x=>x.attn)-sum(v10.past,x=>x.attn))/v10.span:null;
+  H.push(kpi('ALNAV Velocity',av!=null?av.toFixed(1):'N/A','contracts/day · 10 PD',av!=null&&av>=3166/233?'good':'bad',av!=null?((av>=3166/233?'▲ ':'▼ ')+'vs '+(3166/233).toFixed(1)+' req'):'add history'));
+  H.push('</div>');
 
-  // velocity section
-  html.push(secHead('activity','Command Velocity','Moving-average pace per mission set',
-    '<div class="tabs"><button class="tab active" data-w="10">10-Day</button><button class="tab" data-w="30">30-Day</button></div>'));
-  html.push('<div id="velWrap" class="fade"></div>');
+  // ACTION ROW: needs attention + movers
+  H.push(secHead('alert','Command Focus','Where to direct effort right now',''));
+  H.push('<div class="cols fade">');
+  // needs attention
+  const below=cur.stations.map(s=>{
+    const needPerDay=daysLeft>0?(s.goal-s.attn)/daysLeft:0;
+    return {name:s.name,div:s.division,gs:s.glideslope_pct,needPerDay};
+  }).filter(s=>s.gs<1).sort((a,b)=>a.gs-b.gs).slice(0,6);
+  let na='<div class="card"><h3><span class="pip" style="background:var(--danger)"></span>Needs Attention · Below Glideslope</h3>';
+  if(!below.length) na+='<div style="color:var(--good);font-size:13px;font-family:Chakra Petch,monospace">All stations at or above glideslope. ▲</div>';
+  below.forEach((s,i)=>{na+='<div class="alert-row"><div class="alert-rank">'+(i+1)+'</div>'+
+    '<div class="alert-name">'+s.name+'<small>'+s.div+'</small></div>'+
+    '<div class="alert-gs" style="color:var(--danger)">'+(s.gs*100).toFixed(0)+'%</div>'+
+    '<div class="alert-ask">need <b>'+s.needPerDay.toFixed(2)+'</b>/day</div></div>';});
+  na+='</div>'; H.push(na);
+  // movers
+  const pmap={}; prev.stations.forEach(s=>pmap[s.name]=s.glideslope_pct);
+  const movers=cur.stations.map(s=>({name:s.name,div:s.division,chg:s.glideslope_pct-(pmap[s.name]??s.glideslope_pct),gs:s.glideslope_pct}))
+    .sort((a,b)=>b.chg-a.chg);
+  const top=movers.slice(0,3), bot=movers.slice(-3).reverse();
+  let mv='<div class="card"><h3><span class="pip" style="background:var(--good)"></span>Momentum · Week-over-Week Movers</h3>';
+  top.forEach(m=>{mv+='<div class="mv up"><div class="mv-name">'+m.name+'</div><div class="mv-chg">▲ +'+(m.chg*100).toFixed(1)+'%</div></div>';});
+  mv+='<div style="height:8px"></div>';
+  bot.forEach(m=>{mv+='<div class="mv down"><div class="mv-name">'+m.name+'</div><div class="mv-chg">▼ '+(m.chg*100).toFixed(1)+'%</div></div>';});
+  mv+='</div>'; H.push(mv);
+  H.push('</div>');
 
-  // glideslope tiers
-  html.push(secHead('layers','Glideslope Posture','How many stations sit in each ALNAV tier',''));
-  const tierCounts={zeus:0,poseidon:0,triton:0,below:0};
-  cur.stations.forEach(s=>tierCounts[tierOf(s.glideslope_pct)]++);
-  html.push('<div class="tier-grid fade">'+
-    tierCard('zeus','Zeus','≥140% glideslope',tierCounts.zeus)+
-    tierCard('poseidon','Poseidon','≥120% glideslope',tierCounts.poseidon)+
-    tierCard('triton','Triton','≥100% glideslope',tierCounts.triton)+
-    tierCard('below','Below GS','<100% glideslope',tierCounts.below)+'</div>');
+  // velocity
+  H.push(secHead('activity','Command Velocity','Moving-average pace per mission set','<div class="tabs"><button class="tab active" data-w="10">10-Day</button><button class="tab" data-w="30">30-Day</button></div>'));
+  H.push('<div id="velWrap" class="fade"></div>');
+
+  // per-mission-set glideslope (command-wide)
+  H.push(secHead('target','Mission-Set Glideslope','Command-wide attainment vs pace, every set',''));
+  H.push('<div class="ms-grid fade">'+MISSION_SETS.map(ms=>{
+    const g=sum(cur,s=>{const o=ms.key==='alnav'?{goal:s.goal}:s[ms.key]; return (o&&o.goal)||0;});
+    const a=sum(cur,ms.field); const gs=g?a/(g*frac):0; const t=tierOf(gs); const ahead=gs>=1;
+    const col=t==='zeus'?'var(--zeus)':t==='poseidon'?'var(--poseidon)':t==='triton'?'var(--triton)':'var(--danger)';
+    return '<div class="ms '+(ahead?'ahead':'behind')+'"><div class="ms-lab">'+ms.label+'</div>'+
+      '<div class="ms-rate" style="color:'+col+'">'+(gs*100).toFixed(0)+'<span class="ms-unit">%</span></div>'+
+      '<div class="ms-vs">'+fmt(a)+' / '+fmt(g)+'</div>'+
+      '<div class="ms-flag">'+(ahead?'▲':'▼')+' '+(gs>=1?'on pace':'behind')+'</div></div>';
+  }).join('')+'</div>');
+
+  // tiers
+  H.push(secHead('layers','Glideslope Posture','Stations by ALNAV tier',''));
+  const tc={zeus:0,poseidon:0,triton:0,below:0}; cur.stations.forEach(s=>tc[tierOf(s.glideslope_pct)]++);
+  H.push('<div class="tier-grid fade">'+tierCard('zeus','Zeus','≥140%',tc.zeus)+tierCard('poseidon','Poseidon','≥120%',tc.poseidon)+
+    tierCard('triton','Triton','≥100%',tc.triton)+tierCard('below','Below GS','<100%',tc.below)+'</div>');
 
   // trend
-  html.push(secHead('trend','Attainment Trend','Cumulative ALNAV attainment across snapshots',''));
-  html.push('<div class="chart-card fade">'+trendSvg(snaps)+'</div>');
+  H.push(secHead('trend','Attainment Trend','Cumulative ALNAV vs required pace',''));
+  H.push('<div class="card fade">'+trendSvg(snaps)+'</div>');
 
   // division table
-  html.push(secHead('grid','Division Rollup','ALNAV goal vs attainment by division',''));
-  html.push('<div class="chart-card fade" style="padding:6px 14px"><table class="tbl"><thead><tr>'+
-    '<th>Division</th><th>Goal</th><th>Attn</th><th>%</th><th>Glideslope</th></tr></thead><tbody>');
-  Object.keys(divs).sort().forEach(d=>{
-    const o=divs[d]; const pct=o.goal?o.attn/o.goal:0;
-    const gs=o.goal?(o.attn/(o.goal*(curIdx/PROD_DAYS_YEAR))):0;
-    const t=tierOf(gs); const cls={zeus:'gs-z',poseidon:'gs-p',triton:'gs-t',below:'gs-b'}[t];
-    html.push('<tr><td>'+d+'</td><td>'+fmt(o.goal)+'</td><td>'+fmt(o.attn)+'</td><td>'+Math.round(pct*100)+'%</td>'+
-      '<td><span class="gs-chip '+cls+'">'+(gs*100).toFixed(0)+'%</span></td></tr>');
-  });
-  html.push('</tbody></table></div>');
+  H.push(secHead('grid','Division Rollup','ALNAV by division',''));
+  const divs={}; cur.stations.forEach(s=>{const d=s.division||'—'; (divs[d]=divs[d]||{goal:0,attn:0}); divs[d].goal+=s.goal||0; divs[d].attn+=s.attn||0;});
+  let tb='<div class="card fade" style="padding:6px 14px"><table class="tbl"><thead><tr><th>Division</th><th>Goal</th><th>Attn</th><th>%</th><th>Glideslope</th></tr></thead><tbody>';
+  Object.keys(divs).sort().forEach(d=>{const o=divs[d];const pct=o.goal?o.attn/o.goal:0;const gs=o.goal?o.attn/(o.goal*frac):0;const t=tierOf(gs);
+    const cls={zeus:'gs-z',poseidon:'gs-p',triton:'gs-t',below:'gs-b'}[t];
+    tb+='<tr><td>'+d+'</td><td>'+fmt(o.goal)+'</td><td>'+fmt(o.attn)+'</td><td>'+Math.round(pct*100)+'%</td><td><span class="gs-chip '+cls+'">'+(gs*100).toFixed(0)+'%</span></td></tr>';});
+  tb+='</tbody></table></div>'; H.push(tb);
 
-  html.push('<div style="margin-top:24px">'+srcRow(CURRENT_URL)+'</div>');
-
-  document.getElementById('root').innerHTML=html.join('');
-  renderVel(10);
-  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active'); renderVel(+t.dataset.w);
-  });
-  wireSrc();
+  H.push(srcRow());
+  document.getElementById('root').innerHTML=H.join('');
 
   function renderVel(target){
-    const v=velocity(snaps,target);
-    const wrap=document.getElementById('velWrap');
-    if(!v){ wrap.innerHTML='<div class="errbox" style="padding:24px">Not enough production-day history for a '+target+'-day window yet.</div>'; return; }
-    const cards=MISSION_SETS.map(ms=>{
-      const delta=sum(v.cur,ms.field)-sum(v.past,ms.field);
-      const perDay=delta/v.span, req=ms.goal/PROD_DAYS_YEAR;
+    const v=velocity(snaps,target), wrap=document.getElementById('velWrap');
+    if(!v){wrap.innerHTML='<div class="errbox" style="padding:24px">Not enough history for a '+target+'-day window.</div>';return;}
+    wrap.innerHTML='<div class="ms-grid">'+MISSION_SETS.map(ms=>{
+      const delta=sum(v.cur,ms.field)-sum(v.past,ms.field); const perDay=delta/v.span, req=ms.goal/PROD_DAYS_YEAR;
       const ahead=perDay>=req, diff=perDay-req, pct=req>0?perDay/req:0;
-      return '<div class="ms '+(ahead?'ahead':'behind')+'">'+
-        '<div class="ms-lab">'+ms.label+'</div>'+
+      return '<div class="ms '+(ahead?'ahead':'behind')+'"><div class="ms-lab">'+ms.label+'</div>'+
         '<div class="ms-rate">'+perDay.toFixed(1)+'<span class="ms-unit">/day</span></div>'+
         '<div class="ms-vs">vs '+req.toFixed(1)+' req</div>'+
         '<div class="ms-flag">'+(ahead?'▲':'▼')+' '+(diff>=0?'+':'')+diff.toFixed(1)+'/day</div>'+
-        '<div class="ms-bar"><div class="ms-fill" style="width:'+Math.min(pct*100,150)/1.5+'%;background:'+(ahead?'var(--good)':'var(--danger)')+'"></div></div>'+
-        '</div>';
-    }).join('');
-    const exact=v.span===target;
-    wrap.innerHTML='<div class="ms-grid">'+cards+'</div>'+
-      '<div class="sec" style="margin:12px 0 0"><div class="sub">'+v.span+'-production-day average'+
-      (exact?'':' (nearest ≥'+target+')')+' · '+v.cur.label+' vs '+v.past.label+'</div></div>';
+        '<div class="ms-bar"><div class="ms-fill" style="width:'+Math.min(pct*100,150)/1.5+'%;background:'+(ahead?'var(--good)':'var(--danger)')+'"></div></div></div>';
+    }).join('')+'</div><div class="sec" style="margin:12px 0 0"><div class="sub">'+v.span+'-production-day average'+(v.span===target?'':' (nearest ≥'+target+')')+' · '+v.cur.label+' vs '+v.past.label+'</div></div>';
   }
+  renderVel(10);
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderVel(+t.dataset.w);});
+  wireSrc();
 }
-
-function kpi(lab,big,sub,tag,cls,tagText){
-  return '<div class="kpi '+(cls||'')+'"><div class="lab">'+lab+'</div>'+
-    '<div class="big">'+big+'</div><div class="sub">'+sub+'</div>'+
-    (tag?'<div class="tag">'+(tagText||tag)+'</div>':'')+'</div>';
-}
-function tierCard(cls,name,desc,count){
-  return '<div class="tier '+cls+'"><div class="tn">'+name+'</div>'+
-    '<div class="tc">'+count+'</div><div class="td">'+desc+' · stations</div></div>';
-}
-function secHead(icon,title,sub,right){
-  const icons={
-    activity:'<polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/>',
-    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
-    trend:'<polyline points="3 17 9 11 13 15 21 6"/><polyline points="14 6 21 6 21 13"/>',
-    grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'
-  };
-  return '<div class="sec"><div class="sec-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">'+icons[icon]+'</svg></div>'+
-    '<div><h2>'+title+'</h2><div class="sub">'+sub+'</div></div>'+(right||'')+'</div>';
-}
-function trendSvg(snaps){
-  const pts=snaps.filter(s=>s.idx!=null).map(s=>({x:s.idx,y:s.stations.reduce((a,t)=>a+(t.attn||0),0)}));
-  if(pts.length<2) return '<div class="errbox">Not enough data to chart.</div>';
-  const W=1000,H=200,pl=8,pr=8,pt=14,pb=22;
-  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+function kpi(lab,big,sub,cls,tag){return '<div class="kpi '+(cls||'')+'"><div class="lab">'+lab+'</div><div class="big">'+big+'</div><div class="sub">'+sub+'</div>'+(tag?'<div class="tag">'+tag+'</div>':'')+'</div>';}
+function tierCard(cls,name,desc,count){return '<div class="tier '+cls+'"><div class="tn">'+name+'</div><div class="tc">'+count+'</div><div class="td">'+desc+' glideslope · stations</div></div>';}
+function secHead(icon,title,sub,right){const I={alert:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',activity:'<polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/>',layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',trend:'<polyline points="3 17 9 11 13 15 21 6"/><polyline points="14 6 21 6 21 13"/>',grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'};
+  return '<div class="sec"><div class="sec-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">'+I[icon]+'</svg></div><div><h2>'+title+'</h2><div class="sub">'+sub+'</div></div>'+(right||'')+'</div>';}
+function trendSvg(snaps){const pts=snaps.filter(s=>s.idx!=null).map(s=>({x:s.idx,y:s.stations.reduce((a,t)=>a+(t.attn||0),0)}));
+  if(pts.length<2)return '<div class="errbox">Not enough data.</div>';
+  const W=1000,H=200,pl=8,pr=8,pt=14,pb=8;const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
   const xmin=Math.min(...xs),xmax=Math.max(...xs),ymax=Math.max(...ys)*1.08;
-  const X=x=>pl+((x-xmin)/(xmax-xmin||1))*(W-pl-pr);
-  const Y=y=>pt+(1-y/ymax)*(H-pt-pb);
-  // required line
+  const X=x=>pl+((x-xmin)/(xmax-xmin||1))*(W-pl-pr),Y=y=>pt+(1-y/ymax)*(H-pt-pb);
   const totGoal=snaps[snaps.length-1].stations.reduce((a,s)=>a+(s.goal||0),0);
   const reqAt=x=>totGoal*(x/PROD_DAYS_YEAR);
-  const reqPath='M'+X(xmin)+' '+Y(reqAt(xmin))+' L'+X(xmax)+' '+Y(reqAt(xmax));
   const line=pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
   const area=line+' L'+X(xmax)+' '+Y(0)+' L'+X(xmin)+' '+Y(0)+' Z';
-  return '<svg class="trend" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
-    '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'+
-    '<stop offset="0" stop-color="rgba(61,169,252,.35)"/><stop offset="1" stop-color="rgba(61,169,252,0)"/></linearGradient></defs>'+
-    '<path d="'+area+'" fill="url(#g)"/>'+
-    '<path d="'+reqPath+'" stroke="rgba(255,183,77,.7)" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'+
-    '<path d="'+line+'" stroke="var(--triton)" stroke-width="2.5" fill="none"/>'+
-    pts.map(p=>'<circle cx="'+X(p.x).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="3" fill="var(--triton)"/>').join('')+
-    '</svg>'+
-    '<div style="display:flex;gap:18px;justify-content:center;margin:8px 0 2px;font-size:11px;color:var(--ink-faint);font-family:Chakra Petch,monospace">'+
-    '<span style="color:var(--triton)">— Actual attainment</span><span style="color:var(--zeus)">- - Required pace</span></div>';
-}
-
-var CURRENT_URL='data.json';
+  return '<svg class="trend" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(61,169,252,.35)"/><stop offset="1" stop-color="rgba(61,169,252,0)"/></linearGradient></defs>'+
+    '<path d="'+area+'" fill="url(#g)"/><path d="M'+X(xmin)+' '+Y(reqAt(xmin))+' L'+X(xmax)+' '+Y(reqAt(xmax))+'" stroke="rgba(255,183,77,.7)" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'+
+    '<path d="'+line+'" stroke="var(--triton)" stroke-width="2.5" fill="none"/>'+pts.map(p=>'<circle cx="'+X(p.x).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="3" fill="var(--triton)"/>').join('')+'</svg>'+
+    '<div style="display:flex;gap:18px;justify-content:center;margin:8px 0 2px;font-size:11px;color:var(--ink-faint);font-family:Chakra Petch,monospace"><span style="color:var(--triton)">— Actual</span><span style="color:var(--zeus)">- - Required pace</span></div>';}
 load(CURRENT_URL);
 </script>
 </body>
