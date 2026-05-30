@@ -483,7 +483,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .vel-tab{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;
   font-size:13px;letter-spacing:.04em;padding:8px 18px;border-radius:7px;cursor:pointer;transition:.13s}
 .vel-tab.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
-.vel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.vel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
 @media(max-width:600px){.vel-grid{grid-template-columns:repeat(2,1fr)}}
 .vel-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:15px 14px;text-align:center}
 .vel-card.ahead{border-color:rgba(44,230,192,.5)} .vel-card.behind{border-color:rgba(255,84,112,.4)}
@@ -1969,33 +1969,71 @@ function flame(name){
    = 5N production days. Pace = (Δ cumulative attainment)/(5N).
    Compared to required/day = annual goal / 233 production days.
    ============================================================ */
+var FY26_PROD_DAYS = {"2025-10-01":0,"2025-10-02":1,"2025-10-03":2,"2025-10-06":3,"2025-10-07":4,"2025-10-08":5,"2025-10-14":6,"2025-10-15":7,"2025-10-16":8,"2025-10-17":9,"2025-10-20":10,"2025-10-21":11,"2025-10-22":12,"2025-10-23":13,"2025-10-24":14,"2025-10-27":15,"2025-10-28":16,"2025-10-29":17,"2025-10-30":18,"2025-10-31":19,"2025-11-03":20,"2025-11-04":21,"2025-11-05":22,"2025-11-06":23,"2025-11-07":24,"2025-11-12":25,"2025-11-13":26,"2025-11-14":27,"2025-11-17":28,"2025-11-18":29,"2025-11-19":30,"2025-11-20":31,"2025-11-21":32,"2025-11-24":33,"2025-11-25":34,"2025-11-26":35,"2025-12-01":36,"2025-12-02":37,"2025-12-03":38,"2025-12-04":39,"2025-12-08":40,"2025-12-09":41,"2025-12-10":42,"2025-12-11":43,"2025-12-12":44,"2025-12-15":45,"2025-12-16":46,"2025-12-17":47,"2025-12-18":48,"2025-12-19":49,"2026-01-05":50,"2026-01-06":51,"2026-01-07":52,"2026-01-08":53,"2026-01-09":54,"2026-01-12":55,"2026-01-13":56,"2026-01-14":57,"2026-01-15":58,"2026-01-16":59,"2026-01-20":60,"2026-01-21":61,"2026-01-22":62,"2026-01-23":63,"2026-01-26":64,"2026-01-27":65,"2026-01-28":66,"2026-01-29":67,"2026-01-30":68,"2026-02-02":69,"2026-02-03":70,"2026-02-04":71,"2026-02-05":72,"2026-02-06":73,"2026-02-09":74,"2026-02-10":75,"2026-02-11":76,"2026-02-12":77,"2026-02-13":78,"2026-02-17":79,"2026-02-18":80,"2026-02-19":81,"2026-02-20":82,"2026-02-23":83,"2026-02-24":84,"2026-02-25":85,"2026-02-26":86,"2026-02-27":87,"2026-03-02":88,"2026-03-03":89,"2026-03-04":90,"2026-03-05":91,"2026-03-09":92,"2026-03-10":93,"2026-03-11":94,"2026-03-12":95,"2026-03-13":96,"2026-03-16":97,"2026-03-17":98,"2026-03-18":99,"2026-03-19":100,"2026-03-20":101,"2026-03-23":102,"2026-03-24":103,"2026-03-25":104,"2026-03-26":105,"2026-03-27":106,"2026-03-30":107,"2026-03-31":108,"2026-04-01":109,"2026-04-02":110,"2026-04-03":111,"2026-04-06":112,"2026-04-07":113,"2026-04-08":114,"2026-04-09":115,"2026-04-10":116,"2026-04-13":117,"2026-04-14":118,"2026-04-15":119,"2026-04-16":120,"2026-04-17":121,"2026-04-20":122,"2026-04-21":123,"2026-04-22":124,"2026-04-23":125,"2026-04-24":126,"2026-04-27":127,"2026-04-28":128,"2026-04-29":129,"2026-04-30":130,"2026-05-01":131,"2026-05-04":132,"2026-05-05":133,"2026-05-06":134,"2026-05-07":135,"2026-05-08":136,"2026-05-11":137,"2026-05-12":138,"2026-05-13":139,"2026-05-14":140,"2026-05-15":141,"2026-05-18":142,"2026-05-19":143,"2026-05-20":144,"2026-05-21":145,"2026-05-22":146,"2026-05-26":147,"2026-05-27":148,"2026-05-28":149,"2026-05-29":150,"2026-06-01":151,"2026-06-02":152,"2026-06-03":153,"2026-06-04":154,"2026-06-05":155,"2026-06-08":156,"2026-06-09":157,"2026-06-10":158,"2026-06-11":159,"2026-06-12":160,"2026-06-15":161,"2026-06-16":162,"2026-06-17":163,"2026-06-18":164,"2026-06-22":165,"2026-06-23":166,"2026-06-24":167,"2026-06-25":168,"2026-06-26":169,"2026-06-29":170,"2026-06-30":171,"2026-07-01":172,"2026-07-02":173,"2026-07-06":174,"2026-07-07":175,"2026-07-08":176,"2026-07-09":177,"2026-07-10":178,"2026-07-13":179,"2026-07-14":180,"2026-07-15":181,"2026-07-16":182,"2026-07-17":183,"2026-07-20":184,"2026-07-21":185,"2026-07-22":186,"2026-07-23":187,"2026-07-24":188,"2026-07-27":189,"2026-07-28":190,"2026-07-29":191,"2026-07-30":192,"2026-08-03":194,"2026-08-04":195,"2026-08-05":196,"2026-08-06":197,"2026-08-10":198,"2026-08-11":199,"2026-08-12":200,"2026-08-13":201,"2026-08-14":202,"2026-08-17":203,"2026-08-18":204,"2026-08-19":205,"2026-08-20":206,"2026-08-21":207,"2026-08-24":208,"2026-08-25":209,"2026-08-26":210,"2026-08-27":211,"2026-08-28":212,"2026-08-31":213,"2026-09-01":214,"2026-09-02":215,"2026-09-03":216,"2026-09-08":217,"2026-09-09":218,"2026-09-10":219,"2026-09-11":220,"2026-09-14":221,"2026-09-15":222,"2026-09-16":223,"2026-09-17":224,"2026-09-18":225,"2026-09-21":226,"2026-09-22":227,"2026-09-23":228,"2026-09-24":229,"2026-09-25":230,"2026-09-28":231,"2026-09-29":232,"2026-09-30":233};
+/* Authoritative FY26 production-day index: maps an ISO date to cumulative
+   production days elapsed (0-based), straight from the NTAGSW master calendar.
+   Accounts for weekends, federal holidays, training days — every non-prod day. */
+function prodDayIndex(iso){
+  if(FY26_PROD_DAYS[iso]!==undefined) return FY26_PROD_DAYS[iso];
+  // Snapshot landed on a non-production day (e.g. a holiday-week pull):
+  // fall back to the most recent production day on/before that date.
+  const keys=Object.keys(FY26_PROD_DAYS).sort();
+  let best=null;
+  for(const k of keys){ if(k<=iso) best=FY26_PROD_DAYS[k]; else break; }
+  return best; // null if before FY start
+}
 const PROD_DAYS_YEAR = 233;
 const MISSION_SETS = [
   {key:'alnav', label:'ALNAV', goal:3166, field:s=>s.attn},
-  {key:'ac',    label:'AC',    goal:3067, field:s=>s.ac?.attn||0},
+  {key:'ac',    label:'AC',    goal:3101, field:s=>s.ac?.attn||0},
   {key:'nso',   label:'NSO',   goal:169,  field:s=>s.nso?.attn||0},
-  {key:'nf',    label:'NF',    goal:203,  field:s=>s.nuke?.attn||0},
+  {key:'nf',    label:'NF',    goal:204,  field:s=>s.nuke?.attn||0},
+  {key:'nns',   label:'NNS',   goal:203,  field:s=>s.nns?.attn||0},
 ];
-let velWindow = 2;  // snapshots back (2 = 10 prod days, 6 = 30)
+let velWindow = 2;  // legacy: tab value. 2 => 10 prod-day target, 6 => 30.
+const VEL_TARGET = {2:10, 6:30};  // tab "window" -> production-day target
 
 function commandAttn(snap, fieldFn){
   // sum cumulative attainment across all stations for a mission set
   return snap.stations.reduce((sum,s)=>sum+(fieldFn(s)||0), 0);
 }
+
+/* Walk back from the newest snapshot until we've accumulated >= targetDays
+   real production days (per the FY26 calendar). Returns the older snapshot to
+   difference against and the true span — or null if there isn't enough clean
+   history. Snapshots off the production calendar are skipped. */
+function findVelocityBaseline(snaps, targetDays){
+  const dated = snaps
+    .map(s=>({snap:s, idx:prodDayIndex(s.date)}))
+    .filter(o=>o.idx!==null && o.idx!==undefined);
+  if(dated.length < 2) return null;
+  dated.sort((a,b)=>a.idx-b.idx);
+  const newest = dated[dated.length-1];
+  // walk backward to the first snapshot at least targetDays before newest
+  for(let i=dated.length-2;i>=0;i--){
+    const span = newest.idx - dated[i].idx;
+    if(span >= targetDays){
+      return {cur:newest.snap, past:dated[i].snap, span};
+    }
+  }
+  return null; // not enough production-day history yet
+}
+
 function renderVelocity(){
   const snaps=DataLayer.allSnapshots();
   const grid=document.getElementById('velGrid');
   const note=document.getElementById('velNote');
-  if(snaps.length < velWindow+1){
-    grid.innerHTML=`<div class="az-hint">Need ${velWindow+1} weeks of data for this window — have ${snaps.length}.</div>`;
-    note.textContent=''; return;
+  const targetDays = VEL_TARGET[velWindow] || 10;
+  const base = findVelocityBaseline(snaps, targetDays);
+  if(!base){
+    grid.innerHTML=`<div class="az-hint">Not enough production-day history for a ${targetDays}-day window yet.</div>`;
+    note.textContent=`Need ~${targetDays} production days of snapshots. Add more weekly/daily sheets to populate this.`;
+    return;
   }
-  const cur=snaps[snaps.length-1];
-  const past=snaps[snaps.length-1-velWindow];
-  const prodDays=5*velWindow;
+  const {cur, past, span} = base;
   grid.innerHTML = MISSION_SETS.map(ms=>{
     const delta = commandAttn(cur,ms.field) - commandAttn(past,ms.field);
-    const perDay = delta/prodDays;
+    const perDay = delta/span;
     const required = ms.goal/PROD_DAYS_YEAR;
     const ahead = perDay>=required;
     const diff = perDay-required;
@@ -2008,8 +2046,12 @@ function renderVelocity(){
       <div class="vel-bar"><div class="vel-fill" style="width:${Math.min(pct*100,150)/1.5}%;background:${ahead?'var(--good)':'var(--danger)'}"></div></div>
     </div>`;
   }).join('');
-  const winDays=5*velWindow;
-  note.textContent = `${winDays}-production-day moving average (last ${velWindow} weekly snapshots). ${velWindow===2?'Short window — sensitive to a single week.':'Steadier signal over ~6 weeks.'}`;
+  // span may not be exactly the target (option B: nearest boundary at/after target)
+  const exact = span===targetDays;
+  note.textContent = `${span}-production-day moving average`
+    + (exact ? '' : ` (nearest clean window ≥ ${targetDays})`)
+    + ` · ${cur.label} vs ${past.label}.`
+    + (targetDays===10 ? ' Short window — sensitive to recent weeks.' : ' Steadier signal over ~6 weeks.');
 }
 document.querySelectorAll('.vel-tab').forEach(t=>{
   t.addEventListener('click',()=>{
