@@ -291,6 +291,11 @@ function render(){
     if(!v) return 0;
     return (sum(v.cur,ms.field)-sum(v.past,ms.field))/v.span;
   }
+  function setVelocityWin(ms,target){
+    const v=velocity(snaps,target);
+    if(!v) return null;
+    return (sum(v.cur,ms.field)-sum(v.past,ms.field))/v.span;
+  }
   let fcKey = (function(){
     // default to first behind set, else ALNAV
     for(const ms of MISSION_SETS){
@@ -329,6 +334,18 @@ function render(){
         else if(crossD>PROD_DAYS_YEAR) fallPD='after-eoy';
       }else{ fallPD='holds'; }
     }
+    // Goal-completion: PD where cumulative attainment reaches the FULL goal.
+    //   attn + (d-curIdx)*rate = goal  ->  d = curIdx + (goal-attn)/rate
+    let goalPD=null, goalNote='';
+    if(rate>0){
+      const d=curIdx+(goal-attn)/rate;
+      if(attn>=goal){ goalNote='<b style="color:var(--good)">Goal already met.</b>'; }
+      else if(d<=PROD_DAYS_YEAR){ goalPD=Math.ceil(d); const gdt=pdToDate(goalPD);
+        goalNote='Reaches the <b>'+fmt(goal)+'</b> annual goal by <b>'+(gdt||'PD '+goalPD)+'</b> (PD '+goalPD+', '+(goalPD-curIdx)+' PD out).'; }
+      else { const overflow=Math.round(d-PROD_DAYS_YEAR);
+        goalNote='At this rate, finishes the FY at <b>'+fmt(attn+(PROD_DAYS_YEAR-curIdx)*rate)+'</b> — <b style="color:var(--danger)">'+fmt(goal-(attn+(PROD_DAYS_YEAR-curIdx)*rate))+' short</b> of the '+fmt(goal)+' goal ('+overflow+' PD past EOY).'; }
+    }else{ goalNote='<b style="color:var(--danger)">At 0/day the goal is never reached.</b>'; }
+
     // verdict
     let vClass,vText,detail;
     if(behind){
@@ -343,6 +360,7 @@ function render(){
         detail='Easing to <b>'+rate.toFixed(2)+'/day</b> (below the <b>'+reqRate.toFixed(2)+'/day</b> requirement) burns the <b>+'+fmt(attn-reqNow)+'</b> cushion — '+ms.label+' would drop under 100% glideslope around <b>'+(dt||'PD '+fallPD)+'</b>, <b>'+(fallPD-curIdx)+'</b> production days out.'; }
       else { vClass='good'; vText='On glideslope'; detail=ms.label+' is at <b>'+(attn/(goal*frac)*100).toFixed(0)+'%</b> of pace with a <b>+'+fmt(attn-reqNow)+'</b> cushion.'; }
     }
+    detail += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft)">'+goalNote+'</div>';
 
     const maxRate=Math.max(reqRate*2.5, curVel*2, 2);
     wrap.innerHTML=setTabs()+
@@ -355,11 +373,17 @@ function render(){
             '<div class="fc-slider-top"><span class="fc-slider-lab">'+(behind?'Hypothetical recovery rate':'Hypothetical eased-off rate')+'</span><span class="fc-slider-val">'+rate.toFixed(2)+'<small>/day</small></span></div>'+
             '<input type="range" id="fcSlider" min="0" max="'+maxRate.toFixed(2)+'" step="0.05" value="'+rate+'">'+
             '<div class="fc-presets">'+
-              '<span class="fc-preset" data-r="'+curVel.toFixed(2)+'">Current ('+curVel.toFixed(2)+')</span>'+
-              '<span class="fc-preset" data-r="'+reqRate.toFixed(2)+'">On-pace ('+reqRate.toFixed(2)+')</span>'+
-              (behind
-                ? '<span class="fc-preset" data-r="'+(reqRate*1.25).toFixed(2)+'">+25%</span><span class="fc-preset" data-r="'+(reqRate*1.5).toFixed(2)+'">+50%</span>'
-                : '<span class="fc-preset" data-r="'+(reqRate*0.75).toFixed(2)+'">−25%</span><span class="fc-preset" data-r="'+(reqRate*0.5).toFixed(2)+'">−50%</span>')+
+              (function(){
+                const v10=setVelocityWin(ms,10), v30=setVelocityWin(ms,30);
+                let p='';
+                if(v10!=null) p+='<span class="fc-preset" data-r="'+Math.max(0,v10).toFixed(2)+'">10-day avg ('+Math.max(0,v10).toFixed(2)+')</span>';
+                if(v30!=null) p+='<span class="fc-preset" data-r="'+Math.max(0,v30).toFixed(2)+'">30-day avg ('+Math.max(0,v30).toFixed(2)+')</span>';
+                p+='<span class="fc-preset" data-r="'+reqRate.toFixed(2)+'">On-pace ('+reqRate.toFixed(2)+')</span>';
+                p+=(behind
+                  ? '<span class="fc-preset" data-r="'+(reqRate*1.25).toFixed(2)+'">+25%</span><span class="fc-preset" data-r="'+(reqRate*1.5).toFixed(2)+'">+50%</span>'
+                  : '<span class="fc-preset" data-r="'+(reqRate*0.75).toFixed(2)+'">−25%</span><span class="fc-preset" data-r="'+(reqRate*0.5).toFixed(2)+'">−50%</span>');
+                return p;
+              })()+
             '</div>'+
           '</div>'+
         '</div>'+
