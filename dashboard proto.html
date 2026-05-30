@@ -313,24 +313,36 @@ function render(){
     // slider state: contracts/day. default = current velocity
     if(fcRate===null) fcRate=Math.round(curVel*100)/100;
     const rate=fcRate;
-    // project forward: find first PD d (>curIdx) where attn+(d-curIdx)*rate >= goal*(d/233)
-    // attn + (d-curIdx)*rate >= goal*d/233
-    // attn - curIdx*rate >= d*(goal/233 - rate)
-    let reattainPD=null;
-    const slope=reqRate-rate; // required grows by reqRate/day, we grow by rate/day
-    if(rate>reqRate){ // gaining on the line
-      // solve attn + (d-curIdx)*rate = goal*d/233
-      const d=(attn-curIdx*rate)/(goal/PROD_DAYS_YEAR-rate);
-      if(d>=curIdx && d<=PROD_DAYS_YEAR) reattainPD=Math.ceil(d);
-      else if(d>PROD_DAYS_YEAR) reattainPD='after-eoy';
-    }else if(!behind){ reattainPD='on-track'; }
+    // Crossover day d where projected line meets required line:
+    //   attn + (d-curIdx)*rate = goal*d/233  ->  d = (attn - curIdx*rate)/(goal/233 - rate)
+    const crossD=(attn-curIdx*rate)/(goal/PROD_DAYS_YEAR-rate);
+    let reattainPD=null;   // for behind sets: when we climb back to the line
+    let fallPD=null;       // for ahead sets: when we slip below the line
+    if(behind){
+      if(rate>reqRate){
+        if(crossD>=curIdx && crossD<=PROD_DAYS_YEAR) reattainPD=Math.ceil(crossD);
+        else if(crossD>PROD_DAYS_YEAR) reattainPD='after-eoy';
+      }
+    }else{ // ahead — only a rate BELOW required erodes the cushion
+      if(rate<reqRate){
+        if(crossD>curIdx && crossD<=PROD_DAYS_YEAR) fallPD=Math.ceil(crossD);
+        else if(crossD>PROD_DAYS_YEAR) fallPD='after-eoy';
+      }else{ fallPD='holds'; }
+    }
     // verdict
     let vClass,vText,detail;
-    if(!behind && rate>=reqRate){ vClass='good'; vText='On glideslope'; detail='Currently <b>'+(attn/(goal*frac)*100).toFixed(0)+'%</b> of pace. Holding ≥ <b>'+reqRate.toFixed(2)+'/day</b> keeps '+ms.label+' at or above 100%.'; }
-    else if(reattainPD==='after-eoy' || reattainPD===null){ vClass='bad'; vText='Will not reattain this FY'; detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' stays below glideslope through PD 233. Need <b>&gt; '+reqRate.toFixed(2)+'/day</b> sustained to ever catch the line.'; }
-    else if(reattainPD==='on-track'){ vClass='good'; vText='Already on track'; detail=ms.label+' is at or above required pace.'; }
-    else { vClass='warn'; vText='Reattain by PD '+reattainPD; const dt=pdToDate(reattainPD); vClass=reattainPD<=PROD_DAYS_YEAR?'warn':'bad';
-      detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' crosses back to 100% glideslope around <b>'+(dt||'PD '+reattainPD)+'</b> — <b>'+(reattainPD-curIdx)+'</b> production days out. Required pace is '+reqRate.toFixed(2)+'/day.'; }
+    if(behind){
+      if(reattainPD==='after-eoy' || reattainPD===null){ vClass='bad'; vText='Will not reattain this FY'; detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' stays below glideslope through PD 233. Need <b>&gt; '+reqRate.toFixed(2)+'/day</b> sustained to catch the line.'; }
+      else { const dt=pdToDate(reattainPD); vClass=reattainPD<=PROD_DAYS_YEAR?'warn':'bad';
+        detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' crosses back to 100% glideslope around <b>'+(dt||'PD '+reattainPD)+'</b> — <b>'+(reattainPD-curIdx)+'</b> production days out. Required pace is '+reqRate.toFixed(2)+'/day.';
+        vText='Reattain by PD '+reattainPD; }
+    }else{ // ahead
+      if(fallPD==='holds'){ vClass='good'; vText='Holds glideslope'; detail='At <b>'+rate.toFixed(2)+'/day</b> ('+(rate>=reqRate?'≥':'')+' required '+reqRate.toFixed(2)+'/day), '+ms.label+' stays at or above 100% glideslope. Current cushion: <b>+'+fmt(attn-reqNow)+'</b> contracts.'; }
+      else if(fallPD==='after-eoy'){ vClass='good'; vText='Holds through FY26'; detail='Even at <b>'+rate.toFixed(2)+'/day</b>, the current cushion (<b>+'+fmt(attn-reqNow)+'</b>) carries '+ms.label+' above glideslope through the end of the fiscal year.'; }
+      else if(fallPD){ const dt=pdToDate(fallPD); vClass='warn'; vText='Slips below at PD '+fallPD;
+        detail='Easing to <b>'+rate.toFixed(2)+'/day</b> (below the <b>'+reqRate.toFixed(2)+'/day</b> requirement) burns the <b>+'+fmt(attn-reqNow)+'</b> cushion — '+ms.label+' would drop under 100% glideslope around <b>'+(dt||'PD '+fallPD)+'</b>, <b>'+(fallPD-curIdx)+'</b> production days out.'; }
+      else { vClass='good'; vText='On glideslope'; detail=ms.label+' is at <b>'+(attn/(goal*frac)*100).toFixed(0)+'%</b> of pace with a <b>+'+fmt(attn-reqNow)+'</b> cushion.'; }
+    }
 
     const maxRate=Math.max(reqRate*2.5, curVel*2, 2);
     wrap.innerHTML=setTabs()+
@@ -340,17 +352,18 @@ function render(){
           '<div class="fc-detail">'+detail+'</div>'+
           '<div class="fc-detail" style="margin-top:10px;font-size:12px;color:var(--ink-faint)">Now: <b>'+fmt(attn)+'</b> / '+fmt(goal)+' · required to date <b>'+fmt(reqNow)+'</b> · current pace <b>'+curVel.toFixed(2)+'/day</b></div>'+
           '<div class="fc-slider-wrap">'+
-            '<div class="fc-slider-top"><span class="fc-slider-lab">Hypothetical contracting rate</span><span class="fc-slider-val">'+rate.toFixed(2)+'<small>/day</small></span></div>'+
+            '<div class="fc-slider-top"><span class="fc-slider-lab">'+(behind?'Hypothetical recovery rate':'Hypothetical eased-off rate')+'</span><span class="fc-slider-val">'+rate.toFixed(2)+'<small>/day</small></span></div>'+
             '<input type="range" id="fcSlider" min="0" max="'+maxRate.toFixed(2)+'" step="0.05" value="'+rate+'">'+
             '<div class="fc-presets">'+
               '<span class="fc-preset" data-r="'+curVel.toFixed(2)+'">Current ('+curVel.toFixed(2)+')</span>'+
               '<span class="fc-preset" data-r="'+reqRate.toFixed(2)+'">On-pace ('+reqRate.toFixed(2)+')</span>'+
-              '<span class="fc-preset" data-r="'+(reqRate*1.25).toFixed(2)+'">+25%</span>'+
-              '<span class="fc-preset" data-r="'+(reqRate*1.5).toFixed(2)+'">+50%</span>'+
+              (behind
+                ? '<span class="fc-preset" data-r="'+(reqRate*1.25).toFixed(2)+'">+25%</span><span class="fc-preset" data-r="'+(reqRate*1.5).toFixed(2)+'">+50%</span>'
+                : '<span class="fc-preset" data-r="'+(reqRate*0.75).toFixed(2)+'">−25%</span><span class="fc-preset" data-r="'+(reqRate*0.5).toFixed(2)+'">−50%</span>')+
             '</div>'+
           '</div>'+
         '</div>'+
-        '<div>'+fcChart(goal,attn,curIdx,rate,reattainPD)+'</div>'+
+        '<div>'+fcChart(goal,attn,curIdx,rate,(behind?reattainPD:fallPD),behind)+'</div>'+
       '</div>';
     bindSets();
     const sl=document.getElementById('fcSlider');
@@ -372,7 +385,7 @@ function render(){
 var fcRate=null;
 function pdToDate(pd){ const e=Object.entries(FY26_PROD_DAYS).find(([d,i])=>i===pd); if(!e) return null;
   const dt=new Date(e[0]+'T00:00:00'); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
-function fcChart(goal,attn,curIdx,rate,reattainPD){
+function fcChart(goal,attn,curIdx,rate,crossPD,behind){
   const W=1000,Hh=190,pl=10,pr=10,pt=12,pb=22;
   const reqRate=goal/PROD_DAYS_YEAR;
   const xmin=Math.max(0,curIdx-20), xmax=PROD_DAYS_YEAR;
@@ -382,16 +395,18 @@ function fcChart(goal,attn,curIdx,rate,reattainPD){
   const X=x=>pl+((x-xmin)/(xmax-xmin))*(W-pl-pr), Y=y=>pt+(1-y/ymax)*(Hh-pt-pb);
   const proj='M'+X(curIdx)+' '+Y(attn)+' L'+X(xmax)+' '+Y(yAt(xmax));
   const req='M'+X(xmin)+' '+Y(rAt(xmin))+' L'+X(xmax)+' '+Y(rAt(xmax));
+  const mColor=behind?'var(--good)':'var(--danger)';
   let marker='';
-  if(typeof reattainPD==='number'){ marker='<line x1="'+X(reattainPD)+'" y1="'+pt+'" x2="'+X(reattainPD)+'" y2="'+(Hh-pb)+'" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="3 3"/>'+
-    '<circle cx="'+X(reattainPD)+'" cy="'+Y(rAt(reattainPD))+'" r="4" fill="var(--good)"/>'; }
+  if(typeof crossPD==='number'){ marker='<line x1="'+X(crossPD)+'" y1="'+pt+'" x2="'+X(crossPD)+'" y2="'+(Hh-pb)+'" stroke="'+mColor+'" stroke-width="1.5" stroke-dasharray="3 3"/>'+
+    '<circle cx="'+X(crossPD)+'" cy="'+Y(rAt(crossPD))+'" r="4" fill="'+mColor+'"/>'; }
+  const crossLabel=behind?'<span style="color:var(--good)">| Reattain</span>':'<span style="color:var(--danger)">| Slip below</span>';
   return '<svg class="fc-chart" viewBox="0 0 '+W+' '+Hh+'" preserveAspectRatio="none">'+
     marker+
     '<path d="'+req+'" stroke="rgba(255,183,77,.8)" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'+
     '<path d="'+proj+'" stroke="var(--triton)" stroke-width="2.5" fill="none"/>'+
     '<circle cx="'+X(curIdx)+'" cy="'+Y(attn)+'" r="3.5" fill="var(--triton)"/>'+
     '</svg>'+
-    '<div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-size:11px;color:var(--ink-faint);font-family:Chakra Petch,monospace"><span style="color:var(--triton)">— Projected</span><span style="color:var(--zeus)">- - Required (100% GS)</span><span style="color:var(--good)">| Reattain</span></div>';
+    '<div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-size:11px;color:var(--ink-faint);font-family:Chakra Petch,monospace"><span style="color:var(--triton)">— Projected</span><span style="color:var(--zeus)">- - Required (100% GS)</span>'+crossLabel+'</div>';
 }
 function kpi(lab,big,sub,cls,tag){return '<div class="kpi '+(cls||'')+'"><div class="lab">'+lab+'</div><div class="big">'+big+'</div><div class="sub">'+sub+'</div>'+(tag?'<div class="tag">'+tag+'</div>':'')+'</div>';}
 function tierCard(cls,name,desc,count){return '<div class="tier '+cls+'"><div class="tn">'+name+'</div><div class="tc">'+count+'</div><div class="td">'+desc+' glideslope · stations</div></div>';}
