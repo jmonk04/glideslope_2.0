@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NTAG SW · Recruiting Analytics Lab (Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#04070f;--panel:#0c1830;--panel-2:#0a1426;--line:rgba(70,130,200,.18);--line-soft:rgba(70,130,200,.09);
+  --ink:#e8f0fb;--ink-soft:#9fb3cd;--ink-faint:#5d72a0;
+  --triton:#3da9fc;--zeus:#ffb74d;--poseidon:#8b7cf6;--good:#2ce6c0;--danger:#ff5470;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg-0);color:var(--ink);font-family:'Sora',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:24px 16px 60px;background:radial-gradient(900px 500px at 85% -5%,rgba(61,169,252,.10),transparent 60%),radial-gradient(700px 500px at 0% 100%,rgba(139,124,246,.07),transparent 55%),var(--bg-0)}
+.wrap{max-width:1180px;margin:0 auto}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.kicker{font-family:'Chakra Petch',monospace;letter-spacing:.42em;font-size:11px;color:var(--triton);text-transform:uppercase}
+.title{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(24px,5vw,38px);letter-spacing:.02em;text-transform:uppercase}
+.title span{color:var(--triton)}
+.meta{text-align:right;font-size:12px;color:var(--ink-soft);line-height:1.5}
+.meta b{color:var(--ink)}
+.hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:18px 0 4px}
+.sec{margin:34px 0 8px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec h2{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.14em;font-size:14px;text-transform:uppercase}
+.sec .why{font-size:12px;color:var(--ink-faint);font-style:italic}
+.sec .method{font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.14em;color:var(--triton);border:1px solid var(--line);border-radius:20px;padding:3px 10px;text-transform:uppercase}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:6px}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.tb{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s}
+.tb.active{background:linear-gradient(160deg,rgba(61,169,252,.3),rgba(61,169,252,.12));color:var(--ink);border-color:var(--triton)}
+/* small multiples */
+.sm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sm{background:var(--panel);border:1px solid var(--line-soft);border-radius:11px;padding:10px}
+.sm .nm{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm .vv{font-family:'Chakra Petch',monospace;font-size:13px;font-weight:600;float:right}
+.sm svg{width:100%;height:38px;display:block;margin-top:4px}
+/* bullet */
+.bul-row{display:grid;grid-template-columns:140px 1fr 60px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+.bul-row:last-child{border-bottom:0}
+.bul-name{font-family:'Chakra Petch',monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bul-track{position:relative;height:20px;border-radius:4px;overflow:hidden}
+.bul-band{position:absolute;top:0;height:100%}
+.bul-measure{position:absolute;top:5px;height:10px;border-radius:2px;background:var(--ink)}
+.bul-target{position:absolute;top:0;width:2px;height:100%;background:#fff}
+.bul-val{font-family:'Chakra Petch',monospace;font-size:12px;font-weight:600;text-align:right}
+/* slope + bump */
+svg.big{width:100%;display:block}
+.legend{display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:11px;color:var(--ink-faint);font-family:'Chakra Petch',monospace;flex-wrap:wrap}
+/* heatmap */
+.hm-scroll{overflow-x:auto}
+.hm{border-collapse:collapse;font-size:10px}
+.hm td,.hm th{padding:0;text-align:center}
+.hm th{font-family:'Chakra Petch',monospace;font-size:9px;color:var(--ink-faint);font-weight:400;padding:2px 3px;white-space:nowrap}
+.hm th.rh{text-align:left;position:sticky;left:0;background:var(--panel-2);padding-right:8px;z-index:1}
+.hm .cell{width:22px;height:20px;border-radius:3px}
+.proto-badge{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:50;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.2em;color:var(--zeus);background:rgba(255,183,77,.1);border:1px solid rgba(255,183,77,.4);padding:4px 14px;border-radius:20px;text-transform:uppercase}
+.loading,.errbox{text-align:center;padding:50px 20px;color:var(--ink-soft);font-family:'Chakra Petch',monospace;letter-spacing:.1em}
+.errbox{color:var(--danger)}
+.fade{animation:fade .5s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.src-row{margin-top:26px;display:flex;gap:8px;align-items:center;font-size:11px;color:var(--ink-faint)}
+.src-row input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:'Chakra Petch',monospace;font-size:11px}
+.src-row button{background:var(--triton);color:var(--bg-0);border:0;border-radius:8px;padding:7px 14px;font-family:'Chakra Petch',monospace;font-size:11px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="proto-badge">◆ Analytics Lab · Experimental</div>
+<div class="wrap" id="root"><div class="loading">LOADING…</div></div>
+<script>
+var FY26_PROD_DAYS = {"2025-10-01":0,"2025-10-02":1,"2025-10-03":2,"2025-10-06":3,"2025-10-07":4,"2025-10-08":5,"2025-10-14":6,"2025-10-15":7,"2025-10-16":8,"2025-10-17":9,"2025-10-20":10,"2025-10-21":11,"2025-10-22":12,"2025-10-23":13,"2025-10-24":14,"2025-10-27":15,"2025-10-28":16,"2025-10-29":17,"2025-10-30":18,"2025-10-31":19,"2025-11-03":20,"2025-11-04":21,"2025-11-05":22,"2025-11-06":23,"2025-11-07":24,"2025-11-12":25,"2025-11-13":26,"2025-11-14":27,"2025-11-17":28,"2025-11-18":29,"2025-11-19":30,"2025-11-20":31,"2025-11-21":32,"2025-11-24":33,"2025-11-25":34,"2025-11-26":35,"2025-12-01":36,"2025-12-02":37,"2025-12-03":38,"2025-12-04":39,"2025-12-08":40,"2025-12-09":41,"2025-12-10":42,"2025-12-11":43,"2025-12-12":44,"2025-12-15":45,"2025-12-16":46,"2025-12-17":47,"2025-12-18":48,"2025-12-19":49,"2026-01-05":50,"2026-01-06":51,"2026-01-07":52,"2026-01-08":53,"2026-01-09":54,"2026-01-12":55,"2026-01-13":56,"2026-01-14":57,"2026-01-15":58,"2026-01-16":59,"2026-01-20":60,"2026-01-21":61,"2026-01-22":62,"2026-01-23":63,"2026-01-26":64,"2026-01-27":65,"2026-01-28":66,"2026-01-29":67,"2026-01-30":68,"2026-02-02":69,"2026-02-03":70,"2026-02-04":71,"2026-02-05":72,"2026-02-06":73,"2026-02-09":74,"2026-02-10":75,"2026-02-11":76,"2026-02-12":77,"2026-02-13":78,"2026-02-17":79,"2026-02-18":80,"2026-02-19":81,"2026-02-20":82,"2026-02-23":83,"2026-02-24":84,"2026-02-25":85,"2026-02-26":86,"2026-02-27":87,"2026-03-02":88,"2026-03-03":89,"2026-03-04":90,"2026-03-05":91,"2026-03-09":92,"2026-03-10":93,"2026-03-11":94,"2026-03-12":95,"2026-03-13":96,"2026-03-16":97,"2026-03-17":98,"2026-03-18":99,"2026-03-19":100,"2026-03-20":101,"2026-03-23":102,"2026-03-24":103,"2026-03-25":104,"2026-03-26":105,"2026-03-27":106,"2026-03-30":107,"2026-03-31":108,"2026-04-01":109,"2026-04-02":110,"2026-04-03":111,"2026-04-06":112,"2026-04-07":113,"2026-04-08":114,"2026-04-09":115,"2026-04-10":116,"2026-04-13":117,"2026-04-14":118,"2026-04-15":119,"2026-04-16":120,"2026-04-17":121,"2026-04-20":122,"2026-04-21":123,"2026-04-22":124,"2026-04-23":125,"2026-04-24":126,"2026-04-27":127,"2026-04-28":128,"2026-04-29":129,"2026-04-30":130,"2026-05-01":131,"2026-05-04":132,"2026-05-05":133,"2026-05-06":134,"2026-05-07":135,"2026-05-08":136,"2026-05-11":137,"2026-05-12":138,"2026-05-13":139,"2026-05-14":140,"2026-05-15":141,"2026-05-18":142,"2026-05-19":143,"2026-05-20":144,"2026-05-21":145,"2026-05-22":146,"2026-05-26":147,"2026-05-27":148,"2026-05-28":149,"2026-05-29":150,"2026-06-01":151,"2026-06-02":152,"2026-06-03":153,"2026-06-04":154,"2026-06-05":155,"2026-06-08":156,"2026-06-09":157,"2026-06-10":158,"2026-06-11":159,"2026-06-12":160,"2026-06-15":161,"2026-06-16":162,"2026-06-17":163,"2026-06-18":164,"2026-06-22":165,"2026-06-23":166,"2026-06-24":167,"2026-06-25":168,"2026-06-26":169,"2026-06-29":170,"2026-06-30":171,"2026-07-01":172,"2026-07-02":173,"2026-07-06":174,"2026-07-07":175,"2026-07-08":176,"2026-07-09":177,"2026-07-10":178,"2026-07-13":179,"2026-07-14":180,"2026-07-15":181,"2026-07-16":182,"2026-07-17":183,"2026-07-20":184,"2026-07-21":185,"2026-07-22":186,"2026-07-23":187,"2026-07-24":188,"2026-07-27":189,"2026-07-28":190,"2026-07-29":191,"2026-07-30":192,"2026-08-03":194,"2026-08-04":195,"2026-08-05":196,"2026-08-06":197,"2026-08-10":198,"2026-08-11":199,"2026-08-12":200,"2026-08-13":201,"2026-08-14":202,"2026-08-17":203,"2026-08-18":204,"2026-08-19":205,"2026-08-20":206,"2026-08-21":207,"2026-08-24":208,"2026-08-25":209,"2026-08-26":210,"2026-08-27":211,"2026-08-28":212,"2026-08-31":213,"2026-09-01":214,"2026-09-02":215,"2026-09-03":216,"2026-09-08":217,"2026-09-09":218,"2026-09-10":219,"2026-09-11":220,"2026-09-14":221,"2026-09-15":222,"2026-09-16":223,"2026-09-17":224,"2026-09-18":225,"2026-09-21":226,"2026-09-22":227,"2026-09-23":228,"2026-09-24":229,"2026-09-25":230,"2026-09-28":231,"2026-09-29":232,"2026-09-30":233};
+function prodDayIndex(iso){if(FY26_PROD_DAYS[iso]!==undefined)return FY26_PROD_DAYS[iso];const k=Object.keys(FY26_PROD_DAYS).sort();let b=null;for(const x of k){if(x<=iso)b=FY26_PROD_DAYS[x];else break;}return b;}
+const PDY=233;
+const sum=(snap,f)=>snap.stations.reduce((a,s)=>a+(f(s)||0),0);
+const fmt=n=>Math.round(n).toLocaleString();
+function tierColor(gs){ if(gs>=1.4)return'#ffb74d'; if(gs>=1.2)return'#8b7cf6'; if(gs>=1.0)return'#3da9fc'; if(gs>=.85)return'#e0894d'; return'#ff5470'; }
+var CURRENT_URL='data.json',BUNDLE=null,SNAPS=[];
+
+async function load(url){CURRENT_URL=url;const r=document.getElementById('root');r.innerHTML='<div class="loading">LOADING…</div>';
+  try{const res=await fetch(url,{cache:'no-store'});if(!res.ok)throw new Error('HTTP '+res.status);BUNDLE=await res.json();prep();render();}
+  catch(e){r.innerHTML='<div class="errbox">COULD NOT LOAD data.json<br><br>'+e.message+'<br><br>Run this from the same site as data.json.</div>'+srcRow();wireSrc();}}
+function srcRow(){return '<div class="src-row"><span>Source:</span><input id="srcUrl" value="'+CURRENT_URL+'"><button id="srcGo">Reload</button></div>';}
+function wireSrc(){const g=document.getElementById('srcGo');if(g)g.onclick=()=>load(document.getElementById('srcUrl').value.trim());}
+function prep(){
+  SNAPS=[...BUNDLE.snapshots].filter(s=>s.stations&&s.stations.length).map(s=>({...s,idx:prodDayIndex(s.date)})).filter(s=>s.idx!=null).sort((a,b)=>a.idx-b.idx);
+}
+
+const METRICS={
+  alnav:{label:'ALNAV',goal:s=>s.goal,attn:s=>s.attn},
+  ac:{label:'AC',goal:s=>(s.ac&&s.ac.goal)||0,attn:s=>(s.ac&&s.ac.attn)||0},
+  nso:{label:'NSO',goal:s=>(s.nso&&s.nso.goal)||0,attn:s=>(s.nso&&s.nso.attn)||0},
+  nf:{label:'NF',goal:s=>(s.nuke&&s.nuke.goal)||0,attn:s=>(s.nuke&&s.nuke.attn)||0},
+  nns:{label:'NNS',goal:s=>(s.nns&&s.nns.goal)||0,attn:s=>(s.nns&&s.nns.attn)||0},
+};
+var MET='alnav', GRAIN='station';
+
+function unitsFor(snap,grain){
+  // returns [{name, goal, attn, gs}] at station or division grain for current MET
+  const m=METRICS[MET]; const frac=snap.idx/PDY;
+  if(grain==='division'){
+    const d={};
+    snap.stations.forEach(s=>{const k=s.division||'—';(d[k]=d[k]||{goal:0,attn:0});d[k].goal+=m.goal(s);d[k].attn+=m.attn(s);});
+    return Object.keys(d).sort().map(k=>({name:k,goal:d[k].goal,attn:d[k].attn,gs:d[k].goal?d[k].attn/(d[k].goal*frac):0}));
+  }
+  return snap.stations.map(s=>({name:s.name,goal:m.goal(s),attn:m.attn(s),gs:m.goal(s)?m.attn(s)/(m.goal(s)*frac):0}));
+}
+
+function render(){
+  const cur=SNAPS[SNAPS.length-1], curIdx=cur.idx, frac=curIdx/PDY;
+  const H=[];
+  H.push('<div class="head fade"><div><div class="kicker">NTAG Southwest</div><div class="title">Recruiting <span>Analytics Lab</span></div></div>'+
+    '<div class="meta">'+cur.label+' · PD <b>'+curIdx+'</b>/233<br>'+SNAPS.length+' snapshots<br><b>'+cur.stations.length+'</b> stations</div></div><div class="hr"></div>');
+  // global controls
+  H.push('<div class="toolbar" id="metBar">'+Object.keys(METRICS).map(k=>'<button class="tb'+(k===MET?' active':'')+'" data-m="'+k+'">'+METRICS[k].label+'</button>').join('')+
+    '<span style="width:14px"></span>'+['station','division'].map(g=>'<button class="tb'+(g===GRAIN?' active':'')+'" data-g="'+g+'">'+g.toUpperCase()+'</button>').join('')+'</div>');
+
+  // 1. SMALL MULTIPLES
+  H.push(sec('Small Multiples','Glideslope trajectory for every '+GRAIN+', same scale — outliers jump out','Tufte'));
+  H.push('<div class="card fade"><div class="sm-grid" id="smGrid"></div></div>');
+  // 2. BULLET GRAPHS
+  H.push(sec('Bullet Graphs','Attainment vs. pace target with qualitative bands — denser than gauges','Stephen Few'));
+  H.push('<div class="card fade" id="bulCard"></div>');
+  // 3. SLOPEGRAPH
+  H.push(sec('Slopegraph','Glideslope shift over the last ~30 production days — who is rising or falling','Tufte'));
+  H.push('<div class="card fade" id="slopeCard"></div>');
+  // 4. BUMP CHART
+  H.push(sec('Rank Flow','How '+GRAIN+'s move in glideslope ranking across snapshots','Bump chart'));
+  H.push('<div class="card fade" id="bumpCard"></div>');
+  // 5. HEATMAP
+  H.push(sec('Cohort Heatmap',GRAIN+' × time, colored by glideslope — problem clusters show as bands of red','Heatmap'));
+  H.push('<div class="card fade"><div class="hm-scroll" id="hmCard"></div></div>');
+
+  H.push(srcRow());
+  document.getElementById('root').innerHTML=H.join('');
+  drawAll();
+  document.querySelectorAll('#metBar [data-m]').forEach(b=>b.onclick=()=>{MET=b.dataset.m;render();});
+  document.querySelectorAll('#metBar [data-g]').forEach(b=>b.onclick=()=>{GRAIN=b.dataset.g;render();});
+  wireSrc();
+}
+function sec(title,why,method){return '<div class="sec"><h2>'+title+'</h2><span class="method">'+method+'</span><span class="why">'+why+'</span></div>';}
+
+function drawAll(){
+  const cur=SNAPS[SNAPS.length-1];
+  const units=unitsFor(cur,GRAIN);
+  if(!units.some(u=>u.goal>0)){
+    ['smGrid','bulCard','slopeCard','bumpCard','hmCard'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<div class="errbox" style="padding:20px">No '+METRICS[MET].label+' data yet — regenerate data.json with the latest converter.</div>';});
+    return;
+  }
+  drawSmall(); drawBullet(units); drawSlope(); drawBump(); drawHeat();
+}
+
+/* small multiples: per-unit glideslope over snapshots */
+function drawSmall(){
+  const grid=document.getElementById('smGrid');
+  // build series per unit name
+  const names=unitsFor(SNAPS[SNAPS.length-1],GRAIN).map(u=>u.name);
+  const series={}; names.forEach(n=>series[n]=[]);
+  SNAPS.forEach(sn=>{ unitsFor(sn,GRAIN).forEach(u=>{ if(series[u.name]) series[u.name].push({x:sn.idx,y:u.gs}); }); });
+  const allY=[].concat(...Object.values(series)).map(p=>p.y);
+  const ymin=Math.min(0.4,...allY), ymax=Math.max(1.6,...allY);
+  grid.innerHTML=names.map(n=>{
+    const pts=series[n]; if(!pts.length) return '';
+    const last=pts[pts.length-1].y;
+    const W=150,Hh=38; const xs=pts.map(p=>p.x); const xmin=Math.min(...xs),xmax=Math.max(...xs);
+    const X=x=>((x-xmin)/(xmax-xmin||1))*W, Y=y=>Hh-((y-ymin)/(ymax-ymin))*Hh;
+    const line=pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
+    const y100=Y(1.0);
+    return '<div class="sm"><span class="vv" style="color:'+tierColor(last)+'">'+(last*100).toFixed(0)+'%</span><div class="nm">'+n+'</div>'+
+      '<svg viewBox="0 0 '+W+' '+Hh+'" preserveAspectRatio="none">'+
+      '<line x1="0" y1="'+y100.toFixed(1)+'" x2="'+W+'" y2="'+y100.toFixed(1)+'" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="3 3"/>'+
+      '<path d="'+line+'" fill="none" stroke="'+tierColor(last)+'" stroke-width="2"/></svg></div>';
+  }).join('');
+}
+
+/* bullet graphs: actual attn vs required-to-date target */
+function drawBullet(units){
+  const card=document.getElementById('bulCard');
+  const maxGoal=Math.max(...units.map(u=>u.goal))||1;
+  const sorted=[...units].sort((a,b)=>b.gs-a.gs);
+  card.innerHTML=sorted.map(u=>{
+    const frac=SNAPS[SNAPS.length-1].idx/PDY;
+    const reqNow=u.goal*frac;            // target marker
+    const scaleMax=Math.max(u.goal, u.attn, reqNow)*1.05||1;
+    const pc=v=>Math.min(100,v/scaleMax*100);
+    // qualitative bands relative to goal: poor<70%, ok 70-100% of pace, good>pace
+    return '<div class="bul-row"><div class="bul-name">'+u.name+'</div>'+
+      '<div class="bul-track" style="background:rgba(255,255,255,.04)">'+
+        '<div class="bul-band" style="left:0;width:'+pc(reqNow*0.85)+'%;background:rgba(255,84,112,.18)"></div>'+
+        '<div class="bul-band" style="left:'+pc(reqNow*0.85)+'%;width:'+(pc(reqNow)-pc(reqNow*0.85))+'%;background:rgba(255,183,77,.18)"></div>'+
+        '<div class="bul-band" style="left:'+pc(reqNow)+'%;width:'+(100-pc(reqNow))+'%;background:rgba(44,230,192,.13)"></div>'+
+        '<div class="bul-measure" style="width:'+pc(u.attn)+'%;background:'+tierColor(u.gs)+'"></div>'+
+        '<div class="bul-target" style="left:'+pc(reqNow)+'%"></div>'+
+      '</div>'+
+      '<div class="bul-val" style="color:'+tierColor(u.gs)+'">'+(u.gs*100).toFixed(0)+'%</div></div>';
+  }).join('')+'<div class="legend"><span style="color:var(--danger)">▮ behind pace</span><span style="color:var(--zeus)">▮ near pace</span><span style="color:var(--good)">▮ ahead</span><span style="color:#fff">| required to date</span></div>';
+}
+
+/* slopegraph: gs ~30 PD ago vs now */
+function drawSlope(){
+  const card=document.getElementById('slopeCard');
+  const cur=SNAPS[SNAPS.length-1];
+  // find snapshot ~30 PD back
+  let past=SNAPS[0];
+  for(let i=SNAPS.length-1;i>=0;i--){ if(cur.idx-SNAPS[i].idx>=30){past=SNAPS[i];break;} }
+  const uNow=unitsFor(cur,GRAIN), uPast=unitsFor(past,GRAIN);
+  const pmap={}; uPast.forEach(u=>pmap[u.name]=u.gs);
+  const rows=uNow.filter(u=>pmap[u.name]!=null).map(u=>({name:u.name,a:pmap[u.name],b:u.gs})).sort((x,y)=>y.b-x.b);
+  const W=1000,Hh=Math.max(260,rows.length*16),pad=40,lx=W*0.30,rx=W*0.70;
+  const allv=rows.flatMap(r=>[r.a,r.b]); const ymin=Math.min(...allv),ymax=Math.max(...allv);
+  const Y=v=>pad+(1-(v-ymin)/((ymax-ymin)||1))*(Hh-2*pad);
+  let svg='<svg class="big" viewBox="0 0 '+W+' '+Hh+'">';
+  svg+='<text x="'+lx+'" y="20" fill="#9fb3cd" font-size="13" text-anchor="middle" font-family="Chakra Petch">'+past.label+'</text>';
+  svg+='<text x="'+rx+'" y="20" fill="#9fb3cd" font-size="13" text-anchor="middle" font-family="Chakra Petch">'+cur.label+'</text>';
+  rows.forEach(r=>{
+    const up=r.b>=r.a, col=tierColor(r.b);
+    svg+='<line x1="'+lx+'" y1="'+Y(r.a).toFixed(1)+'" x2="'+rx+'" y2="'+Y(r.b).toFixed(1)+'" stroke="'+col+'" stroke-width="1.5" opacity="'+(Math.abs(r.b-r.a)>0.03?0.95:0.35)+'"/>';
+    svg+='<circle cx="'+lx+'" cy="'+Y(r.a).toFixed(1)+'" r="3" fill="'+col+'"/><circle cx="'+rx+'" cy="'+Y(r.b).toFixed(1)+'" r="3" fill="'+col+'"/>';
+    svg+='<text x="'+(lx-8)+'" y="'+(Y(r.a)+3).toFixed(1)+'" fill="#9fb3cd" font-size="9.5" text-anchor="end" font-family="Chakra Petch">'+r.name+'</text>';
+    svg+='<text x="'+(rx+8)+'" y="'+(Y(r.b)+3).toFixed(1)+'" fill="'+col+'" font-size="9.5" text-anchor="start" font-family="Chakra Petch">'+(r.b*100).toFixed(0)+'%</text>';
+  });
+  svg+='</svg>';
+  card.innerHTML=svg;
+}
+
+/* bump chart: rank by gs across snapshots (last ~8) */
+function drawBump(){
+  const card=document.getElementById('bumpCard');
+  const useSnaps=SNAPS.slice(-8);
+  const names=unitsFor(SNAPS[SNAPS.length-1],GRAIN).map(u=>u.name);
+  // rank per snapshot
+  const ranks={}; names.forEach(n=>ranks[n]=[]);
+  useSnaps.forEach((sn,si)=>{
+    const us=unitsFor(sn,GRAIN).slice().sort((a,b)=>b.gs-a.gs);
+    us.forEach((u,r)=>{ if(ranks[u.name]) ranks[u.name].push({x:si,rank:r+1}); });
+  });
+  const N=names.length, W=1000, Hh=Math.max(260,N*15), pad=46;
+  const X=i=>pad+(i/(useSnaps.length-1||1))*(W-2*pad), Y=r=>pad+((r-1)/(N-1||1))*(Hh-2*pad);
+  // color top movers
+  const final=unitsFor(SNAPS[SNAPS.length-1],GRAIN).reduce((m,u)=>(m[u.name]=u.gs,m),{});
+  let svg='<svg class="big" viewBox="0 0 '+W+' '+Hh+'">';
+  useSnaps.forEach((sn,i)=>{svg+='<text x="'+X(i).toFixed(0)+'" y="18" fill="#5d72a0" font-size="9" text-anchor="middle" font-family="Chakra Petch">'+sn.label.replace(/ 26$/,'')+'</text>';});
+  names.forEach(n=>{
+    const pts=ranks[n]; if(pts.length<2)return; const col=tierColor(final[n]||1);
+    const line=pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.rank).toFixed(1)).join(' ');
+    svg+='<path d="'+line+'" fill="none" stroke="'+col+'" stroke-width="1.6" opacity=".75"/>';
+    const last=pts[pts.length-1];
+    svg+='<circle cx="'+X(last.x).toFixed(1)+'" cy="'+Y(last.rank).toFixed(1)+'" r="2.6" fill="'+col+'"/>';
+    if(last.rank<=5||last.rank>N-3) svg+='<text x="'+(X(last.x)+6).toFixed(1)+'" y="'+(Y(last.rank)+3).toFixed(1)+'" fill="'+col+'" font-size="9" font-family="Chakra Petch">'+n+'</text>';
+  });
+  svg+='</svg>';
+  card.innerHTML=svg+'<div class="legend"><span>Top = highest glideslope rank · labels show top 5 & bottom 3</span></div>';
+}
+
+/* heatmap: unit rows × snapshot cols, color = gs */
+function drawHeat(){
+  const card=document.getElementById('hmCard');
+  const useSnaps=SNAPS.slice(-14);
+  const names=unitsFor(SNAPS[SNAPS.length-1],GRAIN).sort((a,b)=>b.gs-a.gs).map(u=>u.name);
+  const lookup=useSnaps.map(sn=>{const m={};unitsFor(sn,GRAIN).forEach(u=>m[u.name]=u.gs);return m;});
+  let h='<table class="hm"><thead><tr><th class="rh">'+GRAIN.toUpperCase()+'</th>'+useSnaps.map(sn=>'<th>'+sn.label.replace(/ ?26$/,'').replace(/ /,'<br>')+'</th>').join('')+'</tr></thead><tbody>';
+  names.forEach(n=>{
+    h+='<tr><th class="rh">'+n+'</th>'+useSnaps.map((sn,i)=>{const gs=lookup[i][n];
+      return '<td><div class="cell" title="'+n+' '+sn.label+': '+(gs!=null?(gs*100).toFixed(0)+'%':'—')+'" style="background:'+(gs!=null?tierColor(gs):'transparent')+';opacity:'+(gs!=null?.88:.1)+'"></div></td>';}).join('')+'</tr>';
+  });
+  h+='</tbody></table>';
+  card.innerHTML=h;
+}
+load(CURRENT_URL);
+</script>
+</body>
+</html>
