@@ -98,6 +98,32 @@ svg.trend{width:100%;height:200px;display:block}
 .gs-chip{display:inline-block;min-width:54px;padding:3px 9px;border-radius:20px;font-family:'Chakra Petch',monospace;font-size:12px;font-weight:600}
 .gs-z{background:rgba(255,183,77,.16);color:var(--zeus)} .gs-p{background:rgba(139,124,246,.16);color:var(--poseidon)}
 .gs-t{background:rgba(61,169,252,.16);color:var(--triton)} .gs-b{background:rgba(255,84,112,.14);color:var(--danger)}
+/* forecaster */
+.fc-wrap{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:18px}
+.fc-sets{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.fc-set{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);padding:7px 14px;border-radius:9px;cursor:pointer;transition:.15s}
+.fc-set.active{background:linear-gradient(160deg,rgba(61,169,252,.3),rgba(61,169,252,.12));color:var(--ink);border-color:var(--triton)}
+.fc-set.behind::after{content:" ▼";color:var(--danger);font-size:10px}
+.fc-set.ahead::after{content:" ▲";color:var(--good);font-size:10px}
+.fc-body{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.fc-body{grid-template-columns:1fr}}
+.fc-readout{display:flex;flex-direction:column;justify-content:center}
+.fc-verdict{font-family:'Chakra Petch',monospace;font-weight:700;font-size:22px;line-height:1.2;margin-bottom:6px}
+.fc-verdict.good{color:var(--good)} .fc-verdict.bad{color:var(--danger)} .fc-verdict.warn{color:var(--warn)}
+.fc-detail{font-size:13px;color:var(--ink-soft);line-height:1.6}
+.fc-detail b{color:var(--ink);font-family:'Chakra Petch',monospace}
+.fc-slider-wrap{margin-top:18px}
+.fc-slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.fc-slider-lab{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.fc-slider-val{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;color:var(--triton)}
+.fc-slider-val small{font-size:11px;color:var(--ink-faint);font-weight:400}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:5px;background:linear-gradient(90deg,var(--triton) 0%,var(--triton) 50%,var(--line) 50%);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--triton);cursor:pointer;box-shadow:0 0 10px var(--triton-glow);border:2px solid var(--bg-0)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--triton);cursor:pointer;border:2px solid var(--bg-0)}
+.fc-presets{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.fc-preset{font-family:'Chakra Petch',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line-soft);padding:5px 10px;border-radius:7px;cursor:pointer}
+.fc-preset:hover{border-color:var(--triton);color:var(--ink)}
+svg.fc-chart{width:100%;height:190px;display:block}
 .proto-badge{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:50;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.2em;color:var(--zeus);background:rgba(255,183,77,.1);border:1px solid rgba(255,183,77,.4);padding:4px 14px;border-radius:20px;text-transform:uppercase}
 .loading,.errbox{text-align:center;padding:50px 20px;color:var(--ink-soft);font-family:'Chakra Petch',monospace;letter-spacing:.1em}
 .errbox{color:var(--danger)}
@@ -217,7 +243,9 @@ function render(){
       '<div class="ms-flag">'+(ahead?'▲':'▼')+' '+(gs>=1?'on pace':'behind')+'</div></div>';
   }).join('')+'</div>');
 
-  // tiers
+  // FORECASTER
+  H.push(secHead('forecast','Reattainment Forecaster','Project when a behind set returns to 100% glideslope',''));
+  H.push('<div class="fc-wrap fade" id="fcWrap"></div>');
   H.push(secHead('layers','Glideslope Posture','Stations by ALNAV tier',''));
   const tc={zeus:0,poseidon:0,triton:0,below:0}; cur.stations.forEach(s=>tc[tierOf(s.glideslope_pct)]++);
   H.push('<div class="tier-grid fade">'+tierCard('zeus','Zeus','≥140%',tc.zeus)+tierCard('poseidon','Poseidon','≥120%',tc.poseidon)+
@@ -255,10 +283,119 @@ function render(){
   renderVel(10);
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderVel(+t.dataset.w);});
   wireSrc();
+
+  /* ---------- FORECASTER ---------- */
+  // current velocity per set over last 10 PD (fallback 30)
+  function setVelocity(ms){
+    const v=velocity(snaps,10)||velocity(snaps,30);
+    if(!v) return 0;
+    return (sum(v.cur,ms.field)-sum(v.past,ms.field))/v.span;
+  }
+  let fcKey = (function(){
+    // default to first behind set, else ALNAV
+    for(const ms of MISSION_SETS){
+      const g=sum(cur,s=>{const o=ms.key==='alnav'?{goal:s.goal}:s[ms.key];return (o&&o.goal)||0;});
+      const a=sum(cur,ms.field); if(g&&a/(g*frac)<1) return ms.key;
+    }
+    return 'alnav';
+  })();
+
+  function drawForecaster(){
+    const ms=MISSION_SETS.find(m=>m.key===fcKey);
+    const goal=sum(cur,s=>{const o=ms.key==='alnav'?{goal:s.goal}:s[ms.key];return (o&&o.goal)||0;});
+    const attn=sum(cur,ms.field);
+    const wrap=document.getElementById('fcWrap');
+    if(!goal){ wrap.innerHTML=setTabs()+'<div class="errbox" style="padding:20px">No goal/data for '+ms.label+' yet — regenerate data.json with the latest converter.</div>'; bindSets(); return; }
+    const curVel=Math.max(0,setVelocity(ms));
+    const reqRate=goal/PROD_DAYS_YEAR;                 // contracts/day to stay exactly on glideslope
+    const reqNow=goal*frac;                            // required attainment as of today
+    const behind=attn<reqNow;
+    // slider state: contracts/day. default = current velocity
+    if(fcRate===null) fcRate=Math.round(curVel*100)/100;
+    const rate=fcRate;
+    // project forward: find first PD d (>curIdx) where attn+(d-curIdx)*rate >= goal*(d/233)
+    // attn + (d-curIdx)*rate >= goal*d/233
+    // attn - curIdx*rate >= d*(goal/233 - rate)
+    let reattainPD=null;
+    const slope=reqRate-rate; // required grows by reqRate/day, we grow by rate/day
+    if(rate>reqRate){ // gaining on the line
+      // solve attn + (d-curIdx)*rate = goal*d/233
+      const d=(attn-curIdx*rate)/(goal/PROD_DAYS_YEAR-rate);
+      if(d>=curIdx && d<=PROD_DAYS_YEAR) reattainPD=Math.ceil(d);
+      else if(d>PROD_DAYS_YEAR) reattainPD='after-eoy';
+    }else if(!behind){ reattainPD='on-track'; }
+    // verdict
+    let vClass,vText,detail;
+    if(!behind && rate>=reqRate){ vClass='good'; vText='On glideslope'; detail='Currently <b>'+(attn/(goal*frac)*100).toFixed(0)+'%</b> of pace. Holding ≥ <b>'+reqRate.toFixed(2)+'/day</b> keeps '+ms.label+' at or above 100%.'; }
+    else if(reattainPD==='after-eoy' || reattainPD===null){ vClass='bad'; vText='Will not reattain this FY'; detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' stays below glideslope through PD 233. Need <b>&gt; '+reqRate.toFixed(2)+'/day</b> sustained to ever catch the line.'; }
+    else if(reattainPD==='on-track'){ vClass='good'; vText='Already on track'; detail=ms.label+' is at or above required pace.'; }
+    else { vClass='warn'; vText='Reattain by PD '+reattainPD; const dt=pdToDate(reattainPD); vClass=reattainPD<=PROD_DAYS_YEAR?'warn':'bad';
+      detail='At <b>'+rate.toFixed(2)+'/day</b>, '+ms.label+' crosses back to 100% glideslope around <b>'+(dt||'PD '+reattainPD)+'</b> — <b>'+(reattainPD-curIdx)+'</b> production days out. Required pace is '+reqRate.toFixed(2)+'/day.'; }
+
+    const maxRate=Math.max(reqRate*2.5, curVel*2, 2);
+    wrap.innerHTML=setTabs()+
+      '<div class="fc-body">'+
+        '<div class="fc-readout">'+
+          '<div class="fc-verdict '+vClass+'">'+vText+'</div>'+
+          '<div class="fc-detail">'+detail+'</div>'+
+          '<div class="fc-detail" style="margin-top:10px;font-size:12px;color:var(--ink-faint)">Now: <b>'+fmt(attn)+'</b> / '+fmt(goal)+' · required to date <b>'+fmt(reqNow)+'</b> · current pace <b>'+curVel.toFixed(2)+'/day</b></div>'+
+          '<div class="fc-slider-wrap">'+
+            '<div class="fc-slider-top"><span class="fc-slider-lab">Hypothetical contracting rate</span><span class="fc-slider-val">'+rate.toFixed(2)+'<small>/day</small></span></div>'+
+            '<input type="range" id="fcSlider" min="0" max="'+maxRate.toFixed(2)+'" step="0.05" value="'+rate+'">'+
+            '<div class="fc-presets">'+
+              '<span class="fc-preset" data-r="'+curVel.toFixed(2)+'">Current ('+curVel.toFixed(2)+')</span>'+
+              '<span class="fc-preset" data-r="'+reqRate.toFixed(2)+'">On-pace ('+reqRate.toFixed(2)+')</span>'+
+              '<span class="fc-preset" data-r="'+(reqRate*1.25).toFixed(2)+'">+25%</span>'+
+              '<span class="fc-preset" data-r="'+(reqRate*1.5).toFixed(2)+'">+50%</span>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div>'+fcChart(goal,attn,curIdx,rate,reattainPD)+'</div>'+
+      '</div>';
+    bindSets();
+    const sl=document.getElementById('fcSlider');
+    sl.oninput=()=>{ fcRate=parseFloat(sl.value); sl.style.background='linear-gradient(90deg,var(--triton) 0%,var(--triton) '+(sl.value/sl.max*100)+'%,var(--line) '+(sl.value/sl.max*100)+'%)'; drawForecaster(); };
+    sl.style.background='linear-gradient(90deg,var(--triton) 0%,var(--triton) '+(rate/maxRate*100)+'%,var(--line) '+(rate/maxRate*100)+'%)';
+    document.querySelectorAll('.fc-preset').forEach(p=>p.onclick=()=>{ fcRate=parseFloat(p.dataset.r); drawForecaster(); });
+  }
+  function setTabs(){
+    return '<div class="fc-sets">'+MISSION_SETS.map(ms=>{
+      const g=sum(cur,s=>{const o=ms.key==='alnav'?{goal:s.goal}:s[ms.key];return (o&&o.goal)||0;});
+      const a=sum(cur,ms.field); const gs=g?a/(g*frac):0;
+      const cls=g?(gs<1?'behind':'ahead'):'';
+      return '<button class="fc-set '+cls+(ms.key===fcKey?' active':'')+'" data-k="'+ms.key+'">'+ms.label+'</button>';
+    }).join('')+'</div>';
+  }
+  function bindSets(){ document.querySelectorAll('.fc-set').forEach(b=>b.onclick=()=>{ fcKey=b.dataset.k; fcRate=null; drawForecaster(); }); }
+  drawForecaster();
+}
+var fcRate=null;
+function pdToDate(pd){ const e=Object.entries(FY26_PROD_DAYS).find(([d,i])=>i===pd); if(!e) return null;
+  const dt=new Date(e[0]+'T00:00:00'); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function fcChart(goal,attn,curIdx,rate,reattainPD){
+  const W=1000,Hh=190,pl=10,pr=10,pt=12,pb=22;
+  const reqRate=goal/PROD_DAYS_YEAR;
+  const xmin=Math.max(0,curIdx-20), xmax=PROD_DAYS_YEAR;
+  const yAt=d=>attn+(d-curIdx)*rate;       // projected
+  const rAt=d=>goal*(d/PROD_DAYS_YEAR);    // required
+  const ymax=Math.max(rAt(xmax),yAt(xmax),goal)*1.05;
+  const X=x=>pl+((x-xmin)/(xmax-xmin))*(W-pl-pr), Y=y=>pt+(1-y/ymax)*(Hh-pt-pb);
+  const proj='M'+X(curIdx)+' '+Y(attn)+' L'+X(xmax)+' '+Y(yAt(xmax));
+  const req='M'+X(xmin)+' '+Y(rAt(xmin))+' L'+X(xmax)+' '+Y(rAt(xmax));
+  let marker='';
+  if(typeof reattainPD==='number'){ marker='<line x1="'+X(reattainPD)+'" y1="'+pt+'" x2="'+X(reattainPD)+'" y2="'+(Hh-pb)+'" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="3 3"/>'+
+    '<circle cx="'+X(reattainPD)+'" cy="'+Y(rAt(reattainPD))+'" r="4" fill="var(--good)"/>'; }
+  return '<svg class="fc-chart" viewBox="0 0 '+W+' '+Hh+'" preserveAspectRatio="none">'+
+    marker+
+    '<path d="'+req+'" stroke="rgba(255,183,77,.8)" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/>'+
+    '<path d="'+proj+'" stroke="var(--triton)" stroke-width="2.5" fill="none"/>'+
+    '<circle cx="'+X(curIdx)+'" cy="'+Y(attn)+'" r="3.5" fill="var(--triton)"/>'+
+    '</svg>'+
+    '<div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-size:11px;color:var(--ink-faint);font-family:Chakra Petch,monospace"><span style="color:var(--triton)">— Projected</span><span style="color:var(--zeus)">- - Required (100% GS)</span><span style="color:var(--good)">| Reattain</span></div>';
 }
 function kpi(lab,big,sub,cls,tag){return '<div class="kpi '+(cls||'')+'"><div class="lab">'+lab+'</div><div class="big">'+big+'</div><div class="sub">'+sub+'</div>'+(tag?'<div class="tag">'+tag+'</div>':'')+'</div>';}
 function tierCard(cls,name,desc,count){return '<div class="tier '+cls+'"><div class="tn">'+name+'</div><div class="tc">'+count+'</div><div class="td">'+desc+' glideslope · stations</div></div>';}
-function secHead(icon,title,sub,right){const I={alert:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',activity:'<polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/>',layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',trend:'<polyline points="3 17 9 11 13 15 21 6"/><polyline points="14 6 21 6 21 13"/>',grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'};
+function secHead(icon,title,sub,right){const I={alert:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',activity:'<polyline points="3 12 7 12 10 4 14 20 17 12 21 12"/>',layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/>',trend:'<polyline points="3 17 9 11 13 15 21 6"/><polyline points="14 6 21 6 21 13"/>',grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',forecast:'<path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/><circle cx="19" cy="7" r="1.5" fill="currentColor"/>'};
   return '<div class="sec"><div class="sec-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">'+I[icon]+'</svg></div><div><h2>'+title+'</h2><div class="sub">'+sub+'</div></div>'+(right||'')+'</div>';}
 function trendSvg(snaps){const pts=snaps.filter(s=>s.idx!=null).map(s=>({x:s.idx,y:s.stations.reduce((a,t)=>a+(t.attn||0),0)}));
   if(pts.length<2)return '<div class="errbox">Not enough data.</div>';
