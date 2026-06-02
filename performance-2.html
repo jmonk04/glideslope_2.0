@@ -173,6 +173,9 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
 .azm-no-eom{font-size:12px;color:var(--ink-faint);font-style:italic;padding:8px 0}
 
 .azm-trend{background:var(--bg-0);border:1px solid var(--line-soft);border-radius:12px;padding:18px;margin-bottom:6px}
+.trend-presets{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:12px}
+.trend-preset{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 13px;border-radius:7px;cursor:pointer;transition:.13s}
+.trend-preset.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -534,10 +537,12 @@ function trendSVG(series){
 }
 
 let _activeProgKey = 'alnav'; // track which program card is selected
+let _trendWindow = 8;         // default 8 weeks
 
 function showStationModal(name){
   const s = DataLayer.station(name); if(!s) return;
   _activeProgKey = 'alnav';
+  _trendWindow = 8;
   _renderModalBody(name, s);
   document.getElementById('azModal').classList.add('show');
 }
@@ -578,10 +583,17 @@ function _renderModalBody(name, s){
   const activeProg = PROGRAMS.find(p=>p.key===_activeProgKey);
   const chartHtml = monthlyBarChart(name, activeProg);
 
-  // Glideslope trend
-  const series = DataLayer.seriesFor(name).filter(p=>p.value!=null);
+  // Glideslope trend — apply window
+  const allSeries = DataLayer.seriesFor(name).filter(p=>p.value!=null);
+  const series = _trendWindow === 0 ? allSeries : allSeries.slice(-_trendWindow);
+  const presetBtns = [4,8,12,0].map(w=>{
+    const lbl = w===0?'All':`${w}W`;
+    return `<button class="trend-preset ${_trendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`;
+  }).join('');
   const trendHtml = series.length>=2
-    ? `<div class="azm-section">📈 ${series.length}-Week Glideslope Trend</div><div class="azm-trend">${trendSVG(series)}</div>`
+    ? `<div class="azm-section">📈 Glideslope Trend</div>
+       <div class="trend-presets" id="trendPresets">${presetBtns}</div>
+       <div id="trendChart" class="azm-trend">${trendSVG(series)}</div>`
     : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history for a trend.</div></div>`;
 
   document.getElementById('azModalBody').innerHTML = `
@@ -600,7 +612,21 @@ function _renderModalBody(name, s){
     <div id="azMonthlyChart" class="azm-monthly">${chartHtml}</div>
     ${trendHtml}`;
 
-  // Wire up program card clicks
+  // Wire up trend preset buttons
+  const presetsEl = document.getElementById('trendPresets');
+  if(presetsEl){
+    presetsEl.querySelectorAll('.trend-preset').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        _trendWindow = +btn.dataset.w;
+        const fullSeries = DataLayer.seriesFor(name).filter(p=>p.value!=null);
+        const sliced = _trendWindow===0 ? fullSeries : fullSeries.slice(-_trendWindow);
+        presetsEl.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active', +b.dataset.w===_trendWindow));
+        document.getElementById('trendChart').innerHTML = sliced.length>=2
+          ? trendSVG(sliced)
+          : '<div class="az-hint">Not enough data for this window.</div>';
+      });
+    });
+  }
   document.querySelectorAll('#azModalBody .azm-prog .p').forEach(card=>{
     card.addEventListener('click',()=>{
       _activeProgKey = card.dataset.prog;
