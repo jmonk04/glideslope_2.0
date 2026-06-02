@@ -141,8 +141,8 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
 .azm-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:22px}
 .azm-badges{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
 .azm-badge{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:20px;font-family:'Chakra Petch',monospace;font-weight:600}
-.azm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-@media(max-width:520px){.azm-stats{grid-template-columns:repeat(2,1fr)}}
+.azm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:560px){.azm-stats{grid-template-columns:repeat(2,1fr)}}
 .azm-stat{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:11px;padding:13px;text-align:center}
 .azm-stat .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 .azm-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:3px}
@@ -547,24 +547,62 @@ function showStationModal(name){
   document.getElementById('azModal').classList.add('show');
 }
 
+function _gsDelta(name, snapCount){
+  // Delta between latest snapshot and the one `snapCount` snapshots back
+  const snaps = DataLayer.allSnapshots();
+  if(snaps.length < snapCount+1) return null;
+  const cur  = snaps[snaps.length-1].stations.find(x=>x.name===name);
+  const past = snaps[snaps.length-1-snapCount].stations.find(x=>x.name===name);
+  if(!cur||!past) return null;
+  return Math.round((cur.glideslope_pct - past.glideslope_pct)*10000)/10000;
+}
+
+function _contractsLabel(s){
+  const gs = s.glideslope_pct;
+  const req = s.requirement || 0;   // NRC glideslope requirement (contracts needed for 100%)
+  // Thresholds in glideslope fraction
+  const tiers = [
+    {label:'Triton',  threshold:1.00},
+    {label:'Poseidon',threshold:1.20},
+    {label:'Zeus',    threshold:1.40},
+  ];
+  // Find next tier above current
+  const next = tiers.find(t=>gs < t.threshold);
+  if(!next){
+    // Already Zeus — show cushion above 140%
+    const cushion = Math.round((gs - 1.40) * req);
+    return {val:`+${cushion}`, sub:'above Zeus floor', color:'var(--zeus)'};
+  }
+  const needed = Math.ceil((next.threshold - gs) * req);
+  const color = next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
+  return {val:`${needed}`, sub:`to ${next.label}`, color};
+}
+
 function _renderModalBody(name, s){
   const {tier,level,reward} = tierLevelReward(s);
-  const rank = azCurrent.findIndex(x=>x.name===name)+1;
-
-  let rankTxt='—', rankColor='var(--ink-faint)';
-  const snaps = DataLayer.allSnapshots();
-  if(snaps.length>=2){
-    const prev=snaps[snaps.length-2];
-    const prevSorted=[...prev.stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
-    const prevRank=prevSorted.findIndex(x=>x.name===name)+1;
-    if(prevRank>0){
-      const ch=prevRank-rank;
-      rankTxt=ch>0?`↑ ${ch}`:ch<0?`↓ ${Math.abs(ch)}`:'→ 0';
-      rankColor=ch>0?'var(--good)':ch<0?'var(--danger)':'var(--ink-faint)';
-    }
-  }
-  const delta=DataLayer.deltaFor(name);
   const tierColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--ink-faint)';
+
+  // Tile 1 — Δ 5-Day (1 snapshot back)
+  const d5 = _gsDelta(name, 1);
+  const d5Txt  = d5==null ? '—' : `${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color = d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow = d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
+
+  // Tile 2 — Δ 20-Day (4 snapshots back)
+  const d20 = _gsDelta(name, 4);
+  const d20Txt  = d20==null ? '—' : `${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
+  const d20Color = d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
+  const d20Arrow = d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+
+  // Tile 3 — Attrition %
+  const attrPct = (s.gross>0) ? s.loss/s.gross : null;
+  const CMD_AVG_ATTR = 0.07;
+  const attrTxt   = attrPct==null ? '—' : `${(attrPct*100).toFixed(1)}%`;
+  const attrColor = attrPct==null ? 'var(--ink-faint)' : attrPct>CMD_AVG_ATTR ? 'var(--danger)' : 'var(--good)';
+  const attrSub   = attrPct==null ? 'no data' : `cmd avg 7%`;
+
+  // Tile 4 — Contracts to next tier / cushion
+  const ct = _contractsLabel(s);
 
   // Program breakdown cards — all 5
   const progCards = PROGRAMS.map(p=>{
@@ -603,9 +641,10 @@ function _renderModalBody(name, s){
       ${reward?`<span class="azm-badge" style="background:var(--poseidon);color:#04221c">🎯 ${reward}</span>`:''}
     </div>
     <div class="azm-stats">
-      <div class="azm-stat"><div class="l">ALNAV Glideslope</div><div class="v" style="color:${tierColor}">${(s.glideslope_pct*100).toFixed(1)}%</div><div class="s">${s.attn} of ${s.goal} goal</div></div>
-      <div class="azm-stat"><div class="l">Current Rank</div><div class="v">#${rank}</div><div class="s">of ${azCurrent.length}</div></div>
-      <div class="azm-stat"><div class="l">vs Last Week</div><div class="v" style="color:${rankColor};font-size:30px">${rankTxt}</div><div class="s">${delta?((delta.delta>0?'+':'')+(delta.delta*100).toFixed(1)+'% gs'):'rank move'}</div></div>
+      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
+      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">${attrSub}</div></div>
+      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
     </div>
     <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
     <div class="azm-prog">${progCards}</div>
