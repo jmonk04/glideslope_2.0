@@ -243,6 +243,12 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
     <div id="warriors" class="warriors"></div>
   </section>
 
+  <!-- Division Overview -->
+  <section class="section">
+    <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
+    <div id="divGrid" class="div-grid"></div>
+  </section>
+
   <!-- Station Standings -->
   <section class="section">
     <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
@@ -251,19 +257,6 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
       <div class="az-hint">Tap any station for detail &amp; monthly breakdown</div>
     </div>
     <div id="standings" class="standings"></div>
-  </section>
-
-  <!-- Division Overview -->
-  <section class="section">
-    <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
-    <div id="divGrid" class="div-grid"></div>
-  </section>
-
-  <!-- Division Standings -->
-  <section class="section">
-    <div class="section-tag"><span class="num">◧</span><h2>Division Standings</h2><span class="rule"></span></div>
-    <div class="az-hint" style="margin-bottom:12px">Tap any division for detail &amp; monthly breakdown</div>
-    <div id="divStandings" class="standings"></div>
   </section>
 
 </div>
@@ -833,7 +826,6 @@ function renderDivGrid(){
         <span class="div-gs" style="color:${gsColor}">${(alnavGs*100).toFixed(1)}%</span>
       </div>
       <div class="div-dots">${dots}</div>
-      <div class="div-sub">${sts.length} stations · ${tier.icon} ${tier.label}</div>
     </div>`;
   }).join('');
 
@@ -1094,7 +1086,6 @@ function renderAll(){
 
   renderStandings();
   renderDivGrid();
-  renderDivStandings();
 }
 
 DataLayer.init().then(renderAll);
