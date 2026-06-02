@@ -78,25 +78,22 @@ body::before{
   background-size:cover;opacity:.5;
 }
 
-.wrap{max-width:1180px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+.wrap{max-width:1180px;margin:0 auto;padding:calc(env(safe-area-inset-top, 0px) + 16px) 22px 0;position:relative;z-index:1}
 
 /* ---------- Header ---------- */
 header{
-  text-align:center;padding:42px 0 18px;
+  text-align:center;padding:24px 0 16px;
 }
-.mascot{font-size:46px;filter:drop-shadow(0 0 18px var(--glow-triton));animation:float 5s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.cmd{
-  font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.4em;
-  color:var(--ink-dim);font-size:13px;margin-top:6px;text-transform:uppercase;
-}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 h1{
   font-family:'Chakra Petch',monospace;font-weight:700;
-  font-size:clamp(28px,5vw,46px);letter-spacing:.12em;margin:4px 0;
+  font-size:clamp(30px,6vw,48px);letter-spacing:.06em;margin:0;text-transform:uppercase;
   background:linear-gradient(100deg,var(--triton),var(--poseidon) 60%,#fff);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-.tagline{color:var(--ink-faint);font-size:14px;letter-spacing:.25em;text-transform:uppercase}
+.mod-eyebrow{display:inline-block;margin-top:12px;font-family:'Chakra Petch',monospace;font-weight:700;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--triton);
+  border:1px solid rgba(61,169,252,.4);background:rgba(61,169,252,.1);border-radius:999px;padding:5px 13px}
 .install-btn{
   margin-top:16px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
   background:var(--panel-2);border:1px solid var(--triton);color:var(--triton);
@@ -364,13 +361,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
 .splash-video{width:min(64vw,300px);height:auto;border-radius:28px;
   box-shadow:0 30px 80px -20px rgba(61,169,252,.4);object-fit:cover;background:#05070f}
-.splash-title{font-family:'Chakra Petch',monospace;font-weight:700;letter-spacing:.14em;
-  font-size:clamp(18px,4.5vw,26px);text-align:center;margin-top:8px;
-  background:linear-gradient(100deg,var(--triton),var(--poseidon) 60%,#fff);
-  -webkit-background-clip:text;background-clip:text;color:transparent}
-.splash-sub{color:var(--ink-faint);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
 .splash-tap{color:var(--ink-faint);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-  margin-top:18px;opacity:.6;animation:pulse 2s ease-in-out infinite}
+  margin-top:26px;opacity:.6;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.8}}
 
 .home{min-height:100vh;display:none;align-items:center;justify-content:center;padding:32px 22px;position:relative;overflow:hidden;
@@ -527,11 +519,49 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .module-card:hover .launch-button{transform:translateX(4px);background:var(--triton);color:var(--bg-0)}
 
 .back-home{
-  display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin:18px 0 -8px;
+  display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin:8px 0 -2px;
   background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;
   font-weight:600;letter-spacing:.08em;font-size:13px;text-transform:uppercase;padding:6px 0;
 }
 .back-home:hover{color:var(--triton)}
+
+/* ---------- Bottom tab bar ---------- */
+.tab-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  display:grid;grid-template-columns:repeat(5,1fr);align-items:end;
+  padding:8px 6px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  background:rgba(7,13,26,.86);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(70,130,200,.18);
+  box-shadow:0 -8px 30px rgba(0,0,0,.4);
+}
+.tab-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;
+  background:none;border:none;cursor:pointer;padding:6px 2px;
+  color:var(--ink-faint);font-family:'Chakra Petch',monospace;font-size:10px;
+  letter-spacing:.08em;text-transform:uppercase;transition:color .15s;
+}
+.tab-item svg{width:22px;height:22px}
+.tab-item.active{color:var(--triton)}
+.tab-item.active svg{filter:drop-shadow(0 0 7px var(--glow-triton))}
+.tab-item:not(.disabled):active{transform:translateY(1px)}
+.tab-item.disabled{color:rgba(150,165,195,.34);cursor:default}
+.tab-soon{position:absolute;top:-2px;right:50%;transform:translateX(20px);
+  font-size:7px;letter-spacing:.06em;color:var(--zeus);
+  background:rgba(255,182,39,.14);border:1px solid rgba(255,182,39,.4);
+  border-radius:999px;padding:1px 5px;line-height:1.3}
+.tab-home{
+  justify-self:center;cursor:pointer;border:none;
+  width:54px;height:54px;border-radius:50%;margin-bottom:6px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,var(--triton),var(--poseidon));
+  box-shadow:0 6px 20px -4px var(--glow-triton),0 0 0 4px rgba(7,13,26,.86);
+  transition:transform .15s,box-shadow .2s;
+}
+.tab-home:active{transform:translateY(1px) scale(.97)}
+.tab-home-mark{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+/* keep content clear of the fixed bar */
+body.has-tabbar #appTool,
+body.has-tabbar #appAnalyze{padding-bottom:96px}
 
 /* ---------- Ops Grid heat map ---------- */
 .heat-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;font-size:11px;color:var(--ink-dim);font-family:'Chakra Petch',monospace}
@@ -619,18 +649,51 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .azm-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:22px}
 .azm-badges{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
 .azm-badge{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:20px;font-family:'Chakra Petch',monospace;font-weight:600}
-.azm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-@media(max-width:520px){.azm-stats{grid-template-columns:repeat(2,1fr)}}
+.azm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:560px){.azm-stats{grid-template-columns:repeat(2,1fr)}}
 .azm-stat{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:11px;padding:13px;text-align:center}
 .azm-stat .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 .azm-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:3px}
 .azm-stat .s{font-size:11px;color:var(--ink-faint);margin-top:2px}
 .azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
-.azm-prog{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-.azm-prog .p{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:11px;text-align:center}
+.azm-prog{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
+@media(max-width:520px){.azm-prog{grid-template-columns:repeat(3,1fr)}}
+.azm-prog .p{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .12s;position:relative}
+.azm-prog .p:hover{border-color:var(--triton);transform:translateY(-2px);box-shadow:0 6px 18px -8px rgba(61,169,252,.4)}
+.azm-prog .p.active{border-color:var(--poseidon);box-shadow:0 0 0 2px rgba(44,230,192,.3);background:rgba(44,230,192,.06)}
+.azm-prog .p .tap-hint{font-size:9px;color:var(--ink-faint);margin-top:5px;letter-spacing:.04em;font-family:'Chakra Petch',monospace}
 .azm-prog .pk{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
-.azm-prog .pv{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;margin-top:3px}
+.azm-prog .pv{font-family:'Chakra Petch',monospace;font-weight:700;font-size:17px;margin-top:3px}
 .azm-trend{background:var(--bg-0);border:1px solid var(--line-soft);border-radius:12px;padding:18px;margin-bottom:6px}
+
+/* ---------- CIC: monthly bar chart (EOM attainment) ---------- */
+.azm-monthly{background:var(--bg-0);border:1px solid var(--line-soft);border-radius:12px;padding:18px;margin-bottom:6px;animation:rise .25s ease both}
+.azm-monthly-title{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px}
+.azm-bar-wrap{display:flex;align-items:flex-end;gap:6px;height:90px}
+.azm-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.azm-bar{border-radius:4px 4px 0 0;min-height:4px;width:100%;transition:height .35s;position:relative}
+.azm-bar-val{font-family:'Chakra Petch',monospace;font-size:9px;font-weight:700;color:var(--ink-dim);text-align:center;line-height:1}
+.azm-bar-lbl{font-size:9px;color:var(--ink-faint);font-family:'Chakra Petch',monospace;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.azm-no-eom{font-size:12px;color:var(--ink-faint);font-style:italic;padding:8px 0}
+
+/* ---------- CIC: trend-window presets ---------- */
+.trend-presets{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:12px}
+.trend-preset{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 13px;border-radius:7px;cursor:pointer;transition:.13s}
+.trend-preset.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
+
+/* ---------- CIC: division overview cards ---------- */
+.div-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.div-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;cursor:pointer;transition:border-color .15s,transform .12s}
+.div-card:hover{border-color:var(--triton);transform:translateY(-2px)}
+.div-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.div-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:15px;letter-spacing:.08em}
+.div-gs{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px}
+.div-dots{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.div-dot{display:flex;flex-direction:column;align-items:center;gap:3px}
+.div-dot-pip{width:10px;height:10px;border-radius:50%}
+.div-dot-lbl{font-family:'Chakra Petch',monospace;font-size:8px;letter-spacing:.05em;color:var(--ink-faint);text-transform:uppercase}
+.div-sub{font-size:11px;color:var(--ink-faint);margin-top:10px;font-family:'Chakra Petch',monospace;letter-spacing:.04em}
+.div-pip{width:9px;height:9px;border-radius:50%;justify-self:center}
 
 /* ---------- Print ---------- */
 @media print{
@@ -648,8 +711,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   <video class="splash-video" id="splashVideo" autoplay muted playsinline poster="poster.jpg">
     <source src="intro.mp4" type="video/mp4">
   </video>
-  <div class="splash-title">TRITON</div>
-  <div class="splash-sub">NTAG Southwest · To the Moon 🚀</div>
   <div class="splash-tap">tap to enter</div>
 </div>
 
@@ -700,8 +761,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
           </svg>
         </div>
         <div class="module-copy">
-          <h2>Analytics</h2>
-          <p>Station, division, and production metrics that reveal performance trends and operational risk.</p>
+          <h2>CIC</h2>
+          <p>Combat Information Center — station, division, and production metrics that reveal performance trends and operational risk.</p>
           <div class="module-meta"><span class="module-chip verb-chip">Analyze</span></div>
         </div>
         <div class="launch-button">
@@ -750,6 +811,31 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   </div>
 </div>
 
+<!-- ============ BOTTOM TAB BAR ============ -->
+<nav id="tabBar" class="tab-bar" style="display:none">
+  <button class="tab-item" data-nav="planning">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+    <span>Plan</span>
+  </button>
+  <button class="tab-item" data-nav="analyze">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 3 3 7-7"/><path d="M14 8h5v5"/></svg>
+    <span>Analyze</span>
+  </button>
+  <button class="tab-home" data-nav="home" aria-label="Home">
+    <span class="tab-home-mark">🔱</span>
+  </button>
+  <button class="tab-item disabled" data-nav="lead" aria-disabled="true">
+    <span class="tab-soon">Soon</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 4 7 12 11 20 7 12 3"/><path d="M4 12l8 4 8-4M4 17l8 4 8-4"/></svg>
+    <span>Lead</span>
+  </button>
+  <button class="tab-item disabled" data-nav="win" aria-disabled="true">
+    <span class="tab-soon">Soon</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M5 5H3v2a3 3 0 0 0 3 3M19 5h2v2a3 3 0 0 1-3 3M9 18h6M10 14h4l-.5 4h-3z"/></svg>
+    <span>Win</span>
+  </button>
+</nav>
+
 <!-- ============ MOON-ZOOM TRANSITION OVERLAY ============ -->
 <div id="moonTransition" class="moon-transition">
   <video id="moonVideo" muted playsinline preload="auto" poster="moon.JPG">
@@ -759,14 +845,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
 <div class="wrap" id="appTool" style="display:none">
 
-  <button id="backHome" class="back-home">‹ Home</button>
+
 
   <header>
-    <div class="mascot">🔱</div>
-    <div class="cmd">NTAG Southwest</div>
-    <h1>MISSION PLANNING MODULE</h1>
-    <div class="tagline">To the Moon</div>
-    <div class="tagline">🚀</div>
+    <h1>Mission Planning</h1>
+    <div class="mod-eyebrow">Glideslope Engine</div>
     <button id="installBtn" class="install-btn" style="display:none">⬇ Install App</button>
   </header>
 
@@ -1018,27 +1101,16 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
 <!-- ============ ANALYZE PERFORMANCE ============ -->
 <div class="wrap" id="appAnalyze" style="display:none">
-  <button id="backHomeA" class="back-home">‹ Home</button>
+
 
   <header style="margin-bottom:14px">
-    <div class="cmd">NTAG Southwest</div>
-    <h1 style="font-size:clamp(20px,4vw,28px)">ANALYZE PERFORMANCE</h1>
+    <h1 style="font-size:clamp(22px,5vw,34px)">Combat Information Center</h1>
+    <div class="mod-eyebrow">CIC · Command Analytics</div>
   </header>
   <div class="data-stamp" id="dataStamp">
     <span class="ds-dot"></span>
     <span id="dataStampText">Loading data…</span>
   </div>
-
-  <!-- command velocity: moving-average pace per mission set -->
-  <section class="section">
-    <div class="section-tag"><span class="num">⚡</span><h2>Command Velocity · Pace vs Required</h2><span class="rule"></span></div>
-    <div class="vel-toggle">
-      <button class="vel-tab active" data-win="2">10-Day</button>
-      <button class="vel-tab" data-win="6">30-Day</button>
-    </div>
-    <div class="vel-grid" id="velGrid"></div>
-    <div class="vel-note" id="velNote"></div>
-  </section>
 
   <!-- command scoreboard: tier counts -->
   <section class="section">
@@ -1065,12 +1137,18 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
     <div id="warriors" class="warriors"></div>
   </section>
 
+  <!-- division overview -->
+  <section class="section">
+    <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
+    <div id="divGrid" class="div-grid"></div>
+  </section>
+
   <!-- standings -->
   <section class="section">
     <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
     <div class="az-controls">
       <select id="azDivFilter" class="az-select"><option value="">All Divisions</option></select>
-      <div class="az-hint">Tap any station for its trend &amp; detail</div>
+      <div class="az-hint">Tap any station for detail &amp; monthly breakdown</div>
     </div>
     <div id="standings" class="standings"></div>
   </section>
@@ -1081,6 +1159,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   <div class="az-modal-card">
     <button class="az-modal-close" id="azModalClose">✕</button>
     <div id="azModalBody"></div>
+  </div>
+</div>
+
+<!-- division detail modal -->
+<div id="divModal" class="az-modal">
+  <div class="az-modal-card">
+    <button class="az-modal-close" id="divModalClose">✕</button>
+    <div id="divModalBody"></div>
   </div>
 </div>
 
@@ -1173,9 +1259,33 @@ const DataLayer = (function(){
     return {from:b[field], to:a[field], delta:Math.round((a[field]-b[field])*10000)/10000};
   }
 
+  // month-end snapshots only (carry an .eom label), oldest→newest
+  function eomSnapshots(){ return _sorted().filter(s=>s.eom); }
+
+  // per-month attainment derived from EOM snapshots (cumulative→monthly delta)
+  // returns [{month, value}] for a station + a field accessor fn
+  function monthlyDeltas(name, fieldFn){
+    const eoms = eomSnapshots();
+    if(!eoms.length) return [];
+    const result = [];
+    for(let i=0;i<eoms.length;i++){
+      const st = eoms[i].stations.find(s=>s.name===name);
+      if(!st) continue;
+      const cur = fieldFn(st)||0;
+      if(i===0){
+        result.push({month:eoms[i].eom||eoms[i].date, value:cur});
+      }else{
+        const pst = eoms[i-1].stations.find(s=>s.name===name);
+        const delta = cur - (pst?fieldFn(pst)||0:0);
+        result.push({month:eoms[i].eom||eoms[i].date, value:Math.max(0,delta)});
+      }
+    }
+    return result;
+  }
+
   function meta(){ return bundle?{generated:bundle.generated, latest:bundle.latest, count:bundle.count}:null; }
 
-  return { init, onReady, hasData, latest, allSnapshots, station, stations, seriesFor, deltaFor, meta };
+  return { init, onReady, hasData, latest, allSnapshots, eomSnapshots, station, stations, seriesFor, deltaFor, monthlyDeltas, meta };
 })();
 
 /* ============================================================
@@ -1866,19 +1976,41 @@ const analyzeEl=document.getElementById('appAnalyze');
 const moonTransition=document.getElementById('moonTransition');
 const moonVideo=document.getElementById('moonVideo');
 
-// the actual view swap, factored out so the transition can call it
-function goToDoor(which){
-  if(which==='planning'){
-    homeEl.classList.remove('show'); homeEl.style.display='none';
+// ---------- Centralized navigation + bottom tab bar ----------
+const tabBar=document.getElementById('tabBar');
+
+function setActiveTab(view){
+  document.querySelectorAll('.tab-item').forEach(t=>{
+    t.classList.toggle('active', t.dataset.nav===view && !t.classList.contains('disabled'));
+  });
+}
+
+// view = 'home' | 'planning' | 'analyze'
+function navigateTo(view){
+  homeEl.classList.remove('show'); homeEl.style.display='none';
+  toolEl.style.display='none';
+  analyzeEl.style.display='none';
+  if(view==='home'){
+    homeEl.style.display='flex'; homeEl.classList.add('show');
+    tabBar.style.display='none';
+    document.body.classList.remove('has-tabbar');
+  }else if(view==='planning'){
     toolEl.style.display='block';
-    window.scrollTo(0,0);
-  }else{
-    // Analyze Performance — reads the shared data spine
-    homeEl.classList.remove('show'); homeEl.style.display='none';
+    tabBar.style.display='grid';
+    document.body.classList.add('has-tabbar');
+  }else if(view==='analyze'){
     analyzeEl.style.display='block';
-    window.scrollTo(0,0);
+    tabBar.style.display='grid';
+    document.body.classList.add('has-tabbar');
     renderAnalyze();
   }
+  setActiveTab(view);
+  window.scrollTo(0,0);
+}
+
+// the view swap used by the moon transition (home cards)
+function goToDoor(which){
+  navigateTo(which==='planning' ? 'planning' : 'analyze');
 }
 
 // Moon-rush transition: scale-push zoom (~2.6s) then fade into the destination.
@@ -1915,17 +2047,16 @@ document.querySelectorAll('.door').forEach(d=>{
   d.addEventListener('click',()=> playTransition(d.dataset.door));
 });
 
-// back to home from either screen
-document.getElementById('backHome').addEventListener('click',()=>{
-  toolEl.style.display='none';
-  homeEl.style.display='flex'; homeEl.classList.add('show');
-  window.scrollTo(0,0);
+// back to home from either screen (the small ‹ Home links, if present)
+const bh=document.getElementById('backHome'); if(bh) bh.addEventListener('click',()=>navigateTo('home'));
+const bhA=document.getElementById('backHomeA'); if(bhA) bhA.addEventListener('click',()=>navigateTo('home'));
+
+// bottom tab bar wiring
+document.querySelectorAll('.tab-item').forEach(t=>{
+  if(t.classList.contains('disabled')) return;
+  t.addEventListener('click',()=>navigateTo(t.dataset.nav));
 });
-document.getElementById('backHomeA').addEventListener('click',()=>{
-  analyzeEl.style.display='none';
-  homeEl.style.display='flex'; homeEl.classList.add('show');
-  window.scrollTo(0,0);
-});
+document.querySelector('.tab-home').addEventListener('click',()=>navigateTo('home'));
 
 /* ============================================================
    ANALYZE PERFORMANCE — reads the shared spine (DataLayer)
@@ -1980,10 +2111,9 @@ function renderAnalyze(){
   // "current as of" freshness stamp — formatted from the latest snapshot date
   const d=new Date((snap.date||m.latest)+'T00:00:00');
   const pretty=isNaN(d)?(snap.label||m.latest):d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-  document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b> · ${azCurrent.length} stations · ${m.count} weeks of history`;
+  const eomCount=DataLayer.eomSnapshots().length;
+  document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b> · ${azCurrent.length} stations · ${m.count} weeks · ${eomCount} EOM snapshots`;
 
-  // command velocity banner
-  renderVelocity();
   // ops grid heat map
   renderHeatMap();
 
@@ -2016,6 +2146,7 @@ function renderAnalyze(){
     azDivList.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
   }
   renderStandings();
+  renderDivGrid();
 }
 
 /* previous-week rank map (computed once per render) */
@@ -2195,54 +2326,138 @@ function renderStandings(){
 }
 document.getElementById('azDivFilter').addEventListener('change',renderStandings);
 
+/* ============================================================
+   PROGRAM DEFINITIONS — all 5 mission sets (CIC modals)
+   ============================================================ */
+const PROGRAMS = [
+  {key:'alnav', label:'ALNAV', color:'var(--triton)',   fieldFn:s=>s.attn||0,       glFn:s=>s.glideslope_pct},
+  {key:'ac',    label:'AC',    color:'var(--poseidon)', fieldFn:s=>s.ac?.attn||0,   glFn:s=>s.ac?.glideslope_pct},
+  {key:'nso',   label:'NSO',   color:'#a78bfa',         fieldFn:s=>s.nso?.attn||0,  glFn:s=>s.nso?.glideslope_pct},
+  {key:'nuke',  label:'NUKE',  color:'var(--zeus)',     fieldFn:s=>s.nuke?.attn||0, glFn:s=>s.nuke?.glideslope_pct},
+  {key:'nns',   label:'NNS',   color:'#fb923c',         fieldFn:s=>s.nns?.attn||0,  glFn:s=>s.nns?.glideslope_pct},
+];
+
+/* monthly EOM attainment bar chart for a station + program */
+function monthlyBarChart(name, prog){
+  const data=DataLayer.monthlyDeltas(name, prog.fieldFn);
+  if(!data.length) return `<div class="azm-no-eom">No EOM snapshots yet — upload month-end sheets to populate this chart.</div>`;
+  const maxVal=Math.max(...data.map(d=>d.value),1);
+  const bars=data.map(d=>{
+    const h=Math.max(4, Math.round((d.value/maxVal)*81));
+    return `<div class="azm-bar-col"><div class="azm-bar-val">${d.value||''}</div><div class="azm-bar" style="height:${h}px;background:${prog.color};opacity:.85"></div><div class="azm-bar-lbl">${d.month}</div></div>`;
+  }).join('');
+  return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM Snapshots)</div><div class="azm-bar-wrap">${bars}</div>`;
+}
+
+/* glideslope delta between latest and `snapCount` snapshots back */
+function _gsDelta(name, snapCount){
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<snapCount+1) return null;
+  const cur=snaps[snaps.length-1].stations.find(x=>x.name===name);
+  const past=snaps[snaps.length-1-snapCount].stations.find(x=>x.name===name);
+  if(!cur||!past) return null;
+  return Math.round((cur.glideslope_pct-past.glideslope_pct)*10000)/10000;
+}
+
+/* contracts to next tier (or cushion above Zeus). Uses requirement, falls back to goal. */
+function _contractsLabel(s){
+  const gs=s.glideslope_pct, req=s.requirement||s.goal||0;
+  const tiers=[{label:'Triton',threshold:1.00},{label:'Poseidon',threshold:1.20},{label:'Zeus',threshold:1.40}];
+  const next=tiers.find(t=>gs<t.threshold);
+  if(!next){ const cushion=Math.round((gs-1.40)*req); return {val:`+${cushion}`, sub:'above Zeus floor', color:'var(--zeus)'}; }
+  const needed=Math.ceil((next.threshold-gs)*req);
+  const color=next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
+  return {val:`${needed}`, sub:`to ${next.label}`, color};
+}
+
+let _activeProgKey='alnav';
+let _trendWindow=8;
+
 function showStationModal(name){
   const s=DataLayer.station(name); if(!s) return;
+  _activeProgKey='alnav'; _trendWindow=8;
+  _renderStationModal(name, s);
+  document.getElementById('azModal').classList.add('show');
+}
+
+function _renderStationModal(name, s){
   const {tier,level,reward}=tierLevelReward(s);
-  const rank=azCurrent.findIndex(x=>x.name===name)+1;
 
-  // rank change vs previous week
-  let rankTxt='—', rankColor='var(--ink-faint)';
-  const snaps=DataLayer.allSnapshots();
-  if(snaps.length>=2){
-    const prev=snaps[snaps.length-2];
-    const prevSorted=[...prev.stations].sort((a,b)=>b.glideslope_pct-a.glideslope_pct);
-    const prevRank=prevSorted.findIndex(x=>x.name===name)+1;
-    if(prevRank>0){
-      const ch=prevRank-rank;
-      rankTxt = ch>0?`↑ ${ch}`:ch<0?`↓ ${Math.abs(ch)}`:'→ 0';
-      rankColor = ch>0?'var(--good)':ch<0?'var(--danger)':'var(--ink-faint)';
-    }
-  }
-  const delta=DataLayer.deltaFor(name);
+  const d5=_gsDelta(name,1);
+  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
 
-  const tierColor = tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--ink-faint)';
-  let html=`<div class="azm-name">${s.name}</div>
+  const d20=_gsDelta(name,4);
+  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
+  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
+  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+
+  const attrPct=(s.gross>0)?s.loss/s.gross:null;
+  const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
+  const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
+  const attrSub=attrPct==null?'no data':'cmd avg 7%';
+
+  const ct=_contractsLabel(s);
+
+  const progCards=PROGRAMS.map(p=>{
+    const glVal=p.glFn(s), attnVal=p.fieldFn(s);
+    const isActive=_activeProgKey===p.key;
+    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}" data-station="${name}">
+      <div class="pk">${p.label}</div>
+      <div class="pv" style="color:${progColor(glVal)}">${pct(glVal)}</div>
+      <div class="tap-hint">${attnVal} attn · tap ▸</div>
+    </div>`;
+  }).join('');
+
+  const activeProg=PROGRAMS.find(p=>p.key===_activeProgKey);
+  const chartHtml=monthlyBarChart(name, activeProg);
+
+  const allSeries=DataLayer.seriesFor(name).filter(p=>p.value!=null);
+  const series=_trendWindow===0?allSeries:allSeries.slice(-_trendWindow);
+  const presetBtns=[4,8,12,0].map(w=>{ const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_trendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`; }).join('');
+  const trendHtml=series.length>=2
+    ? `<div class="azm-section">📈 Glideslope Trend</div><div class="trend-presets" id="trendPresets">${presetBtns}</div><div id="trendChart" class="azm-trend">${trendSVG(series)}</div>`
+    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history for a trend.</div></div>`;
+
+  document.getElementById('azModalBody').innerHTML=`
+    <div class="azm-name">${s.name}</div>
     <div class="azm-badges">
       <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}${level?` · L${level}`:''}</span>
       ${reward?`<span class="azm-badge" style="background:var(--poseidon);color:#04221c">🎯 ${reward}</span>`:''}
     </div>
     <div class="azm-stats">
-      <div class="azm-stat"><div class="l">ALNAV Glideslope</div><div class="v" style="color:${tierColor}">${(s.glideslope_pct*100).toFixed(1)}%</div><div class="s">${s.attn} of ${s.goal} goal</div></div>
-      <div class="azm-stat"><div class="l">Current Rank</div><div class="v">#${rank}</div><div class="s">of ${azCurrent.length}</div></div>
-      <div class="azm-stat"><div class="l">vs Last Week</div><div class="v" style="color:${rankColor};font-size:30px">${rankTxt}</div><div class="s">${delta?((delta.delta>0?'+':'')+(delta.delta*100).toFixed(1)+'% gs'):'rank move'}</div></div>
+      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
+      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">${attrSub}</div></div>
+      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
     </div>
-    <div class="azm-section">Program Breakdown</div>
-    <div class="azm-prog">
-      <div class="p"><div class="pk">AC</div><div class="pv" style="color:${progColor(s.ac?.glideslope_pct)}">${pct(s.ac?.glideslope_pct)}</div></div>
-      <div class="p"><div class="pk">NSO</div><div class="pv" style="color:${progColor(s.nso?.glideslope_pct)}">${pct(s.nso?.glideslope_pct)}</div></div>
-      <div class="p"><div class="pk">NUKE</div><div class="pv" style="color:${progColor(s.nuke?.glideslope_pct)}">${pct(s.nuke?.glideslope_pct)}</div></div>
-    </div>`;
+    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
+    <div class="azm-prog">${progCards}</div>
+    <div id="azMonthlyChart" class="azm-monthly">${chartHtml}</div>
+    ${trendHtml}`;
 
-  // trend chart from the series
-  const series=DataLayer.seriesFor(name).filter(p=>p.value!=null);
-  if(series.length>=2){
-    html+=`<div class="azm-section">📈 ${series.length}-Week Trend</div><div class="azm-trend">${trendSVG(series)}</div>`;
-  }else{
-    html+=`<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history for a trend.</div></div>`;
+  const presetsEl=document.getElementById('trendPresets');
+  if(presetsEl){
+    presetsEl.querySelectorAll('.trend-preset').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        _trendWindow=+btn.dataset.w;
+        const full=DataLayer.seriesFor(name).filter(p=>p.value!=null);
+        const sliced=_trendWindow===0?full:full.slice(-_trendWindow);
+        presetsEl.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_trendWindow));
+        document.getElementById('trendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
+      });
+    });
   }
-
-  document.getElementById('azModalBody').innerHTML=html;
-  document.getElementById('azModal').classList.add('show');
+  document.querySelectorAll('#azModalBody .azm-prog .p').forEach(card=>{
+    card.addEventListener('click',()=>{
+      _activeProgKey=card.dataset.prog;
+      const stationName=card.dataset.station;
+      document.querySelectorAll('#azModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_activeProgKey));
+      const prog=PROGRAMS.find(p=>p.key===_activeProgKey);
+      document.getElementById('azMonthlyChart').innerHTML=monthlyBarChart(stationName, prog);
+    });
+  });
 }
 function pct(v){ return v==null?'—':(v*100).toFixed(1)+'%'; }
 function progColor(v){ if(v==null)return 'var(--ink-faint)'; return v>=1.4?'var(--zeus)':v>=1.2?'var(--poseidon)':v>=1.0?'var(--triton)':'var(--danger)'; }
@@ -2278,6 +2493,194 @@ function trendSVG(series){
 
 document.getElementById('azModalClose').addEventListener('click',()=>document.getElementById('azModal').classList.remove('show'));
 document.getElementById('azModal').addEventListener('click',e=>{ if(e.target.id==='azModal') document.getElementById('azModal').classList.remove('show'); });
+document.getElementById('divModalClose').addEventListener('click',()=>document.getElementById('divModal').classList.remove('show'));
+document.getElementById('divModal').addEventListener('click',e=>{ if(e.target.id==='divModal') document.getElementById('divModal').classList.remove('show'); });
+
+/* ============================================================
+   DIVISION AGGREGATION + OVERVIEW (CIC)
+   Division glideslope = Σ attainment / Σ requirement. _reqOf falls
+   back to a station's goal when data.json has no requirement field.
+   ============================================================ */
+function divStations(divName){ return azCurrent.filter(s=>s.division===divName); }
+function _reqOf(s){ return s.requirement||s.goal||0; }
+
+function divGlideslope(sts, attnFn, reqFn){
+  const a=sts.reduce((sum,s)=>sum+(attnFn(s)||0),0);
+  const r=sts.reduce((sum,s)=>sum+(reqFn(s)||0),0);
+  return r>0?a/r:0;
+}
+function divSeriesALNAV(divName){
+  return DataLayer.allSnapshots().map(snap=>{
+    const sts=snap.stations.filter(s=>s.division===divName);
+    if(!sts.length) return null;
+    return {date:snap.date, seq:snap.seq, value:divGlideslope(sts, s=>s.attn, _reqOf)};
+  }).filter(Boolean);
+}
+function divGsDelta(divName, snapCount){
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<snapCount+1) return null;
+  const curSts=snaps[snaps.length-1].stations.filter(s=>s.division===divName);
+  const pastSts=snaps[snaps.length-1-snapCount].stations.filter(s=>s.division===divName);
+  if(!curSts.length||!pastSts.length) return null;
+  const cur=divGlideslope(curSts, s=>s.attn, _reqOf);
+  const past=divGlideslope(pastSts, s=>s.attn, _reqOf);
+  return Math.round((cur-past)*10000)/10000;
+}
+function divMonthlyDeltas(divName, attnFn){
+  const eoms=DataLayer.eomSnapshots();
+  if(!eoms.length) return [];
+  const result=[];
+  for(let i=0;i<eoms.length;i++){
+    const sts=eoms[i].stations.filter(s=>s.division===divName);
+    const cur=sts.reduce((sum,s)=>sum+(attnFn(s)||0),0);
+    if(i===0){ result.push({month:eoms[i].eom||eoms[i].date, value:cur}); }
+    else{
+      const prevSts=eoms[i-1].stations.filter(s=>s.division===divName);
+      const prev=prevSts.reduce((sum,s)=>sum+(attnFn(s)||0),0);
+      result.push({month:eoms[i].eom||eoms[i].date, value:Math.max(0,cur-prev)});
+    }
+  }
+  return result;
+}
+function divContractsLabel(divName){
+  const sts=divStations(divName);
+  const totalAttn=sts.reduce((s,st)=>s+(st.attn||0),0);
+  const totalReq=sts.reduce((s,st)=>s+_reqOf(st),0);
+  if(!totalReq) return {val:'—', sub:'no data', color:'var(--ink-faint)'};
+  const gs=totalAttn/totalReq;
+  const tiers=[{label:'Triton',t:1.00},{label:'Poseidon',t:1.20},{label:'Zeus',t:1.40}];
+  const next=tiers.find(x=>gs<x.t);
+  if(!next){ const cushion=Math.round((gs-1.40)*totalReq); return {val:`+${cushion}`, sub:'above Zeus floor', color:'var(--zeus)'}; }
+  const needed=Math.ceil((next.t-gs)*totalReq);
+  const color=next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
+  return {val:`${needed}`, sub:`to ${next.label}`, color};
+}
+
+function renderDivGrid(){
+  const divs=[...new Set(azCurrent.map(s=>s.division))].sort();
+  const snap=DataLayer.latest();
+  document.getElementById('divGrid').innerHTML=divs.map(div=>{
+    const sts=snap.stations.filter(s=>s.division===div);
+    const alnavGs=divGlideslope(sts, s=>s.attn, _reqOf);
+    const tier=tierOf(alnavGs);
+    const gsColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
+    const dots=PROGRAMS.map(p=>{
+      const gs=sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
+      const color=gs>=1.0?'var(--good)':'var(--danger)';
+      return `<div class="div-dot"><div class="div-dot-pip" style="background:${color}"></div><div class="div-dot-lbl">${p.label}</div></div>`;
+    }).join('');
+    return `<div class="div-card" data-div="${div}">
+      <div class="div-card-head"><span class="div-name">${div}</span><span class="div-gs" style="color:${gsColor}">${(alnavGs*100).toFixed(1)}%</span></div>
+      <div class="div-dots">${dots}</div>
+      <div class="div-sub">${sts.length} stations · tap for detail ▸</div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.div-card').forEach(c=>{ c.addEventListener('click',()=>showDivModal(c.dataset.div)); });
+}
+
+/* ---------- DIVISION MODAL ---------- */
+let _divActiveProgKey='alnav';
+let _divTrendWindow=8;
+
+function showDivModal(divName){
+  _divActiveProgKey='alnav'; _divTrendWindow=8;
+  _renderDivModal(divName);
+  document.getElementById('divModal').classList.add('show');
+}
+
+function _divMonthlyHtml(divName, prog){
+  const data=divMonthlyDeltas(divName, prog.fieldFn);
+  if(!data.length) return `<div class="azm-no-eom">No EOM snapshots yet.</div>`;
+  const maxVal=Math.max(...data.map(d=>d.value),1);
+  const bars=data.map(d=>{
+    const h=Math.max(4,Math.round((d.value/maxVal)*81));
+    return `<div class="azm-bar-col"><div class="azm-bar-val">${d.value||''}</div><div class="azm-bar" style="height:${h}px;background:${prog.color};opacity:.85"></div><div class="azm-bar-lbl">${d.month}</div></div>`;
+  }).join('');
+  return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM)</div><div class="azm-bar-wrap">${bars}</div>`;
+}
+
+function _renderDivModal(divName){
+  const snap=DataLayer.latest();
+  const sts=snap.stations.filter(s=>s.division===divName);
+  if(!sts.length) return;
+  const alnavGs=divGlideslope(sts, s=>s.attn, _reqOf);
+  const tier=tierOf(alnavGs);
+
+  const d5=divGsDelta(divName,1);
+  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
+
+  const d20=divGsDelta(divName,4);
+  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
+  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
+  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+
+  const totalGross=sts.reduce((s,st)=>s+(st.gross||0),0);
+  const totalLoss=sts.reduce((s,st)=>s+(st.loss||0),0);
+  const attrPct=totalGross>0?totalLoss/totalGross:null;
+  const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
+  const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
+
+  const ct=divContractsLabel(divName);
+
+  const progCards=PROGRAMS.map(p=>{
+    const totalAttn=sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
+    const avgGs=sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
+    const isActive=_divActiveProgKey===p.key;
+    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}" data-div="${divName}">
+      <div class="pk">${p.label}</div>
+      <div class="pv" style="color:${progColor(avgGs)}">${(avgGs*100).toFixed(1)}%</div>
+      <div class="tap-hint">${totalAttn} attn · tap ▸</div>
+    </div>`;
+  }).join('');
+
+  const activeProg=PROGRAMS.find(p=>p.key===_divActiveProgKey);
+  const chartHtml=_divMonthlyHtml(divName, activeProg);
+
+  const allSeries=divSeriesALNAV(divName);
+  const series=_divTrendWindow===0?allSeries:allSeries.slice(-_divTrendWindow);
+  const presetBtns=[4,8,12,0].map(w=>{ const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_divTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`; }).join('');
+  const trendHtml=series.length>=2
+    ? `<div class="azm-section">📈 ALNAV Glideslope Trend</div><div class="trend-presets" id="divTrendPresets">${presetBtns}</div><div id="divTrendChart" class="azm-trend">${trendSVG(series)}</div>`
+    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
+
+  document.getElementById('divModalBody').innerHTML=`
+    <div class="azm-name">${divName}</div>
+    <div class="azm-badges">
+      <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}</span>
+      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:var(--ink-dim)">${sts.length} stations</span>
+    </div>
+    <div class="azm-stats">
+      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
+      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">cmd avg 7%</div></div>
+      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
+    </div>
+    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
+    <div class="azm-prog">${progCards}</div>
+    <div id="divMonthlyChart" class="azm-monthly">${chartHtml}</div>
+    ${trendHtml}`;
+
+  document.querySelectorAll('#divModalBody .azm-prog .p').forEach(card=>{
+    card.addEventListener('click',()=>{
+      _divActiveProgKey=card.dataset.prog;
+      document.querySelectorAll('#divModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_divActiveProgKey));
+      const prog=PROGRAMS.find(p=>p.key===_divActiveProgKey);
+      document.getElementById('divMonthlyChart').innerHTML=_divMonthlyHtml(divName, prog);
+    });
+  });
+  const tp=document.getElementById('divTrendPresets');
+  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      _divTrendWindow=+btn.dataset.w;
+      const full=divSeriesALNAV(divName);
+      const sliced=_divTrendWindow===0?full:full.slice(-_divTrendWindow);
+      tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_divTrendWindow));
+      document.getElementById('divTrendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
+    });
+  });
+}
 </script>
 </body>
 </html>
