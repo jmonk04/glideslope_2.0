@@ -117,7 +117,7 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
 .az-select{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:14px}
 .az-hint{color:var(--ink-faint);font-size:12px}
 .standings{display:flex;flex-direction:column;gap:7px}
-.strow{display:grid;grid-template-columns:64px 1fr auto auto;gap:12px;align-items:center;cursor:pointer;
+.strow{display:grid;grid-template-columns:64px 1fr auto auto auto;gap:10px;align-items:center;cursor:pointer;
   background:var(--panel-2);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;transition:.13s}
 .strow:hover{border-color:var(--triton);transform:translateX(2px)}
 .strow .rank{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);font-size:15px;white-space:nowrap}
@@ -176,6 +176,27 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
 .trend-presets{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:12px}
 .trend-preset{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 13px;border-radius:7px;cursor:pointer;transition:.13s}
 .trend-preset.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
+
+/* AI Brief */
+.ai-brief-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  background:linear-gradient(100deg,rgba(61,169,252,.15),rgba(44,230,192,.12));
+  border:1px solid rgba(61,169,252,.4);border-radius:11px;
+  color:var(--ink);font-family:'Chakra Petch',monospace;font-weight:600;
+  font-size:13px;letter-spacing:.08em;padding:13px;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;margin-top:6px;
+}
+.ai-brief-btn:hover{border-color:var(--triton);box-shadow:0 0 18px -6px var(--glow-triton)}
+.ai-brief-btn:disabled{opacity:.5;cursor:not-allowed}
+.ai-brief-wrap{margin-top:6px;background:var(--bg-0);border:1px solid var(--line-soft);border-radius:12px;padding:18px;animation:rise .3s ease both}
+.ai-brief-header{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--triton);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ai-brief-header .blink{animation:pulse 1.2s ease-in-out infinite}
+.ai-brief-body{font-size:13px;color:var(--ink-dim);line-height:1.7}
+.ai-brief-body p{margin-bottom:10px}
+.ai-brief-body ul{padding-left:16px;display:flex;flex-direction:column;gap:6px}
+.ai-brief-body li{color:var(--ink-dim)}
+.ai-brief-body li b{color:var(--ink)}
+.ai-brief-streaming{font-size:13px;color:var(--ink-faint);font-style:italic;line-height:1.7;white-space:pre-wrap}
 
 /* Division cards */
 .div-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
@@ -499,9 +520,15 @@ function renderStandings(){
   document.getElementById('standings').innerHTML = rows.map(s=>{
     const t = tierOf(s.glideslope_pct);
     const gsColor = t.cls==='pos'?'poseidon':t.cls==='tri'?'triton':t.cls==='zeus'?'zeus':'ink-faint';
+    const dots = PROGRAMS.map(p=>{
+      const gs = p.glFn(s);
+      const color = (gs!=null && gs>=1.0)?'var(--good)':'var(--danger)';
+      return `<div class="div-pip" style="background:${color}" title="${p.label}: ${gs!=null?(gs*100).toFixed(1)+'%':'—'}"></div>`;
+    }).join('');
     return `<div class="strow" data-station="${s.name}">
       <span class="rank">#${s.rank} ${rankArrow(s.name,s.rank)}</span>
       <span class="sn">${s.name} ${flame(s.name)}<small>${s.division} · ${s.size||''}</small></span>
+      <span style="display:flex;gap:5px;align-items:center">${dots}</span>
       <span class="badge ${t.badge}">${t.label}</span>
       <span class="gs" style="color:var(--${gsColor})">${(s.glideslope_pct*100).toFixed(1)}%</span>
     </div>`;
@@ -684,7 +711,9 @@ function _renderModalBody(name, s){
     <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
     <div class="azm-prog">${progCards}</div>
     <div id="azMonthlyChart" class="azm-monthly">${chartHtml}</div>
-    ${trendHtml}`;
+    ${trendHtml}
+    <button class="ai-brief-btn" id="aiBriefBtn">⚡ Summarize with AI</button>
+    <div id="aiBriefOutput"></div>`;
 
   // Wire up trend preset buttons
   const presetsEl = document.getElementById('trendPresets');
@@ -701,18 +730,125 @@ function _renderModalBody(name, s){
       });
     });
   }
+  // Wire program cards
   document.querySelectorAll('#azModalBody .azm-prog .p').forEach(card=>{
     card.addEventListener('click',()=>{
       _activeProgKey = card.dataset.prog;
       const stationName = card.dataset.station;
-      const st = DataLayer.station(stationName);
-      // Update active state on cards
       document.querySelectorAll('#azModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active', c.dataset.prog===_activeProgKey));
-      // Re-render just the chart
       const prog = PROGRAMS.find(p=>p.key===_activeProgKey);
       document.getElementById('azMonthlyChart').innerHTML = monthlyBarChart(stationName, prog);
     });
   });
+
+  // Wire AI brief button
+  document.getElementById('aiBriefBtn').addEventListener('click', ()=>summarizeStation(name, s, series));
+}
+
+/* ============================================================
+   AI STATION BRIEF
+   ============================================================ */
+async function summarizeStation(name, s, trendSeries){
+  const btn = document.getElementById('aiBriefBtn');
+  const out = document.getElementById('aiBriefOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+  out.innerHTML = `<div class="ai-brief-wrap"><div class="ai-brief-header"><span class="blink">●</span> INTEL BRIEF · ${name}</div><div class="ai-brief-streaming" id="aiStream">Generating assessment…</div></div>`;
+
+  // Build context packet
+  const windowLabel = _trendWindow===0 ? 'full FY' : `last ${_trendWindow} weeks`;
+  const trendDesc = trendSeries.length>=2
+    ? trendSeries.map(p=>`${p.date}: ${(p.value*100).toFixed(1)}%`).join(', ')
+    : 'insufficient trend data';
+
+  const eomData = PROGRAMS.map(p=>{
+    const deltas = DataLayer.monthlyDeltas(name, p.fieldFn);
+    if(!deltas.length) return `${p.label}: no EOM data`;
+    return `${p.label}: ${deltas.map(d=>`${d.month}=${d.value}`).join(', ')}`;
+  }).join('\n');
+
+  const d5  = _gsDelta(name, 1);
+  const d20 = _gsDelta(name, 4);
+  const attrPct = s.gross>0 ? (s.loss/s.gross*100).toFixed(1)+'%' : 'unknown';
+  const ct = _contractsLabel(s);
+
+  const prompt = `You are an experienced Navy recruiting operations analyst and coach providing an intel-style performance brief for a recruiting station.
+
+STATION: ${name}
+DIVISION: ${s.division} | SIZE: ${s.size||'unknown'} | TIER: ${tierOf(s.glideslope_pct).label}
+ANALYSIS WINDOW: ${windowLabel}
+
+CURRENT STATUS:
+- ALNAV Glideslope: ${(s.glideslope_pct*100).toFixed(1)}% (${s.attn} attainments of ${s.goal} goal)
+- AC: ${pct(s.ac?.glideslope_pct)} | NSO: ${pct(s.nso?.glideslope_pct)} | NUKE: ${pct(s.nuke?.glideslope_pct)} | NNS: ${pct(s.nns?.glideslope_pct)}
+- Δ 5-Day: ${d5!=null?(d5>=0?'+':'')+(d5*100).toFixed(1)+'%':'N/A'}
+- Δ 20-Day: ${d20!=null?(d20>=0?'+':'')+(d20*100).toFixed(1)+'%':'N/A'}
+- Attrition: ${attrPct} (command avg 7%)
+- Contracts to next tier: ${ct.val} ${ct.sub}
+
+GLIDESLOPE TREND (${windowLabel}):
+${trendDesc}
+
+MONTHLY ATTAINMENT BY PROGRAM (EOM snapshots):
+${eomData}
+
+Provide a concise intel-style brief with:
+1. A 2-3 sentence situational overview paragraph assessing overall station health and trajectory
+2. 3-5 bullet points highlighting the most operationally significant findings — what's working, what needs attention, and one specific actionable recommendation
+
+Keep the tone like a senior ops/intel analyst briefing a commander — direct, data-driven, but coaching in spirit. Do not repeat raw numbers already visible in the dashboard unless they support a specific insight. Use plain language, no jargon beyond standard Navy recruiting terms. Format with a <p> tag for the overview and <ul><li> tags for bullets, with key terms in <b> tags.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if(!response.ok) throw new Error(`API error ${response.status}`);
+
+    const streamEl = document.getElementById('aiStream');
+    streamEl.className = 'ai-brief-body';
+    streamEl.innerHTML = '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buffer += decoder.decode(value, {stream:true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if(data==='[DONE]') break;
+        try{
+          const evt = JSON.parse(data);
+          if(evt.type==='content_block_delta' && evt.delta?.type==='text_delta'){
+            fullText += evt.delta.text;
+            streamEl.innerHTML = fullText;
+          }
+        }catch(e){}
+      }
+    }
+
+    btn.textContent = '↺ Re-analyze';
+    btn.disabled = false;
+
+  } catch(err){
+    out.innerHTML = `<div class="ai-brief-wrap"><div class="ai-brief-header">⚠ Brief Unavailable</div><div class="ai-brief-body"><p>${err.message}</p></div></div>`;
+    btn.textContent = '⚡ Summarize with AI';
+    btn.disabled = false;
+  }
 }
 
 document.getElementById('azModalClose').addEventListener('click',()=>document.getElementById('azModal').classList.remove('show'));
