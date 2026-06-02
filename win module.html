@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TRITON · The Arena (Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#04070f;--panel:#0c1830;--panel-2:#0a1426;--line:rgba(70,130,200,.18);--line-soft:rgba(70,130,200,.09);
+  --ink:#e8f0fb;--ink-soft:#9fb3cd;--ink-faint:#5d72a0;
+  --triton:#3da9fc;--poseidon:#8b7cf6;--zeus:#ffb627;--good:#2ce6c0;--danger:#ff5470;--flame:#ff7a3c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg-0);color:var(--ink);font-family:'Sora',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:24px 16px 60px;
+  background:radial-gradient(900px 500px at 85% -5%,rgba(255,182,39,.08),transparent 60%),radial-gradient(700px 500px at 0% 100%,rgba(139,124,246,.08),transparent 55%),var(--bg-0)}
+.wrap{max-width:1100px;margin:0 auto}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.kicker{font-family:'Chakra Petch',monospace;letter-spacing:.42em;font-size:11px;color:var(--zeus);text-transform:uppercase}
+.title{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(26px,5vw,40px);letter-spacing:.02em;text-transform:uppercase}
+.title span{background:linear-gradient(100deg,var(--zeus),var(--poseidon));-webkit-background-clip:text;background-clip:text;color:transparent}
+.meta{text-align:right;font-size:12px;color:var(--ink-soft);line-height:1.5}
+.meta b{color:var(--ink)}
+.hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:18px 0 22px}
+.sec{margin:32px 0 13px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sec-ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(255,182,39,.22),rgba(10,20,40,.6));border:1px solid var(--line);font-size:15px}
+.sec h2{font-family:'Chakra Petch',monospace;font-weight:600;letter-spacing:.14em;font-size:13px;text-transform:uppercase}
+.sec .sub{font-size:11px;color:var(--ink-faint)}
+/* leaderboard tabs */
+.lb-tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;gap:3px;margin-left:auto;flex-wrap:wrap}
+.lb-tab{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-soft);background:none;border:0;padding:7px 12px;border-radius:8px;cursor:pointer;transition:.15s;text-transform:uppercase}
+.lb-tab.active{background:linear-gradient(160deg,rgba(255,182,39,.28),rgba(255,182,39,.1));color:var(--ink)}
+/* podium */
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end;margin-bottom:14px}
+.pod{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:16px;padding:16px 12px;text-align:center;position:relative;overflow:hidden}
+.pod.first{border-color:rgba(255,182,39,.5);padding-top:24px}
+.pod.first::before{content:"";position:absolute;inset:0;background:radial-gradient(120px 50px at 50% 0,rgba(255,182,39,.2),transparent 70%)}
+.pod.second{border-color:rgba(159,179,205,.4)}
+.pod.third{border-color:rgba(205,127,50,.4)}
+.pod-medal{font-size:22px}
+.pod-name{font-family:'Chakra Petch',monospace;font-size:12.5px;letter-spacing:.03em;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod-val{font-family:'Chakra Petch',monospace;font-weight:700;font-size:22px;margin-top:4px;color:var(--zeus)}
+.pod-sub{font-size:10px;color:var(--ink-faint);letter-spacing:.04em;margin-top:1px}
+/* leaderboard list */
+.lb-list{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lb-row{display:flex;align-items:center;gap:13px;padding:11px 15px;border-bottom:1px solid var(--line-soft)}
+.lb-row:last-child{border-bottom:0}
+.lb-rank{width:24px;font-family:'Chakra Petch',monospace;font-weight:700;font-size:14px;color:var(--ink-faint);text-align:center}
+.lb-name{flex:1;font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.02em}
+.lb-name small{color:var(--ink-faint);font-size:10px;letter-spacing:.05em;margin-left:6px}
+.lb-val{font-family:'Chakra Petch',monospace;font-weight:700;font-size:15px;color:var(--zeus)}
+.lb-row.me{background:rgba(61,169,252,.08)}
+/* rank ladder */
+.ladder{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px}
+.rank-card{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px}
+.rank-badge{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex:none;border:1px solid}
+.rank-badge.zeus{background:rgba(255,182,39,.14);border-color:rgba(255,182,39,.5)}
+.rank-badge.poseidon{background:rgba(139,124,246,.14);border-color:rgba(139,124,246,.5)}
+.rank-badge.triton{background:rgba(61,169,252,.14);border-color:rgba(61,169,252,.5)}
+.rank-badge.recruit{background:rgba(159,179,205,.1);border-color:rgba(159,179,205,.3)}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-family:'Chakra Petch',monospace;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-tier{font-family:'Chakra Petch',monospace;font-weight:700;font-size:14px;margin-top:2px}
+.rank-tier.zeus{color:var(--zeus)} .rank-tier.poseidon{color:var(--poseidon)} .rank-tier.triton{color:var(--triton)} .rank-tier.recruit{color:var(--ink-soft)}
+.rank-prog{height:6px;border-radius:4px;background:rgba(255,255,255,.07);margin-top:8px;overflow:hidden}
+.rank-prog i{display:block;height:100%;border-radius:4px}
+.rank-next{font-size:10px;color:var(--ink-faint);margin-top:5px;letter-spacing:.03em}
+/* streaks */
+.streak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px}
+.streak-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:14px;text-align:center;position:relative}
+.streak-card.hot{border-color:rgba(255,122,60,.45)}
+.streak-flame{font-size:24px;filter:drop-shadow(0 0 8px rgba(255,122,60,.6))}
+.streak-num{font-family:'Chakra Petch',monospace;font-weight:700;font-size:28px;margin-top:2px}
+.streak-name{font-family:'Chakra Petch',monospace;font-size:11px;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.streak-lbl{font-size:9px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+/* badges */
+.badge-shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:11px}
+.badge{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:14px 12px;text-align:center;transition:transform .15s,border-color .15s}
+.badge.earned:hover{transform:translateY(-3px)}
+.badge.locked{opacity:.4}
+.badge-ic{font-size:30px;filter:drop-shadow(0 0 10px rgba(255,182,39,.3))}
+.badge.locked .badge-ic{filter:grayscale(1)}
+.badge-name{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.04em;margin-top:7px}
+.badge-desc{font-size:9.5px;color:var(--ink-faint);margin-top:3px;line-height:1.3}
+.badge-count{display:inline-block;margin-top:6px;font-family:'Chakra Petch',monospace;font-size:9px;color:var(--zeus);background:rgba(255,182,39,.12);border:1px solid rgba(255,182,39,.35);border-radius:999px;padding:2px 7px}
+/* matchup */
+.vs-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:18px}
+.vs-side{text-align:center}
+.vs-name{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.04em}
+.vs-score{font-family:'Chakra Petch',monospace;font-weight:700;font-size:34px;margin-top:4px}
+.vs-side.win .vs-score{color:var(--good)} .vs-side.lose .vs-score{color:var(--ink-faint)}
+.vs-mid{font-family:'Chakra Petch',monospace;font-size:13px;color:var(--zeus);letter-spacing:.1em}
+.vs-bar{grid-column:1/-1;height:8px;border-radius:5px;background:var(--danger);overflow:hidden;margin-top:4px;display:flex}
+.vs-bar i{height:100%;background:var(--good)}
+.proto-badge{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:50;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.2em;color:var(--zeus);background:rgba(255,183,77,.1);border:1px solid rgba(255,183,77,.4);padding:4px 14px;border-radius:20px;text-transform:uppercase}
+.loading,.errbox{text-align:center;padding:50px 20px;color:var(--ink-soft);font-family:'Chakra Petch',monospace;letter-spacing:.1em}
+.errbox{color:var(--danger)}
+.fade{animation:fade .5s ease both}@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.src-row{margin-top:26px;display:flex;gap:8px;align-items:center;font-size:11px;color:var(--ink-faint)}
+.src-row input{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:'Chakra Petch',monospace;font-size:11px}
+.src-row button{background:var(--zeus);color:var(--bg-0);border:0;border-radius:8px;padding:7px 14px;font-family:'Chakra Petch',monospace;font-size:11px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="proto-badge">◆ The Arena · Win Module Prototype</div>
+<div class="wrap" id="root"><div class="loading">ENTERING THE ARENA…</div></div>
+<script>
+var FY26_PROD_DAYS = {"2025-10-01":0,"2025-10-02":1,"2025-10-03":2,"2025-10-06":3,"2025-10-07":4,"2025-10-08":5,"2025-10-14":6,"2025-10-15":7,"2025-10-16":8,"2025-10-17":9,"2025-10-20":10,"2025-10-21":11,"2025-10-22":12,"2025-10-23":13,"2025-10-24":14,"2025-10-27":15,"2025-10-28":16,"2025-10-29":17,"2025-10-30":18,"2025-10-31":19,"2025-11-03":20,"2025-11-04":21,"2025-11-05":22,"2025-11-06":23,"2025-11-07":24,"2025-11-12":25,"2025-11-13":26,"2025-11-14":27,"2025-11-17":28,"2025-11-18":29,"2025-11-19":30,"2025-11-20":31,"2025-11-21":32,"2025-11-24":33,"2025-11-25":34,"2025-11-26":35,"2025-12-01":36,"2025-12-02":37,"2025-12-03":38,"2025-12-04":39,"2025-12-08":40,"2025-12-09":41,"2025-12-10":42,"2025-12-11":43,"2025-12-12":44,"2025-12-15":45,"2025-12-16":46,"2025-12-17":47,"2025-12-18":48,"2025-12-19":49,"2026-01-05":50,"2026-01-06":51,"2026-01-07":52,"2026-01-08":53,"2026-01-09":54,"2026-01-12":55,"2026-01-13":56,"2026-01-14":57,"2026-01-15":58,"2026-01-16":59,"2026-01-20":60,"2026-01-21":61,"2026-01-22":62,"2026-01-23":63,"2026-01-26":64,"2026-01-27":65,"2026-01-28":66,"2026-01-29":67,"2026-01-30":68,"2026-02-02":69,"2026-02-03":70,"2026-02-04":71,"2026-02-05":72,"2026-02-06":73,"2026-02-09":74,"2026-02-10":75,"2026-02-11":76,"2026-02-12":77,"2026-02-13":78,"2026-02-17":79,"2026-02-18":80,"2026-02-19":81,"2026-02-20":82,"2026-02-23":83,"2026-02-24":84,"2026-02-25":85,"2026-02-26":86,"2026-02-27":87,"2026-03-02":88,"2026-03-03":89,"2026-03-04":90,"2026-03-05":91,"2026-03-09":92,"2026-03-10":93,"2026-03-11":94,"2026-03-12":95,"2026-03-13":96,"2026-03-16":97,"2026-03-17":98,"2026-03-18":99,"2026-03-19":100,"2026-03-20":101,"2026-03-23":102,"2026-03-24":103,"2026-03-25":104,"2026-03-26":105,"2026-03-27":106,"2026-03-30":107,"2026-03-31":108,"2026-04-01":109,"2026-04-02":110,"2026-04-03":111,"2026-04-06":112,"2026-04-07":113,"2026-04-08":114,"2026-04-09":115,"2026-04-10":116,"2026-04-13":117,"2026-04-14":118,"2026-04-15":119,"2026-04-16":120,"2026-04-17":121,"2026-04-20":122,"2026-04-21":123,"2026-04-22":124,"2026-04-23":125,"2026-04-24":126,"2026-04-27":127,"2026-04-28":128,"2026-04-29":129,"2026-04-30":130,"2026-05-01":131,"2026-05-04":132,"2026-05-05":133,"2026-05-06":134,"2026-05-07":135,"2026-05-08":136,"2026-05-11":137,"2026-05-12":138,"2026-05-13":139,"2026-05-14":140,"2026-05-15":141,"2026-05-18":142,"2026-05-19":143,"2026-05-20":144,"2026-05-21":145,"2026-05-22":146,"2026-05-26":147,"2026-05-27":148,"2026-05-28":149,"2026-05-29":150,"2026-06-01":151,"2026-06-02":152,"2026-06-03":153,"2026-06-04":154,"2026-06-05":155,"2026-06-08":156,"2026-06-09":157,"2026-06-10":158,"2026-06-11":159,"2026-06-12":160,"2026-06-15":161,"2026-06-16":162,"2026-06-17":163,"2026-06-18":164,"2026-06-22":165,"2026-06-23":166,"2026-06-24":167,"2026-06-25":168,"2026-06-26":169,"2026-06-29":170,"2026-06-30":171,"2026-07-01":172,"2026-07-02":173,"2026-07-06":174,"2026-07-07":175,"2026-07-08":176,"2026-07-09":177,"2026-07-10":178,"2026-07-13":179,"2026-07-14":180,"2026-07-15":181,"2026-07-16":182,"2026-07-17":183,"2026-07-20":184,"2026-07-21":185,"2026-07-22":186,"2026-07-23":187,"2026-07-24":188,"2026-07-27":189,"2026-07-28":190,"2026-07-29":191,"2026-07-30":192,"2026-08-03":194,"2026-08-04":195,"2026-08-05":196,"2026-08-06":197,"2026-08-10":198,"2026-08-11":199,"2026-08-12":200,"2026-08-13":201,"2026-08-14":202,"2026-08-17":203,"2026-08-18":204,"2026-08-19":205,"2026-08-20":206,"2026-08-21":207,"2026-08-24":208,"2026-08-25":209,"2026-08-26":210,"2026-08-27":211,"2026-08-28":212,"2026-08-31":213,"2026-09-01":214,"2026-09-02":215,"2026-09-03":216,"2026-09-08":217,"2026-09-09":218,"2026-09-10":219,"2026-09-11":220,"2026-09-14":221,"2026-09-15":222,"2026-09-16":223,"2026-09-17":224,"2026-09-18":225,"2026-09-21":226,"2026-09-22":227,"2026-09-23":228,"2026-09-24":229,"2026-09-25":230,"2026-09-28":231,"2026-09-29":232,"2026-09-30":233};
+function prodDayIndex(iso){if(FY26_PROD_DAYS[iso]!==undefined)return FY26_PROD_DAYS[iso];const k=Object.keys(FY26_PROD_DAYS).sort();let b=null;for(const x of k){if(x<=iso)b=FY26_PROD_DAYS[x];else break;}return b;}
+const PDY=233;
+const fmt=n=>Math.round(n).toLocaleString();
+var CURRENT_URL='data.json',BUNDLE=null,SNAPS=[];
+
+async function load(url){CURRENT_URL=url;const r=document.getElementById('root');r.innerHTML='<div class="loading">ENTERING THE ARENA…</div>';
+  try{const res=await fetch(url,{cache:'no-store'});if(!res.ok)throw new Error('HTTP '+res.status);BUNDLE=await res.json();prep();render();}
+  catch(e){r.innerHTML='<div class="errbox">COULD NOT LOAD data.json<br><br>'+e.message+'<br><br>Run this from the same site as data.json.</div>'+srcRow();wireSrc();}}
+function srcRow(){return '<div class="src-row"><span>Source:</span><input id="srcUrl" value="'+CURRENT_URL+'"><button id="srcGo">Reload</button></div>';}
+function wireSrc(){const g=document.getElementById('srcGo');if(g)g.onclick=()=>load(document.getElementById('srcUrl').value.trim());}
+function prep(){SNAPS=[...BUNDLE.snapshots].filter(s=>s.stations&&s.stations.length).map(s=>({...s,idx:prodDayIndex(s.date)})).filter(s=>s.idx!=null).sort((a,b)=>a.idx-b.idx);}
+
+// ---- mechanics ----
+function tierOf(gs){return gs>=1.4?'zeus':gs>=1.2?'poseidon':gs>=1.0?'triton':'recruit';}
+function tierName(gs){return gs>=1.4?'Zeus':gs>=1.2?'Poseidon':gs>=1.0?'Triton':'Recruit';}
+const TIER_ICON={zeus:'⚡',poseidon:'🔱',triton:'🛡️',recruit:'⚓'};
+function subLevel(gs){
+  let floor,span,ceil;
+  if(gs>=1.4)return{tier:'zeus',label:'Zeus',prog:1,next:null};
+  if(gs>=1.2){floor=1.2;ceil=1.4;} else if(gs>=1.0){floor=1.0;ceil=1.2;} else {floor=0.5;ceil=1.0;}
+  span=ceil-floor; const p=Math.max(0,Math.min(1,(gs-floor)/span));
+  const lv=p>=.66?'III':p>=.33?'II':'I';
+  const nextName=gs>=1.2?'Zeus':gs>=1.0?'Poseidon':'Triton';
+  return{tier:tierOf(gs),label:tierName(gs)+' '+lv,prog:p,next:nextName,toNext:((ceil-gs)*100)};
+}
+function prodStreak(name){let c=0;for(let i=SNAPS.length-1;i>0;i--){const a=SNAPS[i].stations.find(x=>x.name===name),b=SNAPS[i-1].stations.find(x=>x.name===name);if(a&&b&&(a.gross-b.gross)>0)c++;else break;}return c;}
+function gsAt(snap,name){const s=snap.stations.find(x=>x.name===name);return s?s.glideslope_pct:null;}
+
+function render(){
+  const cur=SNAPS[SNAPS.length-1], curIdx=cur.idx;
+  const H=[];
+  H.push('<div class="head fade"><div><div class="kicker">NTAG Southwest · Win</div><div class="title">The <span>Arena</span></div></div>'+
+    '<div class="meta">'+cur.label+' · PD <b>'+curIdx+'</b>/233<br><b>'+cur.stations.length+'</b> stations competing</div></div><div class="hr"></div>');
+
+  // RANK LADDER
+  H.push(sec('🏅','Rank Ladder','Earned tier and progress to the next rank',''));
+  const ranked=cur.stations.map(s=>({n:s.name,div:s.division,gs:s.glideslope_pct,...subLevel(s.glideslope_pct)})).sort((a,b)=>b.gs-a.gs);
+  H.push('<div class="ladder fade">'+ranked.slice(0,6).map(r=>{
+    const col=r.tier==='zeus'?'var(--zeus)':r.tier==='poseidon'?'var(--poseidon)':r.tier==='triton'?'var(--triton)':'var(--ink-soft)';
+    return '<div class="rank-card"><div class="rank-badge '+r.tier+'">'+TIER_ICON[r.tier]+'</div>'+
+      '<div class="rank-info"><div class="rank-name">'+r.n+'</div>'+
+      '<div class="rank-tier '+r.tier+'">'+r.label+'</div>'+
+      '<div class="rank-prog"><i style="width:'+(r.prog*100).toFixed(0)+'%;background:'+col+'"></i></div>'+
+      '<div class="rank-next">'+(r.next?('+'+r.toNext.toFixed(0)+' pts → '+r.next):'Max tier reached ✦')+'</div></div></div>';
+  }).join('')+'</div>');
+
+  // LEADERBOARDS (multi-axis)
+  H.push(sec('🏆','Leaderboards','Many ways to win — raw, normalized, momentum, and streaks','<div class="lb-tabs" id="lbTabs">'+
+    [['contracts','Contracts'],['glideslope','Glideslope'],['improved','Most Improved'],['streak','Streaks'],['small','Best Small']].map((t,i)=>'<button class="lb-tab'+(i===0?' active':'')+'" data-lb="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'));
+  H.push('<div id="lbWrap" class="fade"></div>');
+
+  // STREAKS
+  H.push(sec('🔥','Hot Streaks','Consecutive snapshots adding contracts — keep the chain alive',''));
+  const streaks=cur.stations.map(s=>({n:s.name,k:prodStreak(s.name)})).sort((a,b)=>b.k-a.k).slice(0,6);
+  H.push('<div class="streak-grid fade">'+streaks.map(s=>
+    '<div class="streak-card'+(s.k>=5?' hot':'')+'"><div class="streak-flame">'+(s.k>=5?'🔥':'✨')+'</div>'+
+    '<div class="streak-num">'+s.k+'</div><div class="streak-name">'+s.n+'</div>'+
+    '<div class="streak-lbl">snapshots</div></div>').join('')+'</div>');
+
+  // BADGES
+  H.push(sec('🎖️','Achievements','Earn them, keep them — collect the set',''));
+  H.push('<div class="badge-shelf fade">'+badges(cur)+'</div>');
+
+  // MATCHUP
+  H.push(sec('⚔️','Division Clash','Head-to-head — most contracts this week wins',''));
+  H.push(matchup(cur));
+
+  H.push(srcRow());
+  document.getElementById('root').innerHTML=H.join('');
+  renderLB('contracts');
+  document.querySelectorAll('.lb-tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.lb-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');renderLB(t.dataset.lb);});
+  wireSrc();
+
+  function renderLB(kind){
+    const cur=SNAPS[SNAPS.length-1];
+    let rows=[], unit='', sub=s=>s.division;
+    if(kind==='contracts'){ rows=cur.stations.map(s=>({n:s.name,div:s.division,v:s.gross})).sort((a,b)=>b.v-a.v); unit=''; }
+    else if(kind==='glideslope'){ rows=cur.stations.map(s=>({n:s.name,div:s.division,v:Math.round(s.glideslope_pct*100)})).sort((a,b)=>b.v-a.v); unit='%'; }
+    else if(kind==='improved'){ const back=SNAPS[SNAPS.length-5]||SNAPS[0]; rows=cur.stations.map(s=>{const p=gsAt(back,s.name);return{n:s.name,div:s.division,v:p!=null?Math.round((s.glideslope_pct-p)*100):0};}).sort((a,b)=>b.v-a.v); unit=' pts'; }
+    else if(kind==='streak'){ rows=cur.stations.map(s=>({n:s.name,div:s.division,v:prodStreak(s.name)})).sort((a,b)=>b.v-a.v); unit=' 🔥'; }
+    else if(kind==='small'){ rows=cur.stations.filter(s=>s.size==='SMALL'||s.size==='MEDIUM').map(s=>({n:s.name,div:s.size,v:Math.round(s.glideslope_pct*100)})).sort((a,b)=>b.v-a.v); unit='%'; sub=s=>s.div; }
+    const top3=rows.slice(0,3), rest=rows.slice(3,10);
+    const medals=['🥇','🥈','🌟'];
+    let html='<div class="podium">';
+    [1,0,2].forEach(pos=>{ const r=top3[pos]; if(!r){html+='<div></div>';return;}
+      const cls=pos===0?'first':pos===1?'second':'third';
+      html+='<div class="pod '+cls+'"><div class="pod-medal">'+medals[pos]+'</div><div class="pod-name">'+r.n+'</div><div class="pod-val">'+r.v+unit+'</div><div class="pod-sub">'+(r.div||'')+'</div></div>';
+    });
+    html+='</div><div class="lb-list">'+rest.map((r,i)=>
+      '<div class="lb-row"><div class="lb-rank">'+(i+4)+'</div><div class="lb-name">'+r.n+'<small>'+(r.div||'')+'</small></div><div class="lb-val">'+r.v+unit+'</div></div>').join('')+'</div>';
+    document.getElementById('lbWrap').innerHTML=html;
+  }
+}
+function sec(icon,title,sub,right){return '<div class="sec"><div class="sec-ic">'+icon+'</div><div><h2>'+title+'</h2><div class="sub">'+sub+'</div></div>'+(right||'')+'</div>';}
+
+function badges(cur){
+  const defs=[];
+  // Zeus Club
+  const zeus=cur.stations.filter(s=>s.glideslope_pct>=1.4);
+  defs.push({ic:'⚡',name:'Zeus Club',desc:'Reach 140% glideslope',earned:zeus.length,sample:zeus.map(s=>s.name)});
+  // Century (100+ contracts)
+  const century=cur.stations.filter(s=>s.gross>=100);
+  defs.push({ic:'💯',name:'Century Club',desc:'100+ contracts written',earned:century.length});
+  // Comeback
+  const comeback=cur.stations.filter(s=>{const hist=SNAPS.map(sn=>gsAt(sn,s.name)).filter(v=>v!=null);return Math.min(...hist)<0.85 && s.glideslope_pct>=1.0;});
+  defs.push({ic:'📈',name:'Comeback',desc:'Dipped below 85%, climbed back to 100%',earned:comeback.length});
+  // Hot Hand (streak >=5)
+  const hot=cur.stations.filter(s=>prodStreak(s.name)>=5);
+  defs.push({ic:'🔥',name:'Hot Hand',desc:'5+ snapshot production streak',earned:hot.length});
+  // Iron (above gs every snapshot)
+  const iron=cur.stations.filter(s=>SNAPS.every(sn=>{const g=gsAt(sn,s.name);return g==null||g>=1.0;}));
+  defs.push({ic:'🛡️',name:'Ironclad',desc:'Never dropped below glideslope',earned:iron.length});
+  // Giant Slayer (small/medium beating a mega's glideslope)
+  const megaMax=Math.max(...cur.stations.filter(s=>s.size==='MEGA').map(s=>s.glideslope_pct),0);
+  const slayer=cur.stations.filter(s=>(s.size==='SMALL'||s.size==='MEDIUM')&&s.glideslope_pct>megaMax);
+  defs.push({ic:'🗡️',name:'Giant Slayer',desc:'Small station out-paces every mega',earned:slayer.length});
+  return defs.map(d=>'<div class="badge '+(d.earned?'earned':'locked')+'"><div class="badge-ic">'+d.ic+'</div>'+
+    '<div class="badge-name">'+d.name+'</div><div class="badge-desc">'+d.desc+'</div>'+
+    (d.earned?'<div class="badge-count">'+d.earned+' earned</div>':'<div class="badge-count" style="color:var(--ink-faint);background:none;border-color:var(--line-soft)">locked</div>')+'</div>').join('');
+}
+
+function matchup(cur){
+  // top two divisions by this-week contract gain
+  const back=SNAPS[SNAPS.length-2]||SNAPS[0];
+  const byDiv={};
+  cur.stations.forEach(s=>{const p=back.stations.find(x=>x.name===s.name);const gain=p?(s.gross-p.gross):0;(byDiv[s.division]=byDiv[s.division]||{gain:0});byDiv[s.division].gain+=gain;});
+  const divs=Object.entries(byDiv).map(([n,o])=>({n,gain:o.gain})).sort((a,b)=>b.gain-a.gain);
+  if(divs.length<2)return '<div class="errbox" style="padding:18px">Need two snapshots for a matchup.</div>';
+  const a=divs[0], b=divs[1]; const tot=Math.max(1,a.gain+b.gain);
+  return '<div class="vs-wrap fade"><div class="vs-side win"><div class="vs-name">'+a.n+'</div><div class="vs-score">'+a.gain+'</div></div>'+
+    '<div class="vs-mid">VS</div>'+
+    '<div class="vs-side lose"><div class="vs-name">'+b.n+'</div><div class="vs-score">'+b.gain+'</div></div>'+
+    '<div class="vs-bar"><i style="width:'+(a.gain/tot*100).toFixed(0)+'%"></i></div></div>';
+}
+load(CURRENT_URL);
+</script>
+</body>
+</html>
