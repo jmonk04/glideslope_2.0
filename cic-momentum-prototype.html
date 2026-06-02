@@ -715,7 +715,13 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
 .mom-line{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--ink-dim)}
 .mom-line b{color:var(--ink);font-family:'Chakra Petch',monospace}
 .mom-norm,.mom-pct{color:var(--ink-faint)}
+.mom-sigma{color:var(--ink-faint);font-size:11px}
 .mom-z{font-family:'Chakra Petch',monospace;font-weight:700;font-size:20px;text-align:right;white-space:nowrap}
+.mom-score{text-align:center;min-width:56px}
+.mom-score-num{font-family:'Chakra Petch',monospace;font-weight:700;font-size:27px;line-height:1}
+.mom-score-lbl{font-family:'Chakra Petch',monospace;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-top:3px}
+.mom-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.mom-toolbar-lbl{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 .mom-spark{display:flex;align-items:flex-end;gap:2px;height:36px}
 .mom-bar{width:5px;border-radius:2px 2px 0 0;display:block}
 .mom-foot{font-size:10.5px;color:var(--ink-faint);margin-top:4px;letter-spacing:.02em}
@@ -1155,7 +1161,7 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
   <!-- momentum radar: production anomaly vs each station's own norm -->
   <section class="section">
     <div class="section-tag"><span class="num">⇅</span><h2>Momentum Radar</h2><span class="rule"></span></div>
-    <div class="az-hint" style="margin-bottom:10px">Stations whose latest month of ALNAV contracts swung well above or below their <em>own</em> historical average — surfacing surges and slowdowns the cumulative glideslope hides.</div>
+    <div class="az-hint" style="margin-bottom:10px">Stations whose recent ALNAV contracts swung well above or below their <em>own</em> historical average. Pick a window — a longer one catches sustained slides, not just a one-month blip.</div>
     <div id="momentumRadar" class="mom-radar"></div>
   </section>
 
@@ -2159,27 +2165,46 @@ function _momColor(m, sev){
   return dir<0 ? _MOM_COOL[sev] : _MOM_HEAT[sev];
 }
 
-// Monthly contract series from EOM snapshots, dropping the cumulative anchor (idx 0)
-function stationMomentum(name, fieldFn){
+// state: how many of the most-recent months count as the "current" period
+let _momWindow = 1;
+
+// Relatable 0–100 score (50 = on the station's normal monthly pace; ±3σ → 0/100)
+function momentumScore(z){ return z==null ? null : Math.max(0, Math.min(100, Math.round(50 + 50*(z/3)))); }
+function momentumRating(z){
+  if(z==null) return 'Building';
+  if(z>= 1.25) return 'Surging';
+  if(z>= 0.5)  return 'Warming';
+  if(z>-0.5)   return 'Steady';
+  if(z>-1.25)  return 'Cooling';
+  return 'Cold';
+}
+
+// Monthly contract series from EOM snapshots, dropping the cumulative anchor (idx 0).
+// `win` = number of most-recent months treated as the current period (default 1).
+function stationMomentum(name, fieldFn, win){
   fieldFn = fieldFn || (s=>s.attn||0);
+  win = Math.max(1, win||1);
   const md = DataLayer.monthlyDeltas(name, fieldFn);   // [{month,value}] — idx 0 = cumulative anchor
   const series = md.length>1 ? md.slice(1) : [];        // clean month-over-month output
   const st = DataLayer.station(name);
   const gs = st ? st.glideslope_pct : 0;
-  const base = {name, division: st?st.division:'', gs, tier: tierOf(gs), series};
-  if(series.length < 2) return Object.assign(base, {ok:false, reason:'building'});
+  const base = {name, division: st?st.division:'', gs, tier: tierOf(gs), series, win};
+  if(series.length < win+2) return Object.assign(base, {ok:false, reason:'building'}); // need window + ≥2 baseline months
   const values = series.map(d=>d.value);
-  const latest = values[values.length-1];
-  const latestMonth = series[series.length-1].month;
-  const baseline = values.slice(0,-1);                  // judge latest vs everything before it
+  const recent = values.slice(-win);
+  const recentMean = _mean(recent);                     // avg monthly output across the window
+  const baseline = values.slice(0,-win);                // months before the window = the norm
   const mean = _mean(baseline);
-  const std = _sampleStd(baseline);
+  const std  = _sampleStd(baseline);
   const cv = mean>0 ? std/mean : null;                  // coefficient of variation (volatility)
-  const pctVsMean = mean>0 ? (latest-mean)/mean : null;
+  const pctVsMean = mean>0 ? (recentMean-mean)/mean : null;
   let z=null, zApprox=false;
-  if(baseline.length>=2 && std>0) z=(latest-mean)/std;
-  else if(baseline.length>=2 && std===0){ z = latest<mean?-3:(latest>mean?3:0); zApprox=true; } // perfectly steady baseline
-  return Object.assign(base, {ok:true, latest, latestMonth, mean, std, cv, z, zApprox, pctVsMean, baselineN:baseline.length});
+  if(baseline.length>=2 && std>0) z=(recentMean-mean)/std;
+  else if(baseline.length>=2 && std===0){ z = recentMean<mean?-3:(recentMean>mean?3:0); zApprox=true; }
+  const months = series.slice(-win).map(d=>d.month);    // dynamic label, e.g. "May" or "Mar–May"
+  const label = win===1 ? months[0] : `${months[0]}–${months[months.length-1]}`;
+  return Object.assign(base, {ok:true, recent, recentMean, latestMonth:label, mean, std, cv, z, zApprox,
+                              pctVsMean, baselineN:baseline.length, displayVal: win===1 ? recent[0] : +recentMean.toFixed(1)});
 }
 
 function _momSeverity(m){
@@ -2209,57 +2234,80 @@ function _momBars(series, color){
 
 function renderMomentumRadar(){
   const el=document.getElementById('momentumRadar'); if(!el) return;
-  const all = azCurrent.map(s=>stationMomentum(s.name));
-  if(!all.some(m=>m.ok)){
-    el.innerHTML='<div class="az-hint">Building monthly baselines — need at least 3 month-end (EOM) snapshots per station before momentum can be scored.</div>';
-    return;
+  const W=_momWindow;
+  const ctrl = `<div class="mom-toolbar">
+    <span class="mom-toolbar-lbl">Window</span>
+    <div class="trend-presets" id="momWindowCtrl">
+      ${[[1,'Latest mo'],[2,'Last 2 mo'],[3,'Last 3 mo']].map(([w,l])=>`<button class="trend-preset ${W===w?'active':''}" data-w="${w}">${l}</button>`).join('')}
+    </div>
+  </div>`;
+  const wire=()=>{
+    const c=el.querySelector('#momWindowCtrl'); if(!c) return;
+    c.querySelectorAll('.trend-preset').forEach(b=>b.addEventListener('click',()=>{ _momWindow=+b.dataset.w; renderMomentumRadar(); }));
+    el.querySelectorAll('.mom-card').forEach(card=>card.addEventListener('click',()=>showStationModal(card.dataset.station)));
+  };
+
+  const anyMonthly = azCurrent.some(s=>stationMomentum(s.name,null,1).ok);
+  if(!anyMonthly){
+    el.innerHTML = ctrl + '<div class="az-hint">Building monthly baselines — need at least 3 month-end (EOM) snapshots per station before momentum can be scored.</div>';
+    wire(); return;
   }
+  const all = azCurrent.map(s=>stationMomentum(s.name, null, W));
+  if(!all.some(m=>m.ok)){
+    el.innerHTML = ctrl + `<div class="az-hint">Not enough history for a ${W}-month window yet — try a shorter window.</div>`;
+    wire(); return;
+  }
+
   const scored = all.filter(m=>m.ok).map(m=>({m, sev:_momSeverity(m), dir:(m.z!=null?m.z:(m.pctVsMean||0))}));
   const cooling = scored.filter(x=>x.sev!=='none' && x.dir<0).sort((a,b)=>a.dir-b.dir).slice(0,8); // most negative first
   const heating = scored.filter(x=>x.sev!=='none' && x.dir>0).sort((a,b)=>b.dir-a.dir).slice(0,8); // most positive first
 
   const card=({m,sev})=>{
-    const dir  = m.z!=null?m.z:(m.pctVsMean||0);
-    const cool = dir<0;
-    const color=_momColor(m,sev);
+    const dir=m.z!=null?m.z:(m.pctVsMean||0), cool=dir<0, color=_momColor(m,sev);
+    const score=momentumScore(m.z), rating=momentumRating(m.z);
     const zTxt  = m.z==null ? '—' : `${m.z>0?'+':''}${m.z.toFixed(1)}σ${m.zApprox?'*':''}`;
     const pmTxt = m.pctVsMean==null ? '' : `${m.pctVsMean>0?'+':''}${Math.round(m.pctVsMean*100)}% vs avg`;
     let flag='';
     if(cool && m.gs>=1.0 && (sev==='strong'||sev==='mid')) flag='<span class="mom-flag cool">▼ cooling · still above GS</span>';
     else if(!cool && m.gs<1.0 && (sev==='strong'||sev==='mid')) flag='<span class="mom-flag heat">▲ surging · climbing back</span>';
     const tierColor = m.tier.cls==='zeus'?'var(--zeus)':m.tier.cls==='pos'?'var(--poseidon)':m.tier.cls==='tri'?'var(--triton)':'var(--danger)';
+    const valTxt = m.win===1 ? `<b>${m.displayVal}</b>` : `<b>${m.displayVal}</b>/mo`;
     return `<div class="mom-card" data-station="${m.name}" style="border-left-color:${color}">
       <div class="mom-dot" style="background:${color}"></div>
       <div class="mom-main">
         <div class="mom-head"><span class="mom-name">${m.name}</span>${flag}</div>
         <div class="mom-sub">${m.division} · GS ${(m.gs*100).toFixed(0)}% <span style="color:${tierColor}">${m.tier.label}</span></div>
         <div class="mom-line">
-          <span class="mom-now">${m.latestMonth}: <b>${m.latest}</b></span>
-          <span class="mom-norm">norm ${m.mean.toFixed(1)} ± ${m.std.toFixed(1)}</span>
-          ${pmTxt?`<span class="mom-pct">${pmTxt}</span>`:''}
+          <span class="mom-now">${m.latestMonth}: ${valTxt}</span>
+          <span class="mom-norm">norm ${m.mean.toFixed(1)} ± ${m.std.toFixed(1)}/mo</span>
+          <span class="mom-sigma">${zTxt}${pmTxt?` · ${pmTxt}`:''}</span>
         </div>
       </div>
-      <div class="mom-z" style="color:${color}">${zTxt}</div>
+      <div class="mom-score" style="color:${color}">
+        <div class="mom-score-num">${score==null?'—':score}</div>
+        <div class="mom-score-lbl">${rating}</div>
+      </div>
       <div class="mom-spark">${_momBars(m.series, color)}</div>
     </div>`;
   };
 
   const coolHtml = cooling.length ? cooling.map(card).join('') : '<div class="mom-empty">No station more than ¾σ below its own norm.</div>';
   const heatHtml = heating.length ? heating.map(card).join('') : '<div class="mom-empty">No station more than ¾σ above its own norm.</div>';
+  const winLbl = W===1?'latest month':`last ${W} months`;
 
-  el.innerHTML = `
+  el.innerHTML = ctrl + `
     <div class="mom-group">
-      <div class="mom-group-label cool">▼ Cooling — latest month below own norm</div>
+      <div class="mom-group-label cool">▼ Cooling — ${winLbl} below own norm</div>
       ${coolHtml}
     </div>
     <div class="mom-group">
-      <div class="mom-group-label heat">▲ Heating — latest month above own norm</div>
+      <div class="mom-group-label heat">▲ Heating — ${winLbl} above own norm</div>
       ${heatHtml}
     </div>
-    ${scored.some(x=>x.m.zApprox) ? '<div class="mom-foot">* baseline perfectly steady (σ≈0); σ-score approximated.</div>' : ''}
-    <div class="mom-foot">σ = standard deviations from the station’s own monthly ALNAV contract average. Tap a card for full detail.</div>`;
+    ${scored.some(x=>x.m.zApprox) ? '<div class="mom-foot">* baseline perfectly steady (σ≈0); score approximated.</div>' : ''}
+    <div class="mom-foot">Score 0–100 (50 = the station’s normal monthly pace). σ = std deviations from its own monthly ALNAV average. Tap a card for detail.</div>`;
 
-  el.querySelectorAll('.mom-card').forEach(c=>c.addEventListener('click',()=>showStationModal(c.dataset.station)));
+  wire();
 }
 
 function renderAnalyze(){
@@ -2589,19 +2637,23 @@ function _renderStationModal(name, s){
     ? `<div class="azm-section">📈 Glideslope Trend</div><div class="trend-presets" id="trendPresets">${presetBtns}</div><div id="trendChart" class="azm-trend">${trendSVG(series)}</div>`
     : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history for a trend.</div></div>`;
 
-  const _mom = stationMomentum(name);
+  const _mom = stationMomentum(name, null, _momWindow);
   let consistencyHtml='';
   if(_mom.ok){
     const _sev=_momSeverity(_mom);
     const _zTxt=_mom.z==null?'—':`${_mom.z>0?'+':''}${_mom.z.toFixed(1)}σ`;
     const _cvTxt=_mom.cv==null?'—':`${Math.round(_mom.cv*100)}%`;
-    consistencyHtml=`<div class="azm-section">ALNAV Monthly Consistency</div>
+    const _score=momentumScore(_mom.z), _rating=momentumRating(_mom.z), _col=_momColor(_mom,_sev);
+    const _curLbl = _mom.win===1 ? _mom.latestMonth : `${_mom.latestMonth} avg`;
+    consistencyHtml=`<div class="azm-section">ALNAV Monthly Momentum</div>
     <div class="azm-consistency">
-      <span class="azm-c-item"><span class="l">Latest mo.</span><span class="v">${_mom.latest}</span></span>
+      <span class="azm-c-item"><span class="l">Score</span><span class="v" style="color:${_col}">${_score==null?'—':_score}</span></span>
+      <span class="azm-c-item"><span class="l">Rating</span><span class="v" style="color:${_col};font-size:13px">${_rating}</span></span>
+      <span class="azm-c-item"><span class="l">${_curLbl}</span><span class="v">${_mom.displayVal}</span></span>
       <span class="azm-c-item"><span class="l">Monthly avg</span><span class="v">${_mom.mean.toFixed(1)}</span></span>
       <span class="azm-c-item"><span class="l">Std dev</span><span class="v">±${_mom.std.toFixed(1)}</span></span>
       <span class="azm-c-item"><span class="l">Volatility</span><span class="v">${_cvTxt}</span></span>
-      <span class="azm-c-item"><span class="l">vs own norm</span><span class="v" style="color:${_momColor(_mom,_sev)}">${_zTxt}</span></span>
+      <span class="azm-c-item"><span class="l">vs own norm</span><span class="v" style="color:${_col}">${_zTxt}</span></span>
     </div>`;
   }
 
