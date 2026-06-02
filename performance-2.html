@@ -176,6 +176,29 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
 .trend-presets{display:inline-flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:12px}
 .trend-preset{background:transparent;border:none;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 13px;border-radius:7px;cursor:pointer;transition:.13s}
 .trend-preset.active{background:var(--panel);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.6)}
+
+/* Division cards */
+.div-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.div-card{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px;cursor:pointer;transition:border-color .15s,transform .12s}
+.div-card:hover{border-color:var(--triton);transform:translateY(-2px)}
+.div-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.div-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:15px;letter-spacing:.08em}
+.div-gs{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px}
+.div-dots{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.div-dot{display:flex;flex-direction:column;align-items:center;gap:3px}
+.div-dot-pip{width:10px;height:10px;border-radius:50%}
+.div-dot-lbl{font-family:'Chakra Petch',monospace;font-size:8px;letter-spacing:.05em;color:var(--ink-faint);text-transform:uppercase}
+.div-sub{font-size:11px;color:var(--ink-faint);margin-top:10px;font-family:'Chakra Petch',monospace;letter-spacing:.04em}
+
+/* Division standings */
+.div-strow{display:grid;grid-template-columns:44px 1fr repeat(5,28px) auto;gap:8px;align-items:center;cursor:pointer;
+  background:var(--panel-2);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px;transition:.13s}
+.div-strow:hover{border-color:var(--triton);transform:translateX(2px)}
+.div-strow .rank{font-family:'Chakra Petch',monospace;font-weight:700;color:var(--ink-faint);font-size:14px;white-space:nowrap}
+.div-strow .dn{font-family:'Chakra Petch',monospace;font-weight:600;font-size:14px}
+.div-strow .dn small{display:block;font-family:'Sora',sans-serif;font-weight:400;font-size:10px;color:var(--ink-faint)}
+.div-pip{width:9px;height:9px;border-radius:50%;justify-self:center}
+.div-strow .gs{font-family:'Chakra Petch',monospace;font-weight:700;font-size:17px;text-align:right}
 </style>
 </head>
 <body>
@@ -230,13 +253,32 @@ h1{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(22px,4vw
     <div id="standings" class="standings"></div>
   </section>
 
-</div>
+  <!-- Division Overview -->
+  <section class="section">
+    <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
+    <div id="divGrid" class="div-grid"></div>
+  </section>
 
-<!-- Station Detail Modal -->
+  <!-- Division Standings -->
+  <section class="section">
+    <div class="section-tag"><span class="num">◧</span><h2>Division Standings</h2><span class="rule"></span></div>
+    <div class="az-hint" style="margin-bottom:12px">Tap any division for detail &amp; monthly breakdown</div>
+    <div id="divStandings" class="standings"></div>
+  </section>
+
+</div>
 <div id="azModal" class="az-modal">
   <div class="az-modal-card">
     <button class="az-modal-close" id="azModalClose">✕</button>
     <div id="azModalBody"></div>
+  </div>
+</div>
+
+<!-- Division Detail Modal -->
+<div id="divModal" class="az-modal">
+  <div class="az-modal-card">
+    <button class="az-modal-close" id="divModalClose">✕</button>
+    <div id="divModalBody"></div>
   </div>
 </div>
 
@@ -682,6 +724,320 @@ function _renderModalBody(name, s){
 
 document.getElementById('azModalClose').addEventListener('click',()=>document.getElementById('azModal').classList.remove('show'));
 document.getElementById('azModal').addEventListener('click',e=>{ if(e.target.id==='azModal') document.getElementById('azModal').classList.remove('show'); });
+document.getElementById('divModalClose').addEventListener('click',()=>document.getElementById('divModal').classList.remove('show'));
+document.getElementById('divModal').addEventListener('click',e=>{ if(e.target.id==='divModal') document.getElementById('divModal').classList.remove('show'); });
+
+/* ============================================================
+   DIVISION AGGREGATION HELPERS
+   ============================================================ */
+function divStations(divName){
+  return azCurrent.filter(s=>s.division===divName);
+}
+
+// Aggregate a numeric field across stations in a snapshot
+function divAgg(snapStations, fieldFn){
+  return snapStations.reduce((sum,s)=>sum+(fieldFn(s)||0), 0);
+}
+
+// Aggregate glideslope for a division: sum(attn) / sum(requirement)
+function divGlideslope(snapStations, attnFn, reqFn){
+  const totalAttn = snapStations.reduce((s,st)=>s+(attnFn(st)||0),0);
+  const totalReq  = snapStations.reduce((s,st)=>s+(reqFn(st)||0),0);
+  return totalReq>0 ? totalAttn/totalReq : 0;
+}
+
+// Division glideslope for ALNAV across all snapshots (for trend line)
+function divSeriesALNAV(divName){
+  return DataLayer.allSnapshots().map(snap=>{
+    const sts = snap.stations.filter(s=>s.division===divName);
+    if(!sts.length) return null;
+    const val = divGlideslope(sts, s=>s.attn, s=>s.requirement||0);
+    return {date:snap.date, seq:snap.seq, value:val};
+  }).filter(Boolean);
+}
+
+// Division glideslope delta — N snapshots back
+function divGsDelta(divName, snapCount){
+  const snaps = DataLayer.allSnapshots();
+  if(snaps.length < snapCount+1) return null;
+  const curSts  = snaps[snaps.length-1].stations.filter(s=>s.division===divName);
+  const pastSts = snaps[snaps.length-1-snapCount].stations.filter(s=>s.division===divName);
+  if(!curSts.length||!pastSts.length) return null;
+  const cur  = divGlideslope(curSts,  s=>s.attn, s=>s.requirement||0);
+  const past = divGlideslope(pastSts, s=>s.attn, s=>s.requirement||0);
+  return Math.round((cur-past)*10000)/10000;
+}
+
+// Monthly deltas aggregated across a division
+function divMonthlyDeltas(divName, attnFn){
+  const eoms = DataLayer.eomSnapshots();
+  if(!eoms.length) return [];
+  const result = [];
+  for(let i=0;i<eoms.length;i++){
+    const sts = eoms[i].stations.filter(s=>s.division===divName);
+    const cur = sts.reduce((sum,s)=>sum+(attnFn(s)||0),0);
+    if(i===0){
+      result.push({month:eoms[i].eom||eoms[i].date, value:cur});
+    } else {
+      const prevSts = eoms[i-1].stations.filter(s=>s.division===divName);
+      const prev = prevSts.reduce((sum,s)=>sum+(attnFn(s)||0),0);
+      result.push({month:eoms[i].eom||eoms[i].date, value:Math.max(0,cur-prev)});
+    }
+  }
+  return result;
+}
+
+function divContractsLabel(divName){
+  const sts = divStations(divName);
+  const totalAttn = sts.reduce((s,st)=>s+(st.attn||0),0);
+  const totalReq  = sts.reduce((s,st)=>s+(st.requirement||0),0);
+  if(!totalReq) return {val:'—', sub:'no data', color:'var(--ink-faint)'};
+  const gs = totalAttn/totalReq;
+  const tiers=[{label:'Triton',t:1.00},{label:'Poseidon',t:1.20},{label:'Zeus',t:1.40}];
+  const next = tiers.find(x=>gs<x.t);
+  if(!next){
+    const cushion = Math.round((gs-1.40)*totalReq);
+    return {val:`+${cushion}`, sub:'above Zeus floor', color:'var(--zeus)'};
+  }
+  const needed = Math.ceil((next.t-gs)*totalReq);
+  const color = next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
+  return {val:`${needed}`, sub:`to ${next.label}`, color};
+}
+
+/* ============================================================
+   DIVISION OVERVIEW CARDS
+   ============================================================ */
+function renderDivGrid(){
+  const divs = [...new Set(azCurrent.map(s=>s.division))].sort();
+  const snap = DataLayer.latest();
+
+  document.getElementById('divGrid').innerHTML = divs.map(div=>{
+    const sts = snap.stations.filter(s=>s.division===div);
+    const alnavGs = divGlideslope(sts, s=>s.attn, s=>s.requirement||0);
+    const tier = tierOf(alnavGs);
+    const gsColor = tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
+
+    const dots = PROGRAMS.map(p=>{
+      const totalAttn = sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
+      // For each program we need total requirement — use ALNAV req as proxy for ALNAV, others use attn/gl ratio
+      // Best we can do: check if aggregate attn >= aggregate requirement equivalent
+      // Use divGlideslope per program
+      const gs = sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0) / sts.length; // avg glideslope
+      const color = gs>=1.0 ? 'var(--good)' : 'var(--danger)';
+      return `<div class="div-dot"><div class="div-dot-pip" style="background:${color}"></div><div class="div-dot-lbl">${p.label}</div></div>`;
+    }).join('');
+
+    return `<div class="div-card" data-div="${div}">
+      <div class="div-card-head">
+        <span class="div-name">${div}</span>
+        <span class="div-gs" style="color:${gsColor}">${(alnavGs*100).toFixed(1)}%</span>
+      </div>
+      <div class="div-dots">${dots}</div>
+      <div class="div-sub">${sts.length} stations · ${tier.icon} ${tier.label}</div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.div-card').forEach(c=>{
+    c.addEventListener('click',()=>showDivModal(c.dataset.div));
+  });
+}
+
+/* ============================================================
+   DIVISION STANDINGS
+   ============================================================ */
+let divPrevRankMap = {};
+function buildDivPrevRankMap(divs){
+  divPrevRankMap = {};
+  const snaps = DataLayer.allSnapshots();
+  if(snaps.length<2) return;
+  const prevSnap = snaps[snaps.length-2];
+  const ranked = divs.map(div=>{
+    const sts = prevSnap.stations.filter(s=>s.division===div);
+    return {div, gs:divGlideslope(sts, s=>s.attn, s=>s.requirement||0)};
+  }).sort((a,b)=>b.gs-a.gs);
+  ranked.forEach((d,i)=>{ divPrevRankMap[d.div]=i+1; });
+}
+
+function renderDivStandings(){
+  const snap = DataLayer.latest();
+  const divs = [...new Set(azCurrent.map(s=>s.division))].sort();
+  buildDivPrevRankMap(divs);
+
+  const ranked = divs.map(div=>{
+    const sts = snap.stations.filter(s=>s.division===div);
+    const gs = divGlideslope(sts, s=>s.attn, s=>s.requirement||0);
+    return {div, gs, sts};
+  }).sort((a,b)=>b.gs-a.gs);
+
+  document.getElementById('divStandings').innerHTML = ranked.map((d,i)=>{
+    const rank = i+1;
+    const tier = tierOf(d.gs);
+    const gsColor = tier.cls==='pos'?'poseidon':tier.cls==='tri'?'triton':tier.cls==='zeus'?'zeus':'ink-faint';
+
+    // Rank arrow
+    const prev = divPrevRankMap[d.div];
+    let arrow = '';
+    if(prev){ const ch=prev-rank; arrow=ch>0?`<span class="arr up">▲${ch}</span>`:ch<0?`<span class="arr dn">▼${Math.abs(ch)}</span>`:`<span class="arr fl">▬</span>`; }
+
+    // Mission area dots
+    const dots = PROGRAMS.map(p=>{
+      const gs = d.sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/d.sts.length;
+      const color = gs>=1.0?'var(--good)':'var(--danger)';
+      return `<div class="div-pip" style="background:${color}" title="${p.label}: ${(gs*100).toFixed(1)}%"></div>`;
+    }).join('');
+
+    return `<div class="div-strow" data-div="${d.div}">
+      <span class="rank">#${rank} ${arrow}</span>
+      <span class="dn">${d.div}<small>${d.sts.length} stations</small></span>
+      ${dots}
+      <span class="badge ${tier.badge}">${tier.label}</span>
+      <span class="gs" style="color:var(--${gsColor})">${(d.gs*100).toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.div-strow').forEach(r=>{
+    r.addEventListener('click',()=>showDivModal(r.dataset.div));
+  });
+}
+
+/* ============================================================
+   DIVISION MODAL
+   ============================================================ */
+let _divActiveProgKey = 'alnav';
+let _divTrendWindow = 8;
+
+function showDivModal(divName){
+  _divActiveProgKey = 'alnav';
+  _divTrendWindow = 8;
+  _renderDivModal(divName);
+  document.getElementById('divModal').classList.add('show');
+}
+
+function _renderDivModal(divName){
+  const snap = DataLayer.latest();
+  const sts = snap.stations.filter(s=>s.division===divName);
+  if(!sts.length) return;
+
+  const alnavGs = divGlideslope(sts, s=>s.attn, s=>s.requirement||0);
+  const tier = tierOf(alnavGs);
+  const tierColor = tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--ink-faint)';
+
+  // Tile 1 — Δ 5-Day
+  const d5 = divGsDelta(divName,1);
+  const d5Txt   = d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color = d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow = d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
+
+  // Tile 2 — Δ 20-Day
+  const d20 = divGsDelta(divName,4);
+  const d20Txt   = d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
+  const d20Color = d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
+  const d20Arrow = d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+
+  // Tile 3 — Attrition
+  const totalGross = sts.reduce((s,st)=>s+(st.gross||0),0);
+  const totalLoss  = sts.reduce((s,st)=>s+(st.loss||0),0);
+  const attrPct  = totalGross>0 ? totalLoss/totalGross : null;
+  const CMD_AVG  = 0.07;
+  const attrTxt  = attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
+  const attrColor= attrPct==null?'var(--ink-faint)':attrPct>CMD_AVG?'var(--danger)':'var(--good)';
+
+  // Tile 4 — Contracts
+  const ct = divContractsLabel(divName);
+
+  // Program breakdown cards
+  const progCards = PROGRAMS.map(p=>{
+    const totalAttn = sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
+    const avgGs = sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
+    const color = progColor(avgGs);
+    const isActive = _divActiveProgKey===p.key;
+    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}" data-div="${divName}">
+      <div class="pk">${p.label}</div>
+      <div class="pv" style="color:${color}">${(avgGs*100).toFixed(1)}%</div>
+      <div class="tap-hint">${totalAttn} attn · tap ▸</div>
+    </div>`;
+  }).join('');
+
+  // Monthly chart
+  const activeProg = PROGRAMS.find(p=>p.key===_divActiveProgKey);
+  const monthData = divMonthlyDeltas(divName, activeProg.fieldFn);
+  const chartHtml = monthData.length
+    ? (()=>{
+        const maxVal = Math.max(...monthData.map(d=>d.value),1);
+        const bars = monthData.map(d=>{
+          const h = Math.max(4, Math.round((d.value/maxVal)*81));
+          return `<div class="azm-bar-col">
+            <div class="azm-bar-val">${d.value||''}</div>
+            <div class="azm-bar" style="height:${h}px;background:${activeProg.color};opacity:0.85"></div>
+            <div class="azm-bar-lbl">${d.month}</div>
+          </div>`;
+        }).join('');
+        return `<div class="azm-monthly-title">${activeProg.label} · Monthly Attainment (EOM)</div><div class="azm-bar-wrap">${bars}</div>`;
+      })()
+    : `<div class="azm-no-eom">No EOM snapshots yet.</div>`;
+
+  // Trend
+  const allSeries = divSeriesALNAV(divName);
+  const series = _divTrendWindow===0 ? allSeries : allSeries.slice(-_divTrendWindow);
+  const presetBtns = [4,8,12,0].map(w=>{
+    const lbl=w===0?'All':`${w}W`;
+    return `<button class="trend-preset ${_divTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`;
+  }).join('');
+  const trendHtml = series.length>=2
+    ? `<div class="azm-section">📈 ALNAV Glideslope Trend</div>
+       <div class="trend-presets" id="divTrendPresets">${presetBtns}</div>
+       <div id="divTrendChart" class="azm-trend">${trendSVG(series)}</div>`
+    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
+
+  document.getElementById('divModalBody').innerHTML = `
+    <div class="azm-name">${divName}</div>
+    <div class="azm-badges">
+      <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}</span>
+      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:var(--ink-dim)">${sts.length} stations</span>
+    </div>
+    <div class="azm-stats">
+      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
+      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">cmd avg 7%</div></div>
+      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
+    </div>
+    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
+    <div class="azm-prog">${progCards}</div>
+    <div id="divMonthlyChart" class="azm-monthly">${chartHtml}</div>
+    ${trendHtml}`;
+
+  // Wire program cards
+  document.querySelectorAll('#divModalBody .azm-prog .p').forEach(card=>{
+    card.addEventListener('click',()=>{
+      _divActiveProgKey = card.dataset.prog;
+      document.querySelectorAll('#divModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_divActiveProgKey));
+      const prog = PROGRAMS.find(p=>p.key===_divActiveProgKey);
+      const data = divMonthlyDeltas(divName, prog.fieldFn);
+      const maxVal = Math.max(...data.map(d=>d.value),1);
+      const bars = data.map(d=>{
+        const h=Math.max(4,Math.round((d.value/maxVal)*81));
+        return `<div class="azm-bar-col"><div class="azm-bar-val">${d.value||''}</div><div class="azm-bar" style="height:${h}px;background:${prog.color};opacity:0.85"></div><div class="azm-bar-lbl">${d.month}</div></div>`;
+      }).join('');
+      document.getElementById('divMonthlyChart').innerHTML = data.length
+        ? `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM)</div><div class="azm-bar-wrap">${bars}</div>`
+        : `<div class="azm-no-eom">No EOM snapshots yet.</div>`;
+    });
+  });
+
+  // Wire trend presets
+  const tp = document.getElementById('divTrendPresets');
+  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      _divTrendWindow = +btn.dataset.w;
+      const full = divSeriesALNAV(divName);
+      const sliced = _divTrendWindow===0?full:full.slice(-_divTrendWindow);
+      tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_divTrendWindow));
+      document.getElementById('divTrendChart').innerHTML = sliced.length>=2
+        ? trendSVG(sliced)
+        : '<div class="az-hint">Not enough data for this window.</div>';
+    });
+  });
+}
 
 /* ============================================================
    MAIN RENDER
@@ -737,6 +1093,8 @@ function renderAll(){
   }
 
   renderStandings();
+  renderDivGrid();
+  renderDivStandings();
 }
 
 DataLayer.init().then(renderAll);
