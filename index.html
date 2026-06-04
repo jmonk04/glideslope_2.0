@@ -655,6 +655,9 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
 .azm-stat .l{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 .azm-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:3px}
 .azm-stat .s{font-size:11px;color:var(--ink-faint);margin-top:2px}
+.azm-stat.toggleable{cursor:pointer;position:relative;transition:border-color .15s,background .15s}
+.azm-stat.toggleable:hover{border-color:var(--triton);background:var(--panel-2)}
+.azm-stat.toggleable::after{content:'⇄';position:absolute;top:6px;right:8px;font-size:10px;color:var(--ink-faint);opacity:.55}
 .azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
 .cmd-breakdown{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px}
 .cmd-breakdown .azm-badges{margin-top:0}
@@ -1128,7 +1131,6 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
   <!-- persistent command summary strip (always visible, absorbs the old scoreboard) -->
   <div class="cic-strip" id="cicStrip">
     <div class="cic-strip-row" id="cicStripStats"></div>
-    <div class="tier-counts" id="tierCounts"></div>
   </div>
 
   <!-- CIC sub-navigation -->
@@ -2129,7 +2131,6 @@ let azDivList=[];
 function renderAnalyze(){
   if(!DataLayer.hasData()){
     document.getElementById('dataStampText').textContent='No data published yet — check back once the feed is live.';
-    document.getElementById('tierCounts').innerHTML='';
     { const _ss=document.getElementById('cicStripStats'); if(_ss) _ss.innerHTML=''; }
     { const _cb=document.getElementById('cmdBreakdown'); if(_cb) _cb.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
     document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
@@ -2147,15 +2148,6 @@ function renderAnalyze(){
 
   // ops grid heat map
   renderHeatMap();
-
-  // tier counts
-  const counts={ZEUS:0,POSEIDON:0,TRITON:0,BELOW:0};
-  azCurrent.forEach(s=>counts[tierOf(s.glideslope_pct).key]++);
-  document.getElementById('tierCounts').innerHTML=`
-    <div class="tc zeus"><div class="v">${counts.ZEUS}</div><div class="k">⚡ Zeus</div></div>
-    <div class="tc pos"><div class="v">${counts.POSEIDON}</div><div class="k">🔱 Poseidon</div></div>
-    <div class="tc tri"><div class="v">${counts.TRITON}</div><div class="k">🛡️ Triton</div></div>
-    <div class="tc below"><div class="v">${counts.BELOW}</div><div class="k">On the Cusp</div></div>`;
 
   // Weekly Warriors — top 5 week-over-week glideslope gains
   const movers=azCurrent.map(s=>{
@@ -2736,6 +2728,8 @@ function _renderDivModal(divName){
    ============================================================ */
 let _cmdActiveProgKey='alnav';
 let _cmdTrendWindow=8;
+/* per-card toggle state for the command summary cards (tap to swap face) */
+let _cmdCard={d5:'pct', d20:'pct', attr:'pct', ct:'gs'};
 
 function cmdSeriesALNAV(){
   return DataLayer.allSnapshots().map(snap=>{
@@ -2750,6 +2744,12 @@ function cmdGsDelta(snapCount){
   const cur=divGlideslope(snaps[snaps.length-1].stations||[], s=>s.attn, _reqOf);
   const past=divGlideslope(snaps[snaps.length-1-snapCount].stations||[], s=>s.attn, _reqOf);
   return Math.round((cur-past)*10000)/10000;
+}
+function cmdContractDelta(snapCount){
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<snapCount+1) return null;
+  const sum=arr=>(arr||[]).reduce((s,st)=>s+(st.attn||0),0);
+  return Math.round(sum(snaps[snaps.length-1].stations) - sum(snaps[snaps.length-1-snapCount].stations));
 }
 function cmdMonthlyDeltas(attnFn){
   const eoms=DataLayer.eomSnapshots();
@@ -2815,7 +2815,31 @@ function renderCommandBreakdown(){
   const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
   const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
 
-  const ct=cmdContractsLabel(sts);
+  // contract deltas over each window (net contracts gained)
+  const c5=cmdContractDelta(1);
+  const c5Txt=c5==null?'—':`${c5>=0?'+':''}${c5}`;
+  const c5Color=c5==null?'var(--ink-faint)':c5>0?'var(--good)':c5<0?'var(--danger)':'var(--ink-dim)';
+  const c20=cmdContractDelta(4);
+  const c20Txt=c20==null?'—':`${c20>=0?'+':''}${c20}`;
+  const c20Color=c20==null?'var(--ink-faint)':c20>0?'var(--good)':c20<0?'var(--danger)':'var(--ink-dim)';
+  // contracts above / below the glideslope pace requirement
+  const gsDiff=Math.round(totalAttn-totalReq);
+  const gsDiffTxt=`${gsDiff>=0?'+':''}${gsDiff}`;
+  const gsDiffColor=gsDiff>=0?'var(--good)':'var(--danger)';
+
+  // per-card faces — each card swaps on tap (state in _cmdCard)
+  const card5 = _cmdCard.d5==='pct'
+    ? {l:'Δ 5-Day', v:`${d5Arrow}${d5Txt}`, c:d5Color, s:'gs vs last snapshot'}
+    : {l:'Δ 5-Day', v:c5Txt, c:c5Color, s:'contracts vs last snapshot'};
+  const card20 = _cmdCard.d20==='pct'
+    ? {l:'Δ 20-Day', v:`${d20Arrow}${d20Txt}`, c:d20Color, s:'gs vs 4 snapshots back'}
+    : {l:'Δ 20-Day', v:c20Txt, c:c20Color, s:'contracts vs 4 back'};
+  const cardAttr = _cmdCard.attr==='pct'
+    ? {l:'Attrition', v:attrTxt, c:attrColor, s:`${totalLoss}/${totalGross} gross`}
+    : {l:'Attrition', v:`${totalLoss}`, c:attrColor, s:'contracts lost'};
+  const cardCt = _cmdCard.ct==='gs'
+    ? {l:'ALNAV GS', v:`${(alnavGs*100).toFixed(1)}%`, c:gsColor, s:'ALNAV glideslope'}
+    : {l:'Contracts', v:gsDiffTxt, c:gsDiffColor, s:gsDiff>=0?'above glideslope':'below glideslope'};
 
   const progCards=PROGRAMS.map(p=>{
     const totAttn=sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
@@ -2839,15 +2863,13 @@ function renderCommandBreakdown(){
 
   el.innerHTML=`
     <div class="azm-badges">
-      <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}</span>
-      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:var(--ink-dim)">${sts.length} stations</span>
       <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:${gsColor}">${(alnavGs*100).toFixed(1)}% ALNAV glideslope · ${totalAttn}/${totalReq}</span>
     </div>
     <div class="azm-stats">
-      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
-      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
-      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">${totalLoss}/${totalGross} gross</div></div>
-      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
+      <div class="azm-stat toggleable" data-card="d5"><div class="l">${card5.l}</div><div class="v" style="color:${card5.c};font-size:22px">${card5.v}</div><div class="s">${card5.s}</div></div>
+      <div class="azm-stat toggleable" data-card="d20"><div class="l">${card20.l}</div><div class="v" style="color:${card20.c};font-size:22px">${card20.v}</div><div class="s">${card20.s}</div></div>
+      <div class="azm-stat toggleable" data-card="attr"><div class="l">${cardAttr.l}</div><div class="v" style="color:${cardAttr.c}">${cardAttr.v}</div><div class="s">${cardAttr.s}</div></div>
+      <div class="azm-stat toggleable" data-card="ct"><div class="l">${cardCt.l}</div><div class="v" style="color:${cardCt.c}">${cardCt.v}</div><div class="s">${cardCt.s}</div></div>
     </div>
     <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
     <div class="azm-prog">${progCards}</div>
@@ -2859,6 +2881,14 @@ function renderCommandBreakdown(){
       _cmdActiveProgKey=card.dataset.prog;
       el.querySelectorAll('.azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_cmdActiveProgKey));
       document.getElementById('cmdMonthlyChart').innerHTML=_cmdMonthlyHtml(PROGRAMS.find(p=>p.key===_cmdActiveProgKey));
+    });
+  });
+  el.querySelectorAll('.azm-stats .toggleable').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const k=card.dataset.card;
+      if(k==='ct'){ _cmdCard.ct = _cmdCard.ct==='gs'?'contracts':'gs'; }
+      else { _cmdCard[k] = _cmdCard[k]==='pct'?'contracts':'pct'; }
+      renderCommandBreakdown();
     });
   });
   const tp=document.getElementById('cmdTrendPresets');
