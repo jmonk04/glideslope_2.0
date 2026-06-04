@@ -365,7 +365,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   margin-top:26px;opacity:.6;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.8}}
 
-.home{min-height:100vh;display:none;align-items:center;justify-content:center;padding:32px 22px;position:relative;overflow:hidden;
+.home{min-height:100vh;display:none;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top, 0px) + 44px) 22px calc(env(safe-area-inset-bottom, 0px) + 32px);position:relative;overflow:hidden;
   background:radial-gradient(1000px 700px at 50% 0%, rgba(61,169,252,.10), transparent 60%)}
 /* full-bleed crescent moon as the entire home background.
    A dark scrim sits over it so the tiles and text stay legible. */
@@ -656,6 +656,8 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
 .azm-stat .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:26px;margin-top:3px}
 .azm-stat .s{font-size:11px;color:var(--ink-faint);margin-top:2px}
 .azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
+.cmd-breakdown{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px}
+.cmd-breakdown .azm-badges{margin-top:0}
 .azm-prog{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
 @media(max-width:520px){.azm-prog{grid-template-columns:repeat(3,1fr)}}
 .azm-prog .p{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .12s;position:relative}
@@ -1118,9 +1120,16 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
     <div class="tier-counts" id="tierCounts"></div>
   </section>
 
+  <!-- command breakdown: whole-command rollup (mirrors station/division detail) -->
+  <section class="section">
+    <div class="section-tag"><span class="num">◎</span><h2>Command Breakdown</h2><span class="rule"></span></div>
+    <div id="cmdBreakdown" class="cmd-breakdown"></div>
+  </section>
+
   <!-- heat-map ops grid -->
   <section class="section">
     <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
+    <div class="trend-presets" id="heatProgToggle" style="margin-bottom:14px"></div>
     <div class="heat-legend">
       <span class="hl-item"><i style="background:var(--danger)"></i>&lt;80%</span>
       <span class="hl-item"><i style="background:#ff9d2e"></i>80–100%</span>
@@ -2101,6 +2110,7 @@ function renderAnalyze(){
   if(!DataLayer.hasData()){
     document.getElementById('dataStampText').textContent='No data published yet — check back once the feed is live.';
     document.getElementById('tierCounts').innerHTML='';
+    { const _cb=document.getElementById('cmdBreakdown'); if(_cb) _cb.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
     document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
     document.getElementById('standings').innerHTML='';
     return;
@@ -2147,6 +2157,7 @@ function renderAnalyze(){
   }
   renderStandings();
   renderDivGrid();
+  renderCommandBreakdown();
 }
 
 /* previous-week rank map (computed once per render) */
@@ -2281,20 +2292,34 @@ function heatColor(gs){
   return 'var(--danger)';
 }
 function heatText(gs){ return (gs>=1.0)?'#04140f':'#1a0508'; }  // dark text on bright tiles
+let _heatProg='alnav';   // which mission set the heat map is colored by
 function renderHeatMap(){
   const wrap=document.getElementById('heatGrid');
-  if(!azCurrent.length){ wrap.innerHTML=''; return; }
+  const toggle=document.getElementById('heatProgToggle');
+  if(!azCurrent.length){ if(wrap) wrap.innerHTML=''; if(toggle) toggle.innerHTML=''; return; }
+  const prog=PROGRAMS.find(p=>p.key===_heatProg)||PROGRAMS[0];
+
+  // mission-set toggle (ALNAV / AC / NSO / NUKE / NNS) — rebuilt each render so active state stays in sync
+  if(toggle){
+    toggle.innerHTML=PROGRAMS.map(p=>`<button class="trend-preset ${p.key===_heatProg?'active':''}" data-prog="${p.key}">${p.label}</button>`).join('');
+    toggle.querySelectorAll('.trend-preset').forEach(b=>b.addEventListener('click',()=>{ _heatProg=b.dataset.prog; renderHeatMap(); }));
+  }
+
   const divs=[...new Set(azCurrent.map(s=>s.division))].sort();
   wrap.innerHTML=divs.map(div=>{
     const tiles=azCurrent.filter(s=>s.division===div)
-      .sort((a,b)=>b.glideslope_pct-a.glideslope_pct)
-      .map(s=>{
-        const c=heatColor(s.glideslope_pct);
-        // abbreviate long station names to fit tiles
+      .map(s=>({s, gs:prog.glFn(s)}))
+      .sort((a,b)=>((b.gs==null?-Infinity:b.gs)-(a.gs==null?-Infinity:a.gs)))
+      .map(({s,gs})=>{
+        const has=gs!=null;
+        const c=has?heatColor(gs):'var(--panel)';
+        const txt=has?heatText(gs):'var(--ink-faint)';
         const short=s.name.length>11?s.name.slice(0,10)+'…':s.name;
-        return `<button class="heat-tile" data-station="${s.name}" style="background:${c};color:${heatText(s.glideslope_pct)}" title="${s.name}: ${(s.glideslope_pct*100).toFixed(1)}%">
+        const vlabel=has?(gs*100).toFixed(0):'—';
+        const title=has?`${s.name}: ${(gs*100).toFixed(1)}% ${prog.label}`:`${s.name}: no ${prog.label} data`;
+        return `<button class="heat-tile" data-station="${s.name}" style="background:${c};color:${txt}" title="${title}">
           <span class="ht-n">${short}</span>
-          <span class="ht-v">${(s.glideslope_pct*100).toFixed(0)}</span>
+          <span class="ht-v">${vlabel}</span>
         </button>`;
       }).join('');
     return `<div class="heat-div"><div class="heat-div-label">${div}</div><div class="heat-row">${tiles}</div></div>`;
@@ -2678,6 +2703,150 @@ function _renderDivModal(divName){
       const sliced=_divTrendWindow===0?full:full.slice(-_divTrendWindow);
       tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_divTrendWindow));
       document.getElementById('divTrendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
+    });
+  });
+}
+/* ============================================================
+   COMMAND BREAKDOWN — whole-command rollup. Aggregates ALL
+   stations the same way the division/station detail does:
+   ALNAV glideslope = Σattn / Σrequirement, attrition = Σloss/Σgross,
+   program cards, monthly EOM production, glideslope trend.
+   ============================================================ */
+let _cmdActiveProgKey='alnav';
+let _cmdTrendWindow=8;
+
+function cmdSeriesALNAV(){
+  return DataLayer.allSnapshots().map(snap=>{
+    const sts=snap.stations||[];
+    if(!sts.length) return null;
+    return {date:snap.date, seq:snap.seq, value:divGlideslope(sts, s=>s.attn, _reqOf)};
+  }).filter(Boolean);
+}
+function cmdGsDelta(snapCount){
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<snapCount+1) return null;
+  const cur=divGlideslope(snaps[snaps.length-1].stations||[], s=>s.attn, _reqOf);
+  const past=divGlideslope(snaps[snaps.length-1-snapCount].stations||[], s=>s.attn, _reqOf);
+  return Math.round((cur-past)*10000)/10000;
+}
+function cmdMonthlyDeltas(attnFn){
+  const eoms=DataLayer.eomSnapshots();
+  if(!eoms.length) return [];
+  const result=[];
+  for(let i=0;i<eoms.length;i++){
+    const cur=(eoms[i].stations||[]).reduce((sum,s)=>sum+(attnFn(s)||0),0);
+    if(i===0){ result.push({month:eoms[i].eom||eoms[i].date, value:cur}); }
+    else{
+      const prev=(eoms[i-1].stations||[]).reduce((sum,s)=>sum+(attnFn(s)||0),0);
+      result.push({month:eoms[i].eom||eoms[i].date, value:Math.max(0,cur-prev)});
+    }
+  }
+  return result;
+}
+function cmdContractsLabel(sts){
+  const totalAttn=sts.reduce((s,st)=>s+(st.attn||0),0);
+  const totalReq=sts.reduce((s,st)=>s+_reqOf(st),0);
+  if(!totalReq) return {val:'—', sub:'no data', color:'var(--ink-faint)'};
+  const gs=totalAttn/totalReq;
+  const tiers=[{label:'Triton',t:1.00},{label:'Poseidon',t:1.20},{label:'Zeus',t:1.40}];
+  const next=tiers.find(x=>gs<x.t);
+  if(!next){ const cushion=Math.round((gs-1.40)*totalReq); return {val:`+${cushion}`, sub:'above Zeus floor', color:'var(--zeus)'}; }
+  const needed=Math.ceil((next.t-gs)*totalReq);
+  const color=next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
+  return {val:`${needed}`, sub:`to ${next.label}`, color};
+}
+function _cmdMonthlyHtml(prog){
+  const data=cmdMonthlyDeltas(prog.fieldFn);
+  if(!data.length) return `<div class="azm-no-eom">No EOM snapshots yet.</div>`;
+  const maxVal=Math.max(...data.map(d=>d.value),1);
+  const bars=data.map(d=>{
+    const h=Math.max(4,Math.round((d.value/maxVal)*81));
+    return `<div class="azm-bar-col"><div class="azm-bar-val">${d.value||''}</div><div class="azm-bar" style="height:${h}px;background:${prog.color};opacity:.85"></div><div class="azm-bar-lbl">${d.month}</div></div>`;
+  }).join('');
+  return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM) — command-wide</div><div class="azm-bar-wrap">${bars}</div>`;
+}
+
+function renderCommandBreakdown(){
+  const el=document.getElementById('cmdBreakdown'); if(!el) return;
+  const snap=DataLayer.latest();
+  const sts=snap?(snap.stations||[]):[];
+  if(!sts.length){ el.innerHTML='<div class="az-hint">Waiting on data…</div>'; return; }
+
+  const alnavGs=divGlideslope(sts, s=>s.attn, _reqOf);
+  const tier=tierOf(alnavGs);
+  const gsColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
+  const totalAttn=sts.reduce((s,st)=>s+(st.attn||0),0);
+  const totalReq=sts.reduce((s,st)=>s+_reqOf(st),0);
+
+  const d5=cmdGsDelta(1);
+  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
+  const d20=cmdGsDelta(4);
+  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
+  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
+  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+
+  const totalGross=sts.reduce((s,st)=>s+(st.gross||0),0);
+  const totalLoss=sts.reduce((s,st)=>s+(st.loss||0),0);
+  const attrPct=totalGross>0?totalLoss/totalGross:null;
+  const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
+  const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
+
+  const ct=cmdContractsLabel(sts);
+
+  const progCards=PROGRAMS.map(p=>{
+    const totAttn=sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
+    const avgGs=sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
+    const isActive=_cmdActiveProgKey===p.key;
+    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}">
+      <div class="pk">${p.label}</div>
+      <div class="pv" style="color:${progColor(avgGs)}">${(avgGs*100).toFixed(1)}%</div>
+      <div class="tap-hint">${totAttn} attn · tap ▸</div>
+    </div>`;
+  }).join('');
+
+  const chartHtml=_cmdMonthlyHtml(PROGRAMS.find(p=>p.key===_cmdActiveProgKey));
+
+  const allSeries=cmdSeriesALNAV();
+  const series=_cmdTrendWindow===0?allSeries:allSeries.slice(-_cmdTrendWindow);
+  const presetBtns=[4,8,12,0].map(w=>{ const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_cmdTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`; }).join('');
+  const trendHtml=series.length>=2
+    ? `<div class="azm-section">📈 ALNAV Glideslope Trend</div><div class="trend-presets" id="cmdTrendPresets">${presetBtns}</div><div id="cmdTrendChart" class="azm-trend">${trendSVG(series)}</div>`
+    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
+
+  el.innerHTML=`
+    <div class="azm-badges">
+      <span class="azm-badge ${tier.badge}">${tier.icon} ${tier.label}</span>
+      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:var(--ink-dim)">${sts.length} stations</span>
+      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:${gsColor}">${(alnavGs*100).toFixed(1)}% ALNAV glideslope · ${totalAttn}/${totalReq}</span>
+    </div>
+    <div class="azm-stats">
+      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
+      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">${totalLoss}/${totalGross} gross</div></div>
+      <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
+    </div>
+    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
+    <div class="azm-prog">${progCards}</div>
+    <div id="cmdMonthlyChart" class="azm-monthly">${chartHtml}</div>
+    ${trendHtml}`;
+
+  el.querySelectorAll('.azm-prog .p').forEach(card=>{
+    card.addEventListener('click',()=>{
+      _cmdActiveProgKey=card.dataset.prog;
+      el.querySelectorAll('.azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_cmdActiveProgKey));
+      document.getElementById('cmdMonthlyChart').innerHTML=_cmdMonthlyHtml(PROGRAMS.find(p=>p.key===_cmdActiveProgKey));
+    });
+  });
+  const tp=document.getElementById('cmdTrendPresets');
+  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      _cmdTrendWindow=+btn.dataset.w;
+      const full=cmdSeriesALNAV();
+      const sliced=_cmdTrendWindow===0?full:full.slice(-_cmdTrendWindow);
+      tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_cmdTrendWindow));
+      document.getElementById('cmdTrendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
     });
   });
 }
