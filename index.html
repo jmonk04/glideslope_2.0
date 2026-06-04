@@ -2751,6 +2751,41 @@ function cmdContractDelta(snapCount){
   const sum=arr=>(arr||[]).reduce((s,st)=>s+(st.attn||0),0);
   return Math.round(sum(snaps[snaps.length-1].stations) - sum(snaps[snaps.length-1-snapCount].stations));
 }
+/* Pick the comparison snapshot by DATE, not by list position. allSnapshots()
+   interleaves weekly + EOM snapshots, so a fixed "N back" count can land on a
+   near-duplicate date. Here we choose the snapshot whose date is closest to
+   (latest date − targetDays), among snapshots strictly before the latest. */
+function _cmdSnapDaysBack(targetDays){
+  const snaps=DataLayer.allSnapshots();
+  if(snaps.length<2) return null;
+  const latest=snaps[snaps.length-1];
+  const tMs=new Date(String(latest.date)+'T00:00:00').getTime();
+  if(isNaN(tMs)) return snaps[snaps.length-2]; // no usable dates → fall back to 1 back
+  const goal=tMs-targetDays*86400000;
+  let best=null, bestDiff=Infinity;
+  for(let i=0;i<snaps.length-1;i++){
+    const d=new Date(String(snaps[i].date)+'T00:00:00').getTime();
+    if(isNaN(d)||d>=tMs) continue;            // only snapshots before the latest date
+    const diff=Math.abs(d-goal);
+    if(diff<bestDiff){ bestDiff=diff; best=snaps[i]; }
+  }
+  return best||snaps[snaps.length-2];
+}
+function cmdGsDeltaDays(targetDays){
+  const snaps=DataLayer.allSnapshots();
+  const past=_cmdSnapDaysBack(targetDays);
+  if(!snaps.length||!past) return null;
+  const cur=divGlideslope(snaps[snaps.length-1].stations||[], s=>s.attn, _reqOf);
+  const prev=divGlideslope(past.stations||[], s=>s.attn, _reqOf);
+  return Math.round((cur-prev)*10000)/10000;
+}
+function cmdContractDeltaDays(targetDays){
+  const snaps=DataLayer.allSnapshots();
+  const past=_cmdSnapDaysBack(targetDays);
+  if(!snaps.length||!past) return null;
+  const sum=arr=>(arr||[]).reduce((s,st)=>s+(st.attn||0),0);
+  return Math.round(sum(snaps[snaps.length-1].stations) - sum(past.stations));
+}
 function cmdMonthlyDeltas(attnFn){
   const eoms=DataLayer.eomSnapshots();
   if(!eoms.length) return [];
@@ -2800,11 +2835,11 @@ function renderCommandBreakdown(){
   const totalAttn=sts.reduce((s,st)=>s+(st.attn||0),0);
   const totalReq=sts.reduce((s,st)=>s+_reqOf(st),0);
 
-  const d5=cmdGsDelta(1);
+  const d5=cmdGsDeltaDays(7);
   const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
   const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
   const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
-  const d20=cmdGsDelta(4);
+  const d20=cmdGsDeltaDays(28);
   const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
   const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
   const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
@@ -2815,11 +2850,11 @@ function renderCommandBreakdown(){
   const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
   const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
 
-  // contract deltas over each window (net contracts gained)
-  const c5=cmdContractDelta(1);
+  // contract deltas over each window (net contracts written in the window)
+  const c5=cmdContractDeltaDays(7);
   const c5Txt=c5==null?'—':`${c5>=0?'+':''}${c5}`;
   const c5Color=c5==null?'var(--ink-faint)':c5>0?'var(--good)':c5<0?'var(--danger)':'var(--ink-dim)';
-  const c20=cmdContractDelta(4);
+  const c20=cmdContractDeltaDays(28);
   const c20Txt=c20==null?'—':`${c20>=0?'+':''}${c20}`;
   const c20Color=c20==null?'var(--ink-faint)':c20>0?'var(--good)':c20<0?'var(--danger)':'var(--ink-dim)';
   // contracts above / below the glideslope pace requirement
@@ -2829,11 +2864,11 @@ function renderCommandBreakdown(){
 
   // per-card faces — each card swaps on tap (state in _cmdCard)
   const card5 = _cmdCard.d5==='pct'
-    ? {l:'Δ 5-Day', v:`${d5Arrow}${d5Txt}`, c:d5Color, s:'gs vs last snapshot'}
-    : {l:'Δ 5-Day', v:c5Txt, c:c5Color, s:'contracts vs last snapshot'};
+    ? {l:'Δ 5-Day', v:`${d5Arrow}${d5Txt}`, c:d5Color, s:'gs vs 5 days ago'}
+    : {l:'Δ 5-Day', v:c5Txt, c:c5Color, s:'contracts last 5 days'};
   const card20 = _cmdCard.d20==='pct'
-    ? {l:'Δ 20-Day', v:`${d20Arrow}${d20Txt}`, c:d20Color, s:'gs vs 4 snapshots back'}
-    : {l:'Δ 20-Day', v:c20Txt, c:c20Color, s:'contracts vs 4 back'};
+    ? {l:'Δ 20-Day', v:`${d20Arrow}${d20Txt}`, c:d20Color, s:'gs vs 20 days ago'}
+    : {l:'Δ 20-Day', v:c20Txt, c:c20Color, s:'contracts last 20 days'};
   const cardAttr = _cmdCard.attr==='pct'
     ? {l:'Attrition', v:attrTxt, c:attrColor, s:`${totalLoss}/${totalGross} gross`}
     : {l:'Attrition', v:`${totalLoss}`, c:attrColor, s:'contracts lost'};
@@ -2911,7 +2946,7 @@ function renderCmdStrip(){
   const gs=divGlideslope(sts, s=>s.attn, _reqOf);
   const tier=tierOf(gs);
   const gsColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
-  const d5=cmdGsDelta(1);
+  const d5=cmdGsDeltaDays(7);
   const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
   const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
   const d5Arrow=d5==null?'':d5>0?'▲':d5<0?'▼':'';
