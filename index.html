@@ -658,6 +658,17 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
 .azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
 .cmd-breakdown{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px}
 .cmd-breakdown .azm-badges{margin-top:0}
+/* ---------- CIC summary strip + tabbed sub-nav ---------- */
+.cic-strip{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.cic-strip-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cic-chip{display:inline-flex;align-items:baseline;gap:6px;font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);padding:6px 11px;border-radius:8px;background:var(--panel);border:1px solid var(--line)}
+.cic-chip b{font-size:15px;letter-spacing:.02em}
+.cic-strip .tier-counts{margin:0}
+.cic-tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;position:sticky;top:8px;z-index:6}
+.cic-tab{flex:1;padding:11px 8px;border:0;background:transparent;color:var(--ink-dim);font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
+.cic-tab.active{background:var(--triton);color:#04140f;font-weight:700}
+.cic-panel{display:none}
+.cic-panel.active{display:block}
 .azm-prog{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
 @media(max-width:520px){.azm-prog{grid-template-columns:repeat(3,1fr)}}
 .azm-prog .p{background:var(--bg-1);border:1px solid var(--line-soft);border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .12s;position:relative}
@@ -1114,53 +1125,62 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
     <span id="dataStampText">Loading data…</span>
   </div>
 
-  <!-- command scoreboard: tier counts -->
-  <section class="section">
-    <div class="section-tag"><span class="num">★</span><h2>Command Scoreboard</h2><span class="rule"></span></div>
+  <!-- persistent command summary strip (always visible, absorbs the old scoreboard) -->
+  <div class="cic-strip" id="cicStrip">
+    <div class="cic-strip-row" id="cicStripStats"></div>
     <div class="tier-counts" id="tierCounts"></div>
-  </section>
+  </div>
 
-  <!-- command breakdown: whole-command rollup (mirrors station/division detail) -->
-  <section class="section">
-    <div class="section-tag"><span class="num">◎</span><h2>Command Breakdown</h2><span class="rule"></span></div>
-    <div id="cmdBreakdown" class="cmd-breakdown"></div>
-  </section>
+  <!-- CIC sub-navigation -->
+  <div class="cic-tabs" id="cicTabs">
+    <button class="cic-tab active" data-tab="command">Command</button>
+    <button class="cic-tab" data-tab="map">Map</button>
+    <button class="cic-tab" data-tab="stations">Stations</button>
+  </div>
 
-  <!-- heat-map ops grid -->
-  <section class="section">
-    <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
-    <div class="trend-presets" id="heatProgToggle" style="margin-bottom:14px"></div>
-    <div class="heat-legend">
-      <span class="hl-item"><i style="background:var(--danger)"></i>&lt;80%</span>
-      <span class="hl-item"><i style="background:#ff9d2e"></i>80–100%</span>
-      <span class="hl-item"><i style="background:var(--triton)"></i>100–120%</span>
-      <span class="hl-item"><i style="background:var(--poseidon)"></i>120–140%</span>
-      <span class="hl-item"><i style="background:var(--zeus)"></i>140%+</span>
-    </div>
-    <div id="heatGrid" class="heat-wrap"></div>
-  </section>
+  <!-- TAB: Command — the SITREP rollup (+ Weekly Warriors, temp home until Win is built) -->
+  <div class="cic-panel active" data-panel="command">
+    <section class="section">
+      <div class="section-tag"><span class="num">◎</span><h2>Command Breakdown</h2><span class="rule"></span></div>
+      <div id="cmdBreakdown" class="cmd-breakdown"></div>
+    </section>
+    <section class="section">
+      <div class="section-tag"><span class="num">🏆</span><h2>Weekly Warriors · Top Movers</h2><span class="rule"></span></div>
+      <div id="warriors" class="warriors"></div>
+    </section>
+  </div>
 
-  <!-- Weekly Warriors -->
-  <section class="section">
-    <div class="section-tag"><span class="num">🏆</span><h2>Weekly Warriors · Top Movers</h2><span class="rule"></span></div>
-    <div id="warriors" class="warriors"></div>
-  </section>
+  <!-- TAB: Map — Ops Grid heat map with mission-set toggle -->
+  <div class="cic-panel" data-panel="map">
+    <section class="section">
+      <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
+      <div class="trend-presets" id="heatProgToggle" style="margin-bottom:14px"></div>
+      <div class="heat-legend">
+        <span class="hl-item"><i style="background:var(--danger)"></i>&lt;80%</span>
+        <span class="hl-item"><i style="background:#ff9d2e"></i>80–100%</span>
+        <span class="hl-item"><i style="background:var(--triton)"></i>100–120%</span>
+        <span class="hl-item"><i style="background:var(--poseidon)"></i>120–140%</span>
+        <span class="hl-item"><i style="background:var(--zeus)"></i>140%+</span>
+      </div>
+      <div id="heatGrid" class="heat-wrap"></div>
+    </section>
+  </div>
 
-  <!-- division overview -->
-  <section class="section">
-    <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
-    <div id="divGrid" class="div-grid"></div>
-  </section>
-
-  <!-- standings -->
-  <section class="section">
-    <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
-    <div class="az-controls">
-      <select id="azDivFilter" class="az-select"><option value="">All Divisions</option></select>
-      <div class="az-hint">Tap any station for detail &amp; monthly breakdown</div>
-    </div>
-    <div id="standings" class="standings"></div>
-  </section>
+  <!-- TAB: Stations — division rollup + ranked standings -->
+  <div class="cic-panel" data-panel="stations">
+    <section class="section">
+      <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
+      <div id="divGrid" class="div-grid"></div>
+    </section>
+    <section class="section">
+      <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
+      <div class="az-controls">
+        <select id="azDivFilter" class="az-select"><option value="">All Divisions</option></select>
+        <div class="az-hint">Tap any station for detail &amp; monthly breakdown</div>
+      </div>
+      <div id="standings" class="standings"></div>
+    </section>
+  </div>
 </div>
 
 <!-- station detail modal -->
@@ -2110,6 +2130,7 @@ function renderAnalyze(){
   if(!DataLayer.hasData()){
     document.getElementById('dataStampText').textContent='No data published yet — check back once the feed is live.';
     document.getElementById('tierCounts').innerHTML='';
+    { const _ss=document.getElementById('cicStripStats'); if(_ss) _ss.innerHTML=''; }
     { const _cb=document.getElementById('cmdBreakdown'); if(_cb) _cb.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
     document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
     document.getElementById('standings').innerHTML='';
@@ -2158,6 +2179,7 @@ function renderAnalyze(){
   renderStandings();
   renderDivGrid();
   renderCommandBreakdown();
+  renderCmdStrip();
 }
 
 /* previous-week rank map (computed once per render) */
@@ -2850,6 +2872,37 @@ function renderCommandBreakdown(){
     });
   });
 }
+/* persistent CIC summary strip — command tier · ALNAV glideslope · Δ5-day */
+function renderCmdStrip(){
+  const el=document.getElementById('cicStripStats'); if(!el) return;
+  const snap=DataLayer.latest();
+  const sts=snap?(snap.stations||[]):[];
+  if(!sts.length){ el.innerHTML=''; return; }
+  const gs=divGlideslope(sts, s=>s.attn, _reqOf);
+  const tier=tierOf(gs);
+  const gsColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
+  const d5=cmdGsDelta(1);
+  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
+  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
+  const d5Arrow=d5==null?'':d5>0?'▲':d5<0?'▼':'';
+  el.innerHTML=`
+    <span class="cic-chip">Command <b style="color:${gsColor}">${tier.icon} ${tier.label}</b></span>
+    <span class="cic-chip">ALNAV GS <b style="color:${gsColor}">${(gs*100).toFixed(1)}%</b></span>
+    <span class="cic-chip">Δ 5-Day <b style="color:${d5Color}">${d5Arrow}${d5Txt}</b></span>
+    <span class="cic-chip">Stations <b>${sts.length}</b></span>`;
+}
+
+/* CIC tab switching */
+(function initCicTabs(){
+  const tabs=document.getElementById('cicTabs'); if(!tabs) return;
+  tabs.querySelectorAll('.cic-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const tab=btn.dataset.tab;
+      tabs.querySelectorAll('.cic-tab').forEach(b=>b.classList.toggle('active',b===btn));
+      document.querySelectorAll('.cic-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));
+    });
+  });
+})();
 </script>
 </body>
 </html>
