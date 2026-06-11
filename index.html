@@ -660,6 +660,55 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
 .azm-stat.toggleable::after{content:'⇄';position:absolute;top:6px;right:8px;font-size:10px;color:var(--ink-faint);opacity:.55}
 .azm-section{font-family:'Chakra Petch',monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--poseidon);margin:6px 0 12px}
 .cmd-breakdown{background:var(--panel-2);border:1px solid var(--line-soft);border-radius:14px;padding:18px}
+
+/* ---------- SITREP dropdown + monthly chart ---------- */
+.sit-pick{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sit-pick label{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.sit-pick .az-select{flex:1;max-width:240px}
+.sit-track{position:relative;display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--line);padding-top:18px}
+.sit-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.sit-cv{font-family:'Chakra Petch',monospace;font-size:11px;color:var(--ink-dim);margin-bottom:4px;white-space:nowrap}
+.sit-bar{width:72%;border-radius:4px 4px 0 0;opacity:.9}
+.sit-lbls{display:flex;gap:6px;margin-top:6px}
+.sit-lbl{flex:1;text-align:center;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.03em;color:var(--ink-faint)}
+.sit-avg,.sit-ref{position:absolute;left:0;right:0;border-top:1px dashed var(--ink-dim);pointer-events:none}
+.sit-ref{border-top-color:var(--danger)}
+.sit-avg span,.sit-ref span{position:absolute;right:2px;top:-14px;font-family:'Chakra Petch',monospace;font-size:9.5px;letter-spacing:.04em;color:var(--ink-faint)}
+.sit-ref span{color:var(--danger)}
+/* ---------- Momentum Radar (ported) ---------- */
+.mom-radar{display:flex;flex-direction:column;gap:10px}
+.mom-card{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--line-soft);border-left-width:3px;border-radius:12px;padding:12px 14px;cursor:pointer;transition:transform .12s,border-color .15s}
+.mom-card:hover{transform:translateY(-2px)}
+.mom-dot{width:10px;height:10px;border-radius:50%}
+.mom-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mom-name{font-family:'Chakra Petch',monospace;font-weight:700;font-size:15px;letter-spacing:.04em}
+.mom-group{display:flex;flex-direction:column;gap:10px}
+.mom-group + .mom-group{margin-top:8px}
+.mom-group-label{font-family:'Chakra Petch',monospace;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.mom-group-label.cool{color:#f5a623}
+.mom-group-label.heat{color:var(--poseidon)}
+.mom-empty{font-size:12px;color:var(--ink-faint);font-style:italic;padding:6px 2px}
+.mom-flag{font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 8px;border:1px solid}
+.mom-flag.cool{color:#f5a623;background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.4)}
+.mom-flag.heat{color:var(--poseidon);background:rgba(44,230,192,.12);border-color:rgba(44,230,192,.4)}
+.mom-sub{font-size:11px;color:var(--ink-faint);font-family:'Chakra Petch',monospace;letter-spacing:.03em;margin-top:3px}
+.mom-line{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--ink-dim)}
+.mom-line b{color:var(--ink);font-family:'Chakra Petch',monospace}
+.mom-norm,.mom-pct{color:var(--ink-faint)}
+.mom-sigma{color:var(--ink-faint);font-size:11px}
+.mom-z{font-family:'Chakra Petch',monospace;font-weight:700;font-size:20px;text-align:right;white-space:nowrap}
+.mom-score{text-align:center;min-width:56px}
+.mom-score-num{font-family:'Chakra Petch',monospace;font-weight:700;font-size:27px;line-height:1}
+.mom-score-lbl{font-family:'Chakra Petch',monospace;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-top:3px}
+.mom-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.mom-toolbar-lbl{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.mom-spark{display:flex;align-items:flex-end;gap:2px;height:36px}
+.mom-bar{width:5px;border-radius:2px 2px 0 0;display:block}
+.mom-foot{font-size:10.5px;color:var(--ink-faint);margin-top:4px;letter-spacing:.02em}
+@media(max-width:560px){
+  .mom-card{grid-template-columns:auto 1fr auto;gap:10px}
+  .mom-spark{display:none}
+
 .cmd-breakdown .azm-badges{margin-top:0}
 /* ---------- CIC summary strip + tabbed sub-nav ---------- */
 .cic-strip{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;margin-bottom:14px}
@@ -802,7 +851,7 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
         <div class="launch-button">Soon</div>
       </button>
 
-      <button class="module-card disabled" type="button" aria-disabled="true">
+      <a class="module-card" href="leaderboard.html" style="text-decoration:none">
         <div class="hud-icon">
           <svg class="hud-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
             <g class="hud-rings"><circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,182,39,.22)" stroke-width="1" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,182,39,.35)" stroke-width="1"/></g>
@@ -813,10 +862,10 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
         <div class="module-copy">
           <h2>Leaderboards</h2>
           <p>Top performers, top stations, top divisions, and recognition tied to the Triton culture of excellence.</p>
-          <div class="module-meta"><span class="module-chip verb-chip">Win</span><span class="module-chip">Coming Soon</span></div>
+          <div class="module-meta"><span class="module-chip verb-chip">Win</span><span class="module-chip">Live</span></div>
         </div>
-        <div class="launch-button">Soon</div>
-      </button>
+        <div class="launch-button">Launch ▸</div>
+      </a>
     </div>
     <div class="home-tag home-tag-footer">One platform for mission planning, analytics, recognition, and command views — powered by the Glideslope engine.</div>
     <div class="home-foot">
@@ -1128,32 +1177,32 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
     <span id="dataStampText">Loading data…</span>
   </div>
 
-  <!-- persistent command summary strip (always visible, absorbs the old scoreboard) -->
-  <div class="cic-strip" id="cicStrip">
-    <div class="cic-strip-row" id="cicStripStats"></div>
-  </div>
-
   <!-- CIC sub-navigation -->
   <div class="cic-tabs" id="cicTabs">
     <button class="cic-tab active" data-tab="command">Command</button>
-    <button class="cic-tab" data-tab="map">Map</button>
-    <button class="cic-tab" data-tab="stations">Stations</button>
+    <button class="cic-tab" data-tab="division">Division</button>
+    <button class="cic-tab" data-tab="station">Station</button>
+    <button class="cic-tab" data-tab="trends">Trends</button>
   </div>
 
-  <!-- TAB: Command — the SITREP rollup (+ Weekly Warriors, temp home until Win is built) -->
+  <!-- TAB: Command — SITREP (mission-set dropdown drives quadrant + chart + trend) -->
   <div class="cic-panel active" data-panel="command">
     <section class="section">
-      <div class="section-tag"><span class="num">◎</span><h2>Command Breakdown</h2><span class="rule"></span></div>
-      <div id="cmdBreakdown" class="cmd-breakdown"></div>
-    </section>
-    <section class="section">
-      <div class="section-tag"><span class="num">🏆</span><h2>Weekly Warriors · Top Movers</h2><span class="rule"></span></div>
-      <div id="warriors" class="warriors"></div>
+      <div class="section-tag"><span class="num">◎</span><h2>Command SITREP</h2><span class="rule"></span></div>
+      <div id="sitrepBody" class="cmd-breakdown"></div>
     </section>
   </div>
 
-  <!-- TAB: Map — Ops Grid heat map with mission-set toggle -->
-  <div class="cic-panel" data-panel="map">
+  <!-- TAB: Division -->
+  <div class="cic-panel" data-panel="division">
+    <section class="section">
+      <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
+      <div id="divGrid" class="div-grid"></div>
+    </section>
+  </div>
+
+  <!-- TAB: Station — Ops Grid heat map -->
+  <div class="cic-panel" data-panel="station">
     <section class="section">
       <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
       <div class="trend-presets" id="heatProgToggle" style="margin-bottom:14px"></div>
@@ -1168,19 +1217,15 @@ body.has-tabbar #appAnalyze{padding-bottom:96px}
     </section>
   </div>
 
-  <!-- TAB: Stations — division rollup + ranked standings -->
-  <div class="cic-panel" data-panel="stations">
+  <!-- TAB: Trends — Weekly Warriors (top 10) + Momentum Radar -->
+  <div class="cic-panel" data-panel="trends">
     <section class="section">
-      <div class="section-tag"><span class="num">◈</span><h2>Division Overview</h2><span class="rule"></span></div>
-      <div id="divGrid" class="div-grid"></div>
+      <div class="section-tag"><span class="num">🏆</span><h2>Weekly Warriors · Top Movers</h2><span class="rule"></span></div>
+      <div id="warriors" class="warriors"></div>
     </section>
     <section class="section">
-      <div class="section-tag"><span class="num">▦</span><h2>Station Standings</h2><span class="rule"></span></div>
-      <div class="az-controls">
-        <select id="azDivFilter" class="az-select"><option value="">All Divisions</option></select>
-        <div class="az-hint">Tap any station for detail &amp; monthly breakdown</div>
-      </div>
-      <div id="standings" class="standings"></div>
+      <div class="section-tag"><span class="num">📡</span><h2>Momentum Radar</h2><span class="rule"></span></div>
+      <div id="momentumRadar" class="mom-radar"></div>
     </section>
   </div>
 </div>
@@ -2131,10 +2176,8 @@ let azDivList=[];
 function renderAnalyze(){
   if(!DataLayer.hasData()){
     document.getElementById('dataStampText').textContent='No data published yet — check back once the feed is live.';
-    { const _ss=document.getElementById('cicStripStats'); if(_ss) _ss.innerHTML=''; }
-    { const _cb=document.getElementById('cmdBreakdown'); if(_cb) _cb.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
-    document.getElementById('warriors').innerHTML='<div class="az-hint">Waiting on data…</div>';
-    document.getElementById('standings').innerHTML='';
+    { const _sb=document.getElementById('sitrepBody'); if(_sb) _sb.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
+    { const _w=document.getElementById('warriors'); if(_w) _w.innerHTML='<div class="az-hint">Waiting on data…</div>'; }
     return;
   }
   const snap=DataLayer.latest();
@@ -2144,34 +2187,28 @@ function renderAnalyze(){
   const d=new Date((snap.date||m.latest)+'T00:00:00');
   const pretty=isNaN(d)?(snap.label||m.latest):d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
   const eomCount=DataLayer.eomSnapshots().length;
-  document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b> · ${azCurrent.length} stations · ${m.count} weeks · ${eomCount} EOM snapshots`;
+  document.getElementById('dataStampText').innerHTML=`Current as of <b>${pretty}</b>`;
 
-  // ops grid heat map
+  // ops grid heat map (Station tab)
   renderHeatMap();
 
-  // Weekly Warriors — top 5 week-over-week glideslope gains
+  // Weekly Warriors — top 10 week-over-week glideslope gains (Trends tab)
   const movers=azCurrent.map(s=>{
     const d=DataLayer.deltaFor(s.name);
     return d?{name:s.name, change:d.delta, now:s.glideslope_pct}:null;
-  }).filter(w=>w&&w.change>0).sort((a,b)=>b.change-a.change).slice(0,5);
-  const medals=['🥇','🥈','🥉','⭐','⭐'];
+  }).filter(w=>w&&w.change>0).sort((a,b)=>b.change-a.change).slice(0,10);
+  const medals=['🥇','🥈','🥉','④','⑤','⑥','⑦','⑧','⑨','⑩'];
   document.getElementById('warriors').innerHTML = movers.length
-    ? movers.map((w,i)=>`<div class="warrior"><span class="medal">${medals[i]}</span>
+    ? movers.map((w,i)=>`<div class="warrior"><span class="medal">${medals[i]||'•'}</span>
         <span class="wn">${w.name}</span>
         <span class="wc">+${(w.change*100).toFixed(1)}%</span>
         <span class="wnow">now ${(w.now*100).toFixed(1)}%</span></div>`).join('')
     : '<div class="az-hint">No week-over-week gains to show yet (need at least 2 weeks of data).</div>';
 
-  // division filter
   azDivList=[...new Set(azCurrent.map(s=>s.division))].sort();
-  const sel=document.getElementById('azDivFilter');
-  if(sel.options.length<=1){
-    azDivList.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
-  }
-  renderStandings();
   renderDivGrid();
-  renderCommandBreakdown();
-  renderCmdStrip();
+  renderCmdSitrep();
+  renderMomentumRadar();
 }
 
 /* previous-week rank map (computed once per render) */
@@ -2363,7 +2400,7 @@ function renderStandings(){
     r.addEventListener('click',()=>showStationModal(r.dataset.station));
   });
 }
-document.getElementById('azDivFilter').addEventListener('change',renderStandings);
+{ const _adf=document.getElementById('azDivFilter'); if(_adf) _adf.addEventListener('change',renderStandings); }
 
 /* ============================================================
    PROGRAM DEFINITIONS — all 5 mission sets (CIC modals)
@@ -2823,119 +2860,168 @@ function _cmdMonthlyHtml(prog){
   return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM) — command-wide</div><div class="azm-bar-wrap">${bars}</div>`;
 }
 
-function renderCommandBreakdown(){
-  const el=document.getElementById('cmdBreakdown'); if(!el) return;
-  const snap=DataLayer.latest();
-  const sts=snap?(snap.stations||[]):[];
-  if(!sts.length){ el.innerHTML='<div class="az-hint">Waiting on data…</div>'; return; }
+/* ============================================================
+   COMMAND SITREP — mission-set dropdown drives a 4-tile quadrant,
+   a monthly bar chart, and a glideslope trend. All windows use the
+   FY26 production calendar (findVelocityBaseline). NF→nuke data.
+   ============================================================ */
+let _sitSet='alnav';
+let _sitTile={gs:'pct', d5:'attn', d20:'attn'};
 
-  const alnavGs=divGlideslope(sts, s=>s.attn, _reqOf);
-  const tier=tierOf(alnavGs);
-  const gsColor=tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
-  const totalAttn=sts.reduce((s,st)=>s+(st.attn||0),0);
-  const totalReq=sts.reduce((s,st)=>s+_reqOf(st),0);
+const SITREP_SETS=[
+  {key:'alnav',label:'ALNAV',goal:3166,color:'var(--triton)',  attn:s=>s.attn||0,        gs:s=>s.glideslope_pct},
+  {key:'ac',   label:'AC',   goal:3101,color:'var(--poseidon)',attn:s=>s.ac?.attn||0,    gs:s=>s.ac?.glideslope_pct},
+  {key:'nso',  label:'NSO',  goal:169, color:'#a78bfa',        attn:s=>s.nso?.attn||0,   gs:s=>s.nso?.glideslope_pct},
+  {key:'nf',   label:'NF',   goal:204, color:'var(--zeus)',    attn:s=>s.nuke?.attn||0,  gs:s=>s.nuke?.glideslope_pct},
+  {key:'nns',  label:'NNS',  goal:203, color:'#fb923c',        attn:s=>s.nns?.attn||0,   gs:s=>s.nns?.glideslope_pct},
+];
+function _setOf(key){ return SITREP_SETS.find(x=>x.key===key)||SITREP_SETS[0]; }
 
-  const d5=cmdGsDeltaDays(7);
-  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
-  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
-  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
-  const d20=cmdGsDeltaDays(28);
-  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
-  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
-  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
-
-  const totalGross=sts.reduce((s,st)=>s+(st.gross||0),0);
-  const totalLoss=sts.reduce((s,st)=>s+(st.loss||0),0);
-  const attrPct=totalGross>0?totalLoss/totalGross:null;
-  const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
-  const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
-
-  // contract deltas over each window (net contracts written in the window)
-  const c5=cmdContractDeltaDays(7);
-  const c5Txt=c5==null?'—':`${c5>=0?'+':''}${c5}`;
-  const c5Color=c5==null?'var(--ink-faint)':c5>0?'var(--good)':c5<0?'var(--danger)':'var(--ink-dim)';
-  const c20=cmdContractDeltaDays(28);
-  const c20Txt=c20==null?'—':`${c20>=0?'+':''}${c20}`;
-  const c20Color=c20==null?'var(--ink-faint)':c20>0?'var(--good)':c20<0?'var(--danger)':'var(--ink-dim)';
-  // contracts above / below the glideslope pace requirement
-  const gsDiff=Math.round(totalAttn-totalReq);
-  const gsDiffTxt=`${gsDiff>=0?'+':''}${gsDiff}`;
-  const gsDiffColor=gsDiff>=0?'var(--good)':'var(--danger)';
-
-  // per-card faces — each card swaps on tap (state in _cmdCard)
-  const card5 = _cmdCard.d5==='pct'
-    ? {l:'Δ 5-Day', v:`${d5Arrow}${d5Txt}`, c:d5Color, s:'gs vs 5 days ago'}
-    : {l:'Δ 5-Day', v:c5Txt, c:c5Color, s:'contracts last 5 days'};
-  const card20 = _cmdCard.d20==='pct'
-    ? {l:'Δ 20-Day', v:`${d20Arrow}${d20Txt}`, c:d20Color, s:'gs vs 20 days ago'}
-    : {l:'Δ 20-Day', v:c20Txt, c:c20Color, s:'contracts last 20 days'};
-  const cardAttr = _cmdCard.attr==='pct'
-    ? {l:'Attrition', v:attrTxt, c:attrColor, s:`${totalLoss}/${totalGross} gross`}
-    : {l:'Attrition', v:`${totalLoss}`, c:attrColor, s:'contracts lost'};
-  const cardCt = _cmdCard.ct==='gs'
-    ? {l:'ALNAV GS', v:`${(alnavGs*100).toFixed(1)}%`, c:gsColor, s:'ALNAV glideslope'}
-    : {l:'Contracts', v:gsDiffTxt, c:gsDiffColor, s:gsDiff>=0?'above glideslope':'below glideslope'};
-
-  const progCards=PROGRAMS.map(p=>{
-    const totAttn=sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
-    const avgGs=sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
-    const isActive=_cmdActiveProgKey===p.key;
-    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}">
-      <div class="pk">${p.label}</div>
-      <div class="pv" style="color:${progColor(avgGs)}">${(avgGs*100).toFixed(1)}%</div>
-      <div class="tap-hint">${totAttn} attn · tap ▸</div>
-    </div>`;
+// per-set command glideslope; requirement derived as attn/gs per station (gs=attn/req)
+function setGsReq(sts, cfg){
+  let attn=0, req=0;
+  sts.forEach(s=>{ const a=cfg.attn(s)||0; const g=cfg.gs(s); attn+=a; if(g&&g>0) req+=a/g; });
+  return {attn, req, gs: req>0?attn/req:null};
+}
+function setSeries(cfg){
+  return DataLayer.allSnapshots().map(snap=>{ const sts=snap.stations||[]; if(!sts.length) return null; const r=setGsReq(sts,cfg); return r.gs==null?null:{date:snap.date,seq:snap.seq,value:r.gs}; }).filter(Boolean);
+}
+function attrSeries(){
+  return DataLayer.allSnapshots().map(snap=>{ const sts=snap.stations||[]; if(!sts.length) return null; const g=sts.reduce((a,s)=>a+(s.gross||0),0), l=sts.reduce((a,s)=>a+(s.loss||0),0); return g>0?{date:snap.date,seq:snap.seq,value:l/g}:null; }).filter(Boolean);
+}
+function prodDaysRemaining(){
+  const snap=DataLayer.latest(); if(!snap) return null;
+  if(typeof snap.contractDaysRemaining==='number') return snap.contractDaysRemaining;
+  const idx=prodDayIndex(snap.date); return idx==null?null:Math.max(0,PROD_DAYS_YEAR-idx);
+}
+function attrMonthly(){
+  const eoms=DataLayer.eomSnapshots(); const out=[];
+  for(let i=0;i<eoms.length;i++){
+    const cg=(eoms[i].stations||[]).reduce((a,s)=>a+(s.gross||0),0);
+    const cl=(eoms[i].stations||[]).reduce((a,s)=>a+(s.loss||0),0);
+    if(i===0){ out.push({month:eoms[i].eom||eoms[i].date, value: cg>0?cl/cg:0}); }
+    else{
+      const pg=(eoms[i-1].stations||[]).reduce((a,s)=>a+(s.gross||0),0);
+      const pl=(eoms[i-1].stations||[]).reduce((a,s)=>a+(s.loss||0),0);
+      const mg=cg-pg, ml=cl-pl; out.push({month:eoms[i].eom||eoms[i].date, value: mg>0?ml/mg:0});
+    }
+  }
+  return out;
+}
+// self-contained bar chart with fixed geometry so avg / ref lines align
+function _sitChart(items, color, opts){
+  opts=opts||{};
+  if(!items.length) return '<div class="azm-no-eom">No EOM snapshots yet.</div>';
+  const H=120;
+  const fmtV=v=> opts.fmt==='pct'?`${(v*100).toFixed(1)}%`:`${Math.round(v)}`;
+  const maxV=Math.max(...items.map(i=>i.value), opts.refVal||0, opts.avgVal||0, 0.0001);
+  const cols=items.map(i=>{
+    const h=Math.max(3,Math.round((i.value/maxV)*H));
+    const bg=i.current?`repeating-linear-gradient(45deg,${color},${color} 6px,rgba(255,255,255,.18) 6px,rgba(255,255,255,.18) 11px)`:color;
+    return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}</div><div class="sit-bar" style="height:${h}px;background:${bg}"></div></div>`;
   }).join('');
+  const lbls=items.map(i=>`<div class="sit-lbl">${i.label}${i.current?' ▸':''}</div>`).join('');
+  let overlay='';
+  if(opts.avgVal!=null){ const b=Math.round((opts.avgVal/maxV)*H); overlay+=`<div class="sit-avg" style="bottom:${b}px"><span>avg ${fmtV(opts.avgVal)}</span></div>`; }
+  if(opts.refVal!=null){ const b=Math.round((opts.refVal/maxV)*H); overlay+=`<div class="sit-ref" style="bottom:${b}px"><span>${opts.refLabel||''}</span></div>`; }
+  return `<div class="sit-track" style="height:${H}px">${cols}${overlay}</div><div class="sit-lbls">${lbls}</div>`;
+}
+function _sitTrend(series, title, opts){
+  opts=opts||{};
+  const full=series; const sl=_cmdTrendWindow===0?full:full.slice(-_cmdTrendWindow);
+  const presetBtns=[4,8,12,0].map(w=>{const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_cmdTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`;}).join('');
+  const body=sl.length>=2?trendSVG(sl):'<div class="az-hint">Need at least 2 weeks of history.</div>';
+  return `<div class="azm-section">📈 ${title}</div><div class="trend-presets" id="sitTrendPresets">${presetBtns}</div><div class="azm-trend">${body}</div>`;
+}
 
-  const chartHtml=_cmdMonthlyHtml(PROGRAMS.find(p=>p.key===_cmdActiveProgKey));
+function renderCmdSitrep(){
+  const el=document.getElementById('sitrepBody'); if(!el) return;
+  const snap=DataLayer.latest(); const sts=snap?(snap.stations||[]):[];
+  if(!sts.length){ el.innerHTML='<div class="az-hint">Waiting on data…</div>'; return; }
+  const snaps=DataLayer.allSnapshots();
+  const isAttr=_sitSet==='attr';
 
-  const allSeries=cmdSeriesALNAV();
-  const series=_cmdTrendWindow===0?allSeries:allSeries.slice(-_cmdTrendWindow);
-  const presetBtns=[4,8,12,0].map(w=>{ const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_cmdTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`; }).join('');
-  const trendHtml=series.length>=2
-    ? `<div class="azm-section">📈 ALNAV Glideslope Trend</div><div class="trend-presets" id="cmdTrendPresets">${presetBtns}</div><div id="cmdTrendChart" class="azm-trend">${trendSVG(series)}</div>`
-    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
+  const opts=SITREP_SETS.map(s=>`<option value="${s.key}" ${_sitSet===s.key?'selected':''}>${s.label}</option>`).join('')
+    + `<option value="attr" ${isAttr?'selected':''}>Attrition</option>`;
+  const dropdown=`<div class="sit-pick"><label for="sitSelect">Mission Set</label><select id="sitSelect" class="az-select">${opts}</select></div>`;
 
-  el.innerHTML=`
-    <div class="azm-badges">
-      <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:${gsColor}">${(alnavGs*100).toFixed(1)}% ALNAV glideslope · ${totalAttn}/${totalReq}</span>
-    </div>
-    <div class="azm-stats">
-      <div class="azm-stat toggleable" data-card="d5"><div class="l">${card5.l}</div><div class="v" style="color:${card5.c};font-size:22px">${card5.v}</div><div class="s">${card5.s}</div></div>
-      <div class="azm-stat toggleable" data-card="d20"><div class="l">${card20.l}</div><div class="v" style="color:${card20.c};font-size:22px">${card20.v}</div><div class="s">${card20.s}</div></div>
-      <div class="azm-stat toggleable" data-card="attr"><div class="l">${cardAttr.l}</div><div class="v" style="color:${cardAttr.c}">${cardAttr.v}</div><div class="s">${cardAttr.s}</div></div>
-      <div class="azm-stat toggleable" data-card="ct"><div class="l">${cardCt.l}</div><div class="v" style="color:${cardCt.c}">${cardCt.v}</div><div class="s">${cardCt.s}</div></div>
-    </div>
-    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
-    <div class="azm-prog">${progCards}</div>
-    <div id="cmdMonthlyChart" class="azm-monthly">${chartHtml}</div>
-    ${trendHtml}`;
+  let quad='', chart='', trend='';
 
-  el.querySelectorAll('.azm-prog .p').forEach(card=>{
-    card.addEventListener('click',()=>{
-      _cmdActiveProgKey=card.dataset.prog;
-      el.querySelectorAll('.azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_cmdActiveProgKey));
-      document.getElementById('cmdMonthlyChart').innerHTML=_cmdMonthlyHtml(PROGRAMS.find(p=>p.key===_cmdActiveProgKey));
-    });
-  });
-  el.querySelectorAll('.azm-stats .toggleable').forEach(card=>{
-    card.addEventListener('click',()=>{
-      const k=card.dataset.card;
-      if(k==='ct'){ _cmdCard.ct = _cmdCard.ct==='gs'?'contracts':'gs'; }
-      else { _cmdCard[k] = _cmdCard[k]==='pct'?'contracts':'pct'; }
-      renderCommandBreakdown();
-    });
-  });
-  const tp=document.getElementById('cmdTrendPresets');
-  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      _cmdTrendWindow=+btn.dataset.w;
-      const full=cmdSeriesALNAV();
-      const sliced=_cmdTrendWindow===0?full:full.slice(-_cmdTrendWindow);
-      tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_cmdTrendWindow));
-      document.getElementById('cmdTrendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
-    });
-  });
+  if(!isAttr){
+    const cfg=_setOf(_sitSet);
+    const {attn, req, gs}=setGsReq(sts,cfg);
+    const tier=gs!=null?tierOf(gs):null;
+    const gsC=!tier?'var(--ink-faint)':tier.cls==='zeus'?'var(--zeus)':tier.cls==='pos'?'var(--poseidon)':tier.cls==='tri'?'var(--triton)':'var(--danger)';
+    const pace=Math.round(attn-req);
+    const need=Math.max(0,Math.round(cfg.goal-attn));
+    const reqPerDay=cfg.goal/PROD_DAYS_YEAR;
+    const win=(days)=>{
+      const b=findVelocityBaseline(snaps,days); if(!b) return null;
+      const delta=commandAttn(b.cur,cfg.attn)-commandAttn(b.past,cfg.attn);
+      const gsCur=setGsReq(b.cur.stations||[],cfg).gs, gsPast=setGsReq(b.past.stations||[],cfg).gs;
+      return {delta:Math.round(delta), span:b.span, perDay:delta/b.span, gsDelta:(gsCur!=null&&gsPast!=null)?gsCur-gsPast:null};
+    };
+    const w5=win(5), w20=win(20);
+    const tileWin=(w,key,label)=>{
+      if(!w) return {l:label, v:'—', c:'var(--ink-faint)', s:'insufficient history'};
+      if(_sitTile[key]==='gs'){
+        const g=w.gsDelta; const c=g==null?'var(--ink-faint)':g>0?'var(--good)':g<0?'var(--danger)':'var(--ink-dim)';
+        return {l:label, v:g==null?'—':`${g>0?'▲':g<0?'▼':''}${(g*100).toFixed(1)}%`, c, s:`GS Δ · ${w.span} prod-days`};
+      }
+      const ok=w.perDay>=reqPerDay;
+      return {l:label, v:`${w.delta>=0?'+':''}${w.delta}`, c: ok?'var(--good)':'var(--danger)', s:`${w.perDay.toFixed(1)}/day vs ${reqPerDay.toFixed(1)} req · ${w.span}d`};
+    };
+    const t5=tileWin(w5,'d5','5-Day'), t20=tileWin(w20,'d20','20-Day');
+    const gsTile=_sitTile.gs==='need'
+      ? {l:'For Goal', v:`${need}`, c:'var(--ink)', s:`needed to ${cfg.goal}`}
+      : {l:'Glideslope', v: gs==null?'—':`${(gs*100).toFixed(1)}%`, c:gsC, s: tier?tier.label:'—'};
+    const paceC = pace>=0?'var(--good)':'var(--danger)';
+    quad=`<div class="azm-stats">
+      <div class="azm-stat toggleable" data-tile="gs"><div class="l">${gsTile.l}</div><div class="v" style="color:${gsTile.c};font-size:24px">${gsTile.v}</div><div class="s">${gsTile.s}</div></div>
+      <div class="azm-stat"><div class="l">Pace</div><div class="v" style="color:${paceC};font-size:24px">${pace>=0?'+':''}${pace}</div><div class="s">${pace>=0?'above':'below'} day requirement</div></div>
+      <div class="azm-stat toggleable" data-tile="d5"><div class="l">${t5.l}</div><div class="v" style="color:${t5.c}">${t5.v}</div><div class="s">${t5.s}</div></div>
+      <div class="azm-stat toggleable" data-tile="d20"><div class="l">${t20.l}</div><div class="v" style="color:${t20.c}">${t20.v}</div><div class="s">${t20.s}</div></div>
+    </div>`;
+
+    const monthly=cmdMonthlyDeltas(cfg.attn);
+    const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
+    let items=monthly.map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
+    if(lastEom){ const cur=commandAttn(snap,cfg.attn)-commandAttn(lastEom,cfg.attn); items.push({label:'Now', value:Math.max(0,Math.round(cur)), current:true}); }
+    const completed=monthly.map(m=>m.value); const avg=completed.length?completed.reduce((a,b)=>a+b,0)/completed.length:null;
+    chart=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, {avgVal:avg})}`;
+    trend=_sitTrend(setSeries(cfg), `${cfg.label} Glideslope Trend`);
+  } else {
+    const grossT=sts.reduce((a,s)=>a+(s.gross||0),0), lossT=sts.reduce((a,s)=>a+(s.loss||0),0);
+    const pct=grossT>0?lossT/grossT:null;
+    const pc=pct==null?'var(--ink-faint)':pct>0.07?'var(--danger)':'var(--good)';
+    const lossWin=(days)=>{ const b=findVelocityBaseline(snaps,days); if(!b) return null; const d=commandAttn(b.cur,s=>s.loss||0)-commandAttn(b.past,s=>s.loss||0); return {d:Math.round(d), span:b.span}; };
+    const l5=lossWin(5), l20=lossWin(20);
+    const attrCard=_sitTile.gs==='need'
+      ? {l:'Losses', v:`${lossT}`, c:pc, s:`of ${grossT} gross`}
+      : {l:'Attrition', v: pct==null?'—':`${(pct*100).toFixed(1)}%`, c:pc, s: pct!=null&&pct>0.07?'above 7% threshold':'within tolerance'};
+    quad=`<div class="azm-stats">
+      <div class="azm-stat toggleable" data-tile="gs"><div class="l">${attrCard.l}</div><div class="v" style="color:${attrCard.c};font-size:24px">${attrCard.v}</div><div class="s">${attrCard.s}</div></div>
+      <div class="azm-stat"><div class="l">Gross</div><div class="v">${grossT}</div><div class="s">contracts written</div></div>
+      <div class="azm-stat"><div class="l">5-Day Loss</div><div class="v" style="color:${l5&&l5.d>0?'var(--danger)':'var(--ink)'}">${l5?(l5.d>=0?'+':'')+l5.d:'—'}</div><div class="s">${l5?l5.span+' prod-days':'—'}</div></div>
+      <div class="azm-stat"><div class="l">20-Day Loss</div><div class="v" style="color:${l20&&l20.d>0?'var(--danger)':'var(--ink)'}">${l20?(l20.d>=0?'+':'')+l20.d:'—'}</div><div class="s">${l20?l20.span+' prod-days':'—'}</div></div>
+    </div>`;
+    const am=attrMonthly().map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
+    chart=`<div class="azm-section">Monthly Attrition %</div>${_sitChart(am, 'var(--danger)', {fmt:'pct', refVal:0.07, refLabel:'7% floor'})}`;
+    trend=_sitTrend(attrSeries(), 'Attrition % Trend', {fmt:'pct'});
+  }
+
+  el.innerHTML = dropdown + quad + `<div id="sitChartWrap">${chart}</div>` + `<div id="sitTrendWrap">${trend}</div>`;
+
+  const sel=document.getElementById('sitSelect');
+  if(sel) sel.addEventListener('change',()=>{ _sitSet=sel.value; _sitTile={gs:'pct',d5:'attn',d20:'attn'}; renderCmdSitrep(); });
+  el.querySelectorAll('.azm-stats .toggleable').forEach(t=>t.addEventListener('click',()=>{
+    const k=t.dataset.tile;
+    if(k==='gs'){ _sitTile.gs = _sitTile.gs==='pct'?'need':'pct'; }
+    else { _sitTile[k] = _sitTile[k]==='attn'?'gs':'attn'; }
+    renderCmdSitrep();
+  }));
+  const tp=document.getElementById('sitTrendPresets');
+  if(tp) tp.querySelectorAll('.trend-preset').forEach(b=>b.addEventListener('click',()=>{ _cmdTrendWindow=+b.dataset.w; renderCmdSitrep(); }));
 }
 /* persistent CIC summary strip — command tier · ALNAV glideslope · Δ5-day */
 function renderCmdStrip(){
@@ -2968,6 +3054,166 @@ function renderCmdStrip(){
     });
   });
 })();
+/* ===== MOMENTUM RADAR (ported from prototype) ===== */
+function _mean(a){ return a.length ? a.reduce((s,x)=>s+x,0)/a.length : 0; }
+function _sampleStd(a){
+  if(a.length<2) return 0;
+  const m=_mean(a);
+  return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1));
+}
+const _MOM_COOL={strong:'var(--danger)', mid:'#f5a623', soft:'var(--ink-dim)'};
+const _MOM_HEAT={strong:'var(--poseidon)', mid:'var(--good)', soft:'var(--ink-dim)'};
+function _momColor(m, sev){
+  if(sev==='none') return 'var(--ink-faint)';
+  const dir = m.z!=null ? m.z : (m.pctVsMean||0);
+  return dir<0 ? _MOM_COOL[sev] : _MOM_HEAT[sev];
+}
+
+// state: how many of the most-recent months count as the "current" period
+let _momWindow = 1;
+
+// Relatable 0–100 score (50 = on the station's normal monthly pace; ±3σ → 0/100)
+function momentumScore(z){ return z==null ? null : Math.max(0, Math.min(100, Math.round(50 + 50*(z/3)))); }
+function momentumRating(z){
+  if(z==null) return 'Building';
+  if(z>= 1.25) return 'Surging';
+  if(z>= 0.5)  return 'Warming';
+  if(z>-0.5)   return 'Steady';
+  if(z>-1.25)  return 'Cooling';
+  return 'Cold';
+}
+
+// Monthly contract series from EOM snapshots, dropping the cumulative anchor (idx 0).
+// `win` = number of most-recent months treated as the current period (default 1).
+function stationMomentum(name, fieldFn, win){
+  fieldFn = fieldFn || (s=>s.attn||0);
+  win = Math.max(1, win||1);
+  const md = DataLayer.monthlyDeltas(name, fieldFn);   // [{month,value}] — idx 0 = cumulative anchor
+  const series = md.length>1 ? md.slice(1) : [];        // clean month-over-month output
+  const st = DataLayer.station(name);
+  const gs = st ? st.glideslope_pct : 0;
+  const base = {name, division: st?st.division:'', gs, tier: tierOf(gs), series, win};
+  if(series.length < win+2) return Object.assign(base, {ok:false, reason:'building'}); // need window + ≥2 baseline months
+  const values = series.map(d=>d.value);
+  const recent = values.slice(-win);
+  const recentMean = _mean(recent);                     // avg monthly output across the window
+  const baseline = values.slice(0,-win);                // months before the window = the norm
+  const mean = _mean(baseline);
+  const std  = _sampleStd(baseline);
+  const cv = mean>0 ? std/mean : null;                  // coefficient of variation (volatility)
+  const pctVsMean = mean>0 ? (recentMean-mean)/mean : null;
+  let z=null, zApprox=false;
+  if(baseline.length>=2 && std>0) z=(recentMean-mean)/std;
+  else if(baseline.length>=2 && std===0){ z = recentMean<mean?-3:(recentMean>mean?3:0); zApprox=true; }
+  const months = series.slice(-win).map(d=>d.month);    // dynamic label, e.g. "May" or "Mar–May"
+  const label = win===1 ? months[0] : `${months[0]}–${months[months.length-1]}`;
+  return Object.assign(base, {ok:true, recent, recentMean, latestMonth:label, mean, std, cv, z, zApprox,
+                              pctVsMean, baselineN:baseline.length, displayVal: win===1 ? recent[0] : +recentMean.toFixed(1)});
+}
+
+function _momSeverity(m){
+  if(!m.ok) return 'none';
+  if(m.z!=null){
+    const a=Math.abs(m.z);
+    if(a>=2)    return 'strong';
+    if(a>=1.25) return 'mid';
+    if(a>=0.75) return 'soft';
+    return 'none';
+  }
+  const p=Math.abs(m.pctVsMean||0);   // no sigma yet → magnitude of % vs own mean
+  if(p>=0.5) return 'mid';
+  if(p>=0.3) return 'soft';
+  return 'none';
+}
+
+function _momBars(series, color){
+  const vals=series.map(d=>d.value), max=Math.max(...vals,1);
+  return vals.map((v,i)=>{
+    const h=Math.max(3,Math.round(v/max*34));
+    const last=i===vals.length-1;
+    const c=last ? (color||'var(--triton)') : 'rgba(122,162,247,.35)';
+    return `<span class="mom-bar" style="height:${h}px;background:${c}"></span>`;
+  }).join('');
+}
+
+function renderMomentumRadar(){
+  const el=document.getElementById('momentumRadar'); if(!el) return;
+  const W=_momWindow;
+  const ctrl = `<div class="mom-toolbar">
+    <span class="mom-toolbar-lbl">Window</span>
+    <div class="trend-presets" id="momWindowCtrl">
+      ${[[1,'Latest mo'],[2,'Last 2 mo'],[3,'Last 3 mo']].map(([w,l])=>`<button class="trend-preset ${W===w?'active':''}" data-w="${w}">${l}</button>`).join('')}
+    </div>
+  </div>`;
+  const wire=()=>{
+    const c=el.querySelector('#momWindowCtrl'); if(!c) return;
+    c.querySelectorAll('.trend-preset').forEach(b=>b.addEventListener('click',()=>{ _momWindow=+b.dataset.w; renderMomentumRadar(); }));
+    el.querySelectorAll('.mom-card').forEach(card=>card.addEventListener('click',()=>showStationModal(card.dataset.station)));
+  };
+
+  const anyMonthly = azCurrent.some(s=>stationMomentum(s.name,null,1).ok);
+  if(!anyMonthly){
+    el.innerHTML = ctrl + '<div class="az-hint">Building monthly baselines — need at least 3 month-end (EOM) snapshots per station before momentum can be scored.</div>';
+    wire(); return;
+  }
+  const all = azCurrent.map(s=>stationMomentum(s.name, null, W));
+  if(!all.some(m=>m.ok)){
+    el.innerHTML = ctrl + `<div class="az-hint">Not enough history for a ${W}-month window yet — try a shorter window.</div>`;
+    wire(); return;
+  }
+
+  const scored = all.filter(m=>m.ok).map(m=>({m, sev:_momSeverity(m), dir:(m.z!=null?m.z:(m.pctVsMean||0))}));
+  const cooling = scored.filter(x=>x.sev!=='none' && x.dir<0).sort((a,b)=>a.dir-b.dir).slice(0,8); // most negative first
+  const heating = scored.filter(x=>x.sev!=='none' && x.dir>0).sort((a,b)=>b.dir-a.dir).slice(0,8); // most positive first
+
+  const card=({m,sev})=>{
+    const dir=m.z!=null?m.z:(m.pctVsMean||0), cool=dir<0, color=_momColor(m,sev);
+    const score=momentumScore(m.z), rating=momentumRating(m.z);
+    const zTxt  = m.z==null ? '—' : `${m.z>0?'+':''}${m.z.toFixed(1)}σ${m.zApprox?'*':''}`;
+    const pmTxt = m.pctVsMean==null ? '' : `${m.pctVsMean>0?'+':''}${Math.round(m.pctVsMean*100)}% vs avg`;
+    let flag='';
+    if(cool && m.gs>=1.0 && (sev==='strong'||sev==='mid')) flag='<span class="mom-flag cool">▼ cooling · still above GS</span>';
+    else if(!cool && m.gs<1.0 && (sev==='strong'||sev==='mid')) flag='<span class="mom-flag heat">▲ surging · climbing back</span>';
+    const tierColor = m.tier.cls==='zeus'?'var(--zeus)':m.tier.cls==='pos'?'var(--poseidon)':m.tier.cls==='tri'?'var(--triton)':'var(--danger)';
+    const valTxt = m.win===1 ? `<b>${m.displayVal}</b>` : `<b>${m.displayVal}</b>/mo`;
+    return `<div class="mom-card" data-station="${m.name}" style="border-left-color:${color}">
+      <div class="mom-dot" style="background:${color}"></div>
+      <div class="mom-main">
+        <div class="mom-head"><span class="mom-name">${m.name}</span>${flag}</div>
+        <div class="mom-sub">${m.division} · GS ${(m.gs*100).toFixed(0)}% <span style="color:${tierColor}">${m.tier.label}</span></div>
+        <div class="mom-line">
+          <span class="mom-now">${m.latestMonth}: ${valTxt}</span>
+          <span class="mom-norm">norm ${m.mean.toFixed(1)} ± ${m.std.toFixed(1)}/mo</span>
+          <span class="mom-sigma">${zTxt}${pmTxt?` · ${pmTxt}`:''}</span>
+        </div>
+      </div>
+      <div class="mom-score" style="color:${color}">
+        <div class="mom-score-num">${score==null?'—':score}</div>
+        <div class="mom-score-lbl">${rating}</div>
+      </div>
+      <div class="mom-spark">${_momBars(m.series, color)}</div>
+    </div>`;
+  };
+
+  const coolHtml = cooling.length ? cooling.map(card).join('') : '<div class="mom-empty">No station more than ¾σ below its own norm.</div>';
+  const heatHtml = heating.length ? heating.map(card).join('') : '<div class="mom-empty">No station more than ¾σ above its own norm.</div>';
+  const winLbl = W===1?'latest month':`last ${W} months`;
+
+  el.innerHTML = ctrl + `
+    <div class="mom-group">
+      <div class="mom-group-label cool">▼ Cooling — ${winLbl} below own norm</div>
+      ${coolHtml}
+    </div>
+    <div class="mom-group">
+      <div class="mom-group-label heat">▲ Heating — ${winLbl} above own norm</div>
+      ${heatHtml}
+    </div>
+    ${scored.some(x=>x.m.zApprox) ? '<div class="mom-foot">* baseline perfectly steady (σ≈0); score approximated.</div>' : ''}
+    <div class="mom-foot">Score 0–100 (50 = the station’s normal monthly pace). σ = std deviations from its own monthly ALNAV average. Tap a card for detail.</div>`;
+
+  wire();
+}
+
 </script>
 </body>
 </html>
