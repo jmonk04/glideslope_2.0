@@ -1458,9 +1458,14 @@ body.has-tabbar #appWin{padding-bottom:96px}
   </div>
 
   <div id="winPaneMonth" style="display:none">
+    <div class="board" id="board-monthly-cur">
+      <div class="board-head"><div class="board-name"><span class="ic">📅</span>Current Month</div>
+        <div class="board-sub" id="sub-monthly-cur">Month-to-date · contracts ÷ annual goal</div></div>
+      <div id="rows-monthly-cur"></div>
+    </div>
     <div class="board" id="board-monthly">
-      <div class="board-head"><div class="board-name"><span class="ic">🚀</span>Monthly Leaders</div>
-        <div class="board-sub">Last ~4 weeks net contracts ÷ annual goal</div></div>
+      <div class="board-head"><div class="board-name"><span class="ic">🚀</span>Last Month</div>
+        <div class="board-sub">net contracts ÷ annual goal</div></div>
       <div id="rows-monthly"></div>
     </div>
   </div>
@@ -3779,6 +3784,43 @@ function renderTrending(){
    an approximated 4-week window. attn is YTD cumulative; attrition
    can pull a month negative, so ≤0 results are excluded.
    ============================================================ */
+function renderMonthlyCurrent(){
+  const host=document.getElementById('rows-monthly-cur'); if(!host) return;
+  const sub=document.getElementById('sub-monthly-cur');
+  const snap=DataLayer.latest();
+  const eoms=DataLayer.eomSnapshots();
+  const base=eoms.length?eoms[eoms.length-1]:null;   // last completed month-end (baseline)
+  const MONS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  if(!snap || !base){
+    host.innerHTML='<div class="empty">Need a current snapshot and a prior month-end to compute this month.</div>';
+    if(sub) sub.textContent='Month-to-date · contracts ÷ annual goal';
+    return;
+  }
+  const d=new Date((snap.date||'')+'T00:00:00');
+  const lbl=isNaN(d)?'Month-to-date':`${MONS[d.getMonth()]}${String(d.getFullYear()).slice(-2)} month-to-date`;
+  if(sub) sub.textContent=`${lbl} · contracts ÷ annual goal`;
+  const ranked=snap.stations.map(s=>{
+    if(s.goal==null || s.attn==null || s.goal===0) return null;
+    const before=base.stations.find(x=>x.name===s.name);
+    if(!before || before.attn==null) return null;
+    const monthCount=s.attn-before.attn;                 // contracts so far this month
+    if(monthCount<=0) return null;
+    return { name:s.name, division:s.division, monthCount, goal:s.goal, goalPct:monthCount/s.goal, now:s.glideslope_pct };
+  }).filter(Boolean).sort((a,b)=>b.goalPct-a.goalPct).slice(0,5);
+  if(!ranked.length){
+    host.innerHTML='<div class="empty">No net contracts logged yet this month.</div>';
+    return;
+  }
+  host.innerHTML=ranked.map((m,i)=>{
+    const t=tierOf(m.now);
+    return `<div class="row ${rowClass(i)} ${t.cls}">
+      <span class="rk">#${i+1}</span>
+      <span class="nm">${m.name}</span>
+      <span class="val">${(m.goalPct*100).toFixed(1)}%</span>
+      <span class="sub">${m.division||''} · ${m.monthCount} of ${m.goal} goal</span>
+    </div>`;
+  }).join('');
+}
 function renderMonthly(){
   const eoms = DataLayer.eomSnapshots();
   const host = document.getElementById('rows-monthly');
@@ -4119,7 +4161,7 @@ function renderWin(){
   if(!DataLayer.hasData()) return;
   renderWinStamp();
   if(_winTab==='overall'){ renderWinStandings(_winMode); }
-  else if(_winTab==='month'){ renderMonthly(); }
+  else if(_winTab==='month'){ renderMonthlyCurrent(); renderMonthly(); }
   else if(_winTab==='week'){ renderWarriors(); renderTrending(); }
   else if(_winTab==='pr'){ renderRecords(); }
 }
