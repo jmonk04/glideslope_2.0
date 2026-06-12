@@ -940,11 +940,12 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .cmd-gs{margin:0 0 16px}
 .cmd-gs:empty{display:none}
 .cmd-gs .ey{font-family:'Chakra Petch',monospace;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 9px 2px}
-.cmd-gs-chips{display:flex;flex-wrap:wrap;gap:7px}
-.cmd-gs .chip{display:flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:9px;padding:7px 11px}
-.cmd-gs .chip .pip{width:10px;height:10px;border-radius:50%;flex:none}
-.cmd-gs .chip .lbl{font-family:'Chakra Petch',monospace;font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--ink-dim);text-transform:uppercase}
-.cmd-gs .chip .v{font-family:'Chakra Petch',monospace;font-size:13px;font-weight:700}
+.cmd-gs-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.cmd-gs .cell{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:10px;padding:10px 4px}
+.cmd-gs .cell .pip{width:9px;height:9px;border-radius:50%;flex:none}
+.cmd-gs .cell .lbl{font-family:'Chakra Petch',monospace;font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--ink-faint);text-transform:uppercase}
+.cmd-gs .cell .v{font-family:'Chakra Petch',monospace;font-size:13px;font-weight:700;color:var(--ink)}
+.cmd-gs .cell.under .v{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -2954,14 +2955,14 @@ function renderCmdStoplight(){
   const host=document.getElementById('cmdStoplight'); if(!host) return;
   const snap=DataLayer.latest(); const sts=snap?(snap.stations||[]):[];
   if(!sts.length){ host.innerHTML=''; return; }
-  const chips=PROGRAMS.map(p=>{
+  const cells=PROGRAMS.map(p=>{
     const gs=setGsReq(sts,_divSetCfg(p.key)).gs;
     const dotC=gs==null?'var(--ink-faint)':(gs>=1.0?'var(--good)':'var(--danger)');
-    const valC=gs==null?'var(--ink-faint)':(gs<1.0?'var(--danger)':'var(--ink)');
+    const under=(gs!=null && gs<1.0);
     const val=gs==null?'\u2014':(gs*100).toFixed(1)+'%';
-    return `<div class="chip"><span class="pip" style="background:${dotC}"></span><span class="lbl">${p.label}</span><span class="v" style="color:${valC}">${val}</span></div>`;
+    return `<div class="cell ${under?'under':''}"><span class="pip" style="background:${dotC}"></span><span class="lbl">${p.label}</span><span class="v">${val}</span></div>`;
   }).join('');
-  host.innerHTML=`<div class="ey">Glideslope by mission set</div><div class="cmd-gs-chips">${chips}</div>`;
+  host.innerHTML=`<div class="ey">Mission Vitals</div><div class="cmd-gs-grid">${cells}</div>`;
 }
 function renderDivGrid(){
   const divs=[...new Set(azCurrent.map(s=>s.division))].sort();
