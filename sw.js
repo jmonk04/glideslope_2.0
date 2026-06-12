@@ -1,7 +1,7 @@
 /* Triton Glideslope — service worker
    Bump CACHE_VERSION whenever you deploy changes so clients
    pick up the new files instead of serving stale ones. */
-const CACHE_VERSION = 'glideslope-v43';
+const CACHE_VERSION = 'glideslope-v44';
 const ASSETS = [
   './',
   './index.html',

@@ -2894,9 +2894,22 @@ function renderDivGrid(){
 /* ---------- DIVISION MODAL ---------- */
 let _divActiveProgKey='alnav';
 let _divTrendWindow=8;
+let _divTile={gs:'pct', pace:'pace', d5:'attn', d20:'attn'};
+function _divScopedAttn(snap, divName, fieldFn){
+  return (snap.stations||[]).filter(s=>s.division===divName).reduce((a,s)=>a+(fieldFn(s)||0),0);
+}
+function _divSetCfg(progKey){ return _setOf(progKey==='nuke'?'nf':progKey); }
+function _divSetSeries(divName, cfg){
+  return DataLayer.allSnapshots().map(snap=>{
+    const sts=(snap.stations||[]).filter(s=>s.division===divName);
+    if(!sts.length) return null;
+    const r=setGsReq(sts,cfg);
+    return r.gs==null?null:{date:snap.date,seq:snap.seq,value:r.gs};
+  }).filter(Boolean);
+}
 
 function showDivModal(divName){
-  _divActiveProgKey='alnav'; _divTrendWindow=8;
+  _divActiveProgKey='alnav'; _divTrendWindow=8; _divTile={gs:'pct',pace:'pace',d5:'attn',d20:'attn'};
   _renderDivModal(divName);
   document.getElementById('divModal').classList.add('show');
 }
@@ -2916,47 +2929,92 @@ function _renderDivModal(divName){
   const snap=DataLayer.latest();
   const sts=snap.stations.filter(s=>s.division===divName);
   if(!sts.length) return;
+  const snaps=DataLayer.allSnapshots();
   const alnavGs=divGlideslope(sts, s=>s.attn, _reqOf);
   const tier=tierOf(alnavGs);
 
-  const d5=divGsDelta(divName,1);
-  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
-  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
-  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
-
-  const d20=divGsDelta(divName,4);
-  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
-  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
-  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
-
+  // division-level context (set-independent)
   const totalGross=sts.reduce((s,st)=>s+(st.gross||0),0);
   const totalLoss=sts.reduce((s,st)=>s+(st.loss||0),0);
   const attrPct=totalGross>0?totalLoss/totalGross:null;
   const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
   const attrColor=attrPct==null?'var(--ink-faint)':attrPct>0.07?'var(--danger)':'var(--good)';
-
   const ct=divContractsLabel(divName);
 
+  // program selector cards — pace-accurate glideslope per set (matches Command)
   const progCards=PROGRAMS.map(p=>{
-    const totalAttn=sts.reduce((sum,s)=>sum+(p.fieldFn(s)||0),0);
-    const avgGs=sts.reduce((sum,s)=>sum+(p.glFn(s)||0),0)/sts.length;
+    const pcfg=_divSetCfg(p.key);
+    const r=setGsReq(sts,pcfg);
+    const gsTxt=r.gs==null?'—':`${(r.gs*100).toFixed(1)}%`;
     const isActive=_divActiveProgKey===p.key;
-    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}" data-div="${divName}">
+    return `<div class="p ${isActive?'active':''}" data-prog="${p.key}">
       <div class="pk">${p.label}</div>
-      <div class="pv" style="color:${progColor(avgGs)}">${(avgGs*100).toFixed(1)}%</div>
-      <div class="tap-hint">${totalAttn} attn · tap ▸</div>
+      <div class="pv" style="color:${progColor(r.gs)}">${gsTxt}</div>
+      <div class="tap-hint">${r.attn} attn · tap ▸</div>
     </div>`;
   }).join('');
 
-  const activeProg=PROGRAMS.find(p=>p.key===_divActiveProgKey);
-  const chartHtml=_divMonthlyHtml(divName, activeProg);
+  // SITREP quad for the active set, scoped to this division
+  const cfg=_divSetCfg(_divActiveProgKey);
+  const {attn, req, gs, goal}=setGsReq(sts,cfg);
+  const stier=gs!=null?tierOf(gs):null;
+  const gsC=!stier?'var(--ink-faint)':stier.cls==='zeus'?'var(--zeus)':stier.cls==='pos'?'var(--poseidon)':stier.cls==='tri'?'var(--triton)':'var(--danger)';
+  const pace=(req!=null)?Math.round(attn-req):null;
+  const need=Math.max(0,Math.round(goal-attn));
+  const reqPerDay=goal/PROD_DAYS_YEAR;
+  const win=(days)=>{
+    const b=findVelocityBaseline(snaps,days); if(!b) return null;
+    const delta=_divScopedAttn(b.cur,divName,cfg.attn)-_divScopedAttn(b.past,divName,cfg.attn);
+    const gsCur=setGsReq((b.cur.stations||[]).filter(s=>s.division===divName),cfg).gs;
+    const gsPast=setGsReq((b.past.stations||[]).filter(s=>s.division===divName),cfg).gs;
+    return {delta:Math.round(delta), span:b.span, perDay:delta/b.span, gsDelta:(gsCur!=null&&gsPast!=null)?gsCur-gsPast:null};
+  };
+  const w5=win(5), w20=win(20);
+  const tileWin=(w,key,label)=>{
+    if(!w) return {l:label, v:'—', c:'var(--ink-faint)', s:'insufficient history'};
+    if(_divTile[key]==='gs'){
+      const g=w.gsDelta; const c=g==null?'var(--ink-faint)':g>0?'var(--good)':g<0?'var(--danger)':'var(--ink-dim)';
+      return {l:label, v:g==null?'—':`${g>0?'▲':g<0?'▼':''}${(g*100).toFixed(1)}%`, c, s:`GS Δ · ${w.span} prod-days`};
+    }
+    const ok=w.perDay>=reqPerDay;
+    return {l:label, v:`${w.delta>=0?'+':''}${w.delta}`, c: ok?'var(--good)':'var(--danger)', s:`${w.perDay.toFixed(1)}/day vs ${reqPerDay.toFixed(1)} req · ${w.span}d`};
+  };
+  const t5=tileWin(w5,'d5','5-Day'), t20=tileWin(w20,'d20','20-Day');
+  const gsTile=_divTile.gs==='need'
+    ? {l:'For Goal', v:`${need}`, c:'var(--ink)', s:`needed to ${goal}`}
+    : {l:'Glideslope', v: gs==null?'—':`${(gs*100).toFixed(1)}%`, c:gsC, s: stier?stier.label:'—'};
+  const _remDays=prodDaysRemaining();
+  const _needRate=(_remDays && _remDays>0 && req!=null) ? (goal-attn)/_remDays : null;
+  let paceTile;
+  if(_divTile.pace==='rate'){
+    paceTile={l:'Rate to Goal', v:_needRate==null?'—':`${_needRate.toFixed(2)}/day`, c:'var(--ink)', s:_needRate==null?'no data':`to reach ${goal} in ${_remDays} prod-days`};
+  } else {
+    const _bad=(pace==null||isNaN(pace));
+    paceTile={l:'Pace', v:_bad?'—':`${pace>=0?'+':''}${pace}`, c:_bad?'var(--ink-faint)':pace>=0?'var(--good)':'var(--danger)', s:_bad?'no pace data':pace>=0?'above day requirement':'below day requirement'};
+  }
+  const sitQuad=`<div class="azm-stats">
+    <div class="azm-stat toggleable" data-tile="gs"><div class="l">${gsTile.l}</div><div class="v" style="color:${gsTile.c};font-size:24px">${gsTile.v}</div><div class="s">${gsTile.s}</div></div>
+    <div class="azm-stat toggleable" data-tile="pace"><div class="l">${paceTile.l}</div><div class="v" style="color:${paceTile.c};font-size:24px">${paceTile.v}</div><div class="s">${paceTile.s}</div></div>
+    <div class="azm-stat toggleable" data-tile="d5"><div class="l">${t5.l}</div><div class="v" style="color:${t5.c}">${t5.v}</div><div class="s">${t5.s}</div></div>
+    <div class="azm-stat toggleable" data-tile="d20"><div class="l">${t20.l}</div><div class="v" style="color:${t20.c}">${t20.v}</div><div class="s">${t20.s}</div></div>
+  </div>
+  <div class="tap-hint">Tap any tile for more · ⇄</div>`;
 
-  const allSeries=divSeriesALNAV(divName);
+  // monthly attainment (command-style: completed months + live "Now" bar + avg line)
+  const monthly=divMonthlyDeltas(divName, cfg.attn);
+  const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
+  let items=monthly.map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
+  if(lastEom){ const cur=_divScopedAttn(snap,divName,cfg.attn)-_divScopedAttn(lastEom,divName,cfg.attn); items.push({label:'Now', value:Math.max(0,Math.round(cur)), current:true}); }
+  const completed=monthly.map(m=>m.value); const avg=completed.length?completed.reduce((a,b)=>a+b,0)/completed.length:null;
+  const chartHtml=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, {avgVal:avg})}`;
+
+  // per-set glideslope trend (division-scoped)
+  const allSeries=_divSetSeries(divName, cfg);
   const series=_divTrendWindow===0?allSeries:allSeries.slice(-_divTrendWindow);
   const presetBtns=[4,8,12,0].map(w=>{ const lbl=w===0?'All':`${w}W`; return `<button class="trend-preset ${_divTrendWindow===w?'active':''}" data-w="${w}">${lbl}</button>`; }).join('');
   const trendHtml=series.length>=2
-    ? `<div class="azm-section">📈 ALNAV Glideslope Trend</div><div class="trend-presets" id="divTrendPresets">${presetBtns}</div><div id="divTrendChart" class="azm-trend">${trendSVG(series)}</div>`
-    : `<div class="azm-section">📈 Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
+    ? `<div class="azm-section">📈 ${cfg.label} Glideslope Trend</div><div class="trend-presets" id="divTrendPresets">${presetBtns}</div><div id="divTrendChart" class="azm-trend">${trendSVG(series)}</div>`
+    : `<div class="azm-section">📈 ${cfg.label} Trend</div><div class="azm-trend"><div class="az-hint">Need at least 2 weeks of history.</div></div>`;
 
   document.getElementById('divModalBody').innerHTML=`
     <div class="azm-name">${divName}</div>
@@ -2965,34 +3023,28 @@ function _renderDivModal(divName){
       <span class="azm-badge" style="background:var(--panel);border:1px solid var(--line);color:var(--ink-dim)">${sts.length} stations</span>
     </div>
     <div class="azm-stats">
-      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
-      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
       <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">cmd avg 7%</div></div>
       <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
     </div>
-    <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
+    <div class="azm-section">Program Breakdown · Tap to Analyze</div>
     <div class="azm-prog">${progCards}</div>
+    ${sitQuad}
     <div id="divMonthlyChart" class="azm-monthly">${chartHtml}</div>
     ${trendHtml}`;
 
+  // interactions — full re-render keeps everything in sync (mirrors Command SITREP)
   document.querySelectorAll('#divModalBody .azm-prog .p').forEach(card=>{
-    card.addEventListener('click',()=>{
-      _divActiveProgKey=card.dataset.prog;
-      document.querySelectorAll('#divModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_divActiveProgKey));
-      const prog=PROGRAMS.find(p=>p.key===_divActiveProgKey);
-      document.getElementById('divMonthlyChart').innerHTML=_divMonthlyHtml(divName, prog);
-    });
+    card.addEventListener('click',()=>{ _divActiveProgKey=card.dataset.prog; _divTile={gs:'pct',pace:'pace',d5:'attn',d20:'attn'}; _renderDivModal(divName); });
   });
+  document.querySelectorAll('#divModalBody .azm-stats .toggleable').forEach(t=>t.addEventListener('click',()=>{
+    const k=t.dataset.tile;
+    if(k==='gs'){ _divTile.gs=_divTile.gs==='pct'?'need':'pct'; }
+    else if(k==='pace'){ _divTile.pace=_divTile.pace==='pace'?'rate':'pace'; }
+    else { _divTile[k]=_divTile[k]==='attn'?'gs':'attn'; }
+    _renderDivModal(divName);
+  }));
   const tp=document.getElementById('divTrendPresets');
-  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      _divTrendWindow=+btn.dataset.w;
-      const full=divSeriesALNAV(divName);
-      const sliced=_divTrendWindow===0?full:full.slice(-_divTrendWindow);
-      tp.querySelectorAll('.trend-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===_divTrendWindow));
-      document.getElementById('divTrendChart').innerHTML=sliced.length>=2?trendSVG(sliced):'<div class="az-hint">Not enough data for this window.</div>';
-    });
-  });
+  if(tp) tp.querySelectorAll('.trend-preset').forEach(btn=>btn.addEventListener('click',()=>{ _divTrendWindow=+btn.dataset.w; _renderDivModal(divName); }));
 }
 /* ============================================================
    COMMAND BREAKDOWN — whole-command rollup. Aggregates ALL
