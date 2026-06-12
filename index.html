@@ -913,6 +913,7 @@ body.has-tabbar #appWin{padding-bottom:96px}
   font-size:12px;color:var(--ink-dim);
 }
 
+.tap-hint{font-size:11px;color:var(--ink-dim);font-family:'Chakra Petch',monospace;letter-spacing:.04em;text-align:center;margin:2px 0 12px;opacity:.85}
 </style>
 </head>
 <body>
@@ -1352,6 +1353,7 @@ body.has-tabbar #appWin{padding-bottom:96px}
   <div class="cic-panel" data-panel="station">
     <section class="section">
       <div class="section-tag"><span class="num">▰</span><h2>Ops Grid · Glideslope Heat Map</h2><span class="rule"></span></div>
+      <div class="tap-hint">Tap a station for in-depth analysis</div>
       <div class="trend-presets" id="heatProgToggle" style="margin-bottom:14px"></div>
       <div class="heat-legend">
         <span class="hl-item"><i style="background:var(--danger)"></i>&lt;80%</span>
@@ -1395,18 +1397,41 @@ body.has-tabbar #appWin{padding-bottom:96px}
 
 <div class="wrap" id="appWin" style="display:none">
   <div class="win-stamp" id="winStamp"><span class="live"></span>Loading…</div>
+  <div class="section-tag"><span class="num">★</span><h2>Leaderboards</h2><span class="rule"></span></div>
 
-  <div class="section">
-    <div class="section-tag"><span class="num">🎖️</span><h2>Command Standings · All Stations</h2><span class="rule"></span></div>
+  <div class="cic-tabs" id="winTabs">
+    <button class="cic-tab active" data-wtab="overall">Overall</button>
+    <button class="cic-tab" data-wtab="month">Month</button>
+    <button class="cic-tab" data-wtab="week">Week</button>
+    <button class="cic-tab" data-wtab="pr">PR Board</button>
+  </div>
+
+  <div id="winPaneOverall">
+    <div class="sit-pick"><label for="winOverallMode">Ranking</label>
+      <select id="winOverallMode" class="az-select">
+        <option value="tier">Incentive Tiers</option>
+        <option value="ac">AC</option>
+        <option value="nso">NSO</option>
+        <option value="nuke">NUKE</option>
+        <option value="nns">NNS</option>
+      </select>
+    </div>
     <div class="board" id="board-standings">
       <div class="board-head"><div class="board-name"><span class="ic">⚓</span>Tier Rollup</div>
-        <div class="board-sub">Every station ranked by ALNAV glideslope, grouped by incentive tier</div></div>
+        <div class="board-sub" id="standings-sub">Every station ranked by ALNAV glideslope, grouped by incentive tier</div></div>
       <div id="rows-standings"></div>
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-tag"><span class="num">⚡</span><h2>ALNAV · Live Competition</h2><span class="rule"></span></div>
+  <div id="winPaneMonth" style="display:none">
+    <div class="board" id="board-monthly">
+      <div class="board-head"><div class="board-name"><span class="ic">🚀</span>Monthly Leaders</div>
+        <div class="board-sub">Last ~4 weeks net contracts ÷ annual goal</div></div>
+      <div id="rows-monthly"></div>
+    </div>
+  </div>
+
+  <div id="winPaneWeek" style="display:none">
     <div class="board" id="board-warriors">
       <div class="board-head"><div class="board-name"><span class="ic">🥇</span>Weekly Warriors</div>
         <div class="board-sub">Biggest glideslope % jump this week</div></div>
@@ -1417,29 +1442,9 @@ body.has-tabbar #appWin{padding-bottom:96px}
         <div class="board-sub">2+ consecutive weeks rising · ranked by total gain</div></div>
       <div id="rows-trending"></div>
     </div>
-    <div class="board" id="board-monthly">
-      <div class="board-head"><div class="board-name"><span class="ic">🚀</span>Monthly Leaders</div>
-        <div class="board-sub">Last ~4 weeks net contracts ÷ annual goal</div></div>
-      <div id="rows-monthly"></div>
-    </div>
   </div>
 
-  <div class="section">
-    <div class="section-tag"><span class="num">🎯</span><h2>Specialist Programs · Top 5</h2><span class="rule"></span></div>
-    <div class="board" id="board-nso">
-      <div class="board-head"><div class="board-name"><span class="ic">⚓</span>NSO · Top 5</div>
-        <div class="board-sub">Highest NSO glideslope %</div></div>
-      <div id="rows-nso"></div>
-    </div>
-    <div class="board" id="board-nf">
-      <div class="board-head"><div class="board-name"><span class="ic">☢️</span>NF / NUKE · Top 5</div>
-        <div class="board-sub">Highest NUKE glideslope %</div></div>
-      <div id="rows-nf"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-tag"><span class="num">🏛️</span><h2>PR Board · YTD</h2><span class="rule"></span></div>
+  <div id="winPanePr" style="display:none">
     <div class="scaffold-note">Personal records, built from authoritative month-end (EOM) snapshots for stations, and from the latest snapshot's recruiter stats. Tap any category to see the top 5.</div>
     <div class="record-book">
       <div class="board-head"><div class="board-name"><span class="ic">🏆</span>PR Board · This Year</div>
@@ -3095,7 +3100,7 @@ function _cmdMonthlyHtml(prog){
    FY26 production calendar (findVelocityBaseline). NF→nuke data.
    ============================================================ */
 let _sitSet='alnav';
-let _sitTile={gs:'pct', d5:'attn', d20:'attn'};
+let _sitTile={gs:'pct', pace:'pace', d5:'attn', d20:'attn'};
 
 const SITREP_SETS=[
   {key:'alnav',label:'ALNAV',goal:3166,color:'var(--triton)',  attn:s=>s.attn||0,        goalOf:s=>s.goal||0},
@@ -3215,15 +3220,28 @@ function renderCmdSitrep(){
     const gsTile=_sitTile.gs==='need'
       ? {l:'For Goal', v:`${need}`, c:'var(--ink)', s:`needed to ${goal}`}
       : {l:'Glideslope', v: gs==null?'—':`${(gs*100).toFixed(1)}%`, c:gsC, s: tier?tier.label:'—'};
-    const paceTxt = pace==null||isNaN(pace) ? '—' : `${pace>=0?'+':''}${pace}`;
-    const paceC = (pace==null||isNaN(pace)) ? 'var(--ink-faint)' : pace>=0?'var(--good)':'var(--danger)';
-    const paceSub = (pace==null||isNaN(pace)) ? 'no pace data' : pace>=0?'above day requirement':'below day requirement';
+    const _remDays = prodDaysRemaining();
+    const _needRate = (_remDays && _remDays>0 && req!=null) ? (goal-attn)/_remDays : null;
+    let paceTile;
+    if(_sitTile.pace==='rate'){
+      paceTile = {l:'Rate to Goal',
+        v: _needRate==null ? '—' : `${_needRate.toFixed(2)}/day`,
+        c: 'var(--ink)',
+        s: _needRate==null ? 'no data' : `to reach ${goal} in ${_remDays} prod-days`};
+    } else {
+      const _bad = (pace==null||isNaN(pace));
+      paceTile = {l:'Pace',
+        v: _bad ? '—' : `${pace>=0?'+':''}${pace}`,
+        c: _bad ? 'var(--ink-faint)' : pace>=0?'var(--good)':'var(--danger)',
+        s: _bad ? 'no pace data' : pace>=0?'above day requirement':'below day requirement'};
+    }
     quad=`<div class="azm-stats">
       <div class="azm-stat toggleable" data-tile="gs"><div class="l">${gsTile.l}</div><div class="v" style="color:${gsTile.c};font-size:24px">${gsTile.v}</div><div class="s">${gsTile.s}</div></div>
-      <div class="azm-stat"><div class="l">Pace</div><div class="v" style="color:${paceC};font-size:24px">${paceTxt}</div><div class="s">${paceSub}</div></div>
+      <div class="azm-stat toggleable" data-tile="pace"><div class="l">${paceTile.l}</div><div class="v" style="color:${paceTile.c};font-size:24px">${paceTile.v}</div><div class="s">${paceTile.s}</div></div>
       <div class="azm-stat toggleable" data-tile="d5"><div class="l">${t5.l}</div><div class="v" style="color:${t5.c}">${t5.v}</div><div class="s">${t5.s}</div></div>
       <div class="azm-stat toggleable" data-tile="d20"><div class="l">${t20.l}</div><div class="v" style="color:${t20.c}">${t20.v}</div><div class="s">${t20.s}</div></div>
-    </div>`;
+    </div>
+    <div class="tap-hint">Tap any tile for more · ⇄</div>`;
 
     const monthly=cmdMonthlyDeltas(cfg.attn);
     const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
@@ -3259,6 +3277,7 @@ function renderCmdSitrep(){
   el.querySelectorAll('.azm-stats .toggleable').forEach(t=>t.addEventListener('click',()=>{
     const k=t.dataset.tile;
     if(k==='gs'){ _sitTile.gs = _sitTile.gs==='pct'?'need':'pct'; }
+    else if(k==='pace'){ _sitTile.pace = _sitTile.pace==='pace'?'rate':'pace'; }
     else { _sitTile[k] = _sitTile[k]==='attn'?'gs':'attn'; }
     renderCmdSitrep();
   }));
@@ -3928,17 +3947,46 @@ function renderWinStamp(){
   const latest=DataLayer.latest();
   el.innerHTML = latest ? '<span class="live"></span>Current as of '+latest.date : '<span class="live" style="background:var(--danger);box-shadow:0 0 8px var(--danger)"></span>No data';
 }
+let _winTab='overall', _winMode='tier';
+function renderWinStandings(mode){
+  const host=document.getElementById('rows-standings'); if(!host) return;
+  const fieldOf={ tier:s=>s.glideslope_pct, ac:s=>s.ac&&s.ac.glideslope_pct, nso:s=>s.nso&&s.nso.glideslope_pct, nuke:s=>s.nuke&&s.nuke.glideslope_pct, nns:s=>s.nns&&s.nns.glideslope_pct };
+  const f=fieldOf[mode]||fieldOf.tier;
+  const labelMap={tier:'ALNAV',ac:'AC',nso:'NSO',nuke:'NF/NUKE',nns:'NNS'};
+  const sub=document.getElementById('standings-sub');
+  if(sub) sub.textContent=`Every station ranked by ${labelMap[mode]||'ALNAV'} glideslope, grouped by incentive tier`;
+  const list=DataLayer.stations().map(s=>({s, gs:f(s)})).filter(x=>x.gs!=null).sort((a,b)=>b.gs-a.gs);
+  if(!list.length){ host.innerHTML='<div class="empty">No data for this mission set in the current snapshot.</div>'; return; }
+  const tierName={zeus:'ZEUS · ≥140%', pos:'POSEIDON · ≥120%', tri:'TRITON · ≥100%', below:'ON THE CUSP · below 100%'};
+  let html='', lastCls=null;
+  list.forEach((x,i)=>{
+    const t=tierOf(x.gs);
+    if(t.cls!==lastCls){ html+=`<div class="lb-tier-head ${t.cls}">${tierName[t.cls]||t.key}</div>`; lastCls=t.cls; }
+    const rank = i<3 ? medalFor(i) : '#'+(i+1);
+    html+=`<div class="row ${t.cls}"><span class="medal">${rank}</span><span class="nm">${x.s.name}<span class="div">${x.s.division||''}</span></span><span class="val">${pctTxt(x.gs)}</span><span class="sub">${t.key}</span></div>`;
+  });
+  host.innerHTML=html;
+}
 function renderWin(){
   if(!DataLayer.hasData()) return;
   renderWinStamp();
-  renderLbStandings();
-  renderWarriors();
-  renderTrending();
-  renderMonthly();
-  renderProgramTop('nso','rows-nso','NSO');
-  renderProgramTop('nuke','rows-nf','NF/NUKE');
-  renderRecords();
+  if(_winTab==='overall'){ renderWinStandings(_winMode); }
+  else if(_winTab==='month'){ renderMonthly(); }
+  else if(_winTab==='week'){ renderWarriors(); renderTrending(); }
+  else if(_winTab==='pr'){ renderRecords(); }
 }
+(function initWinTabs(){
+  const tabs=document.getElementById('winTabs'); if(!tabs) return;
+  const panes={overall:'winPaneOverall', month:'winPaneMonth', week:'winPaneWeek', pr:'winPanePr'};
+  tabs.querySelectorAll('.cic-tab').forEach(btn=>btn.addEventListener('click',()=>{
+    _winTab=btn.dataset.wtab;
+    tabs.querySelectorAll('.cic-tab').forEach(b=>b.classList.toggle('active',b===btn));
+    Object.entries(panes).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) el.style.display=(k===_winTab)?'block':'none'; });
+    renderWin();
+  }));
+  const sel=document.getElementById('winOverallMode');
+  if(sel) sel.addEventListener('change',()=>{ _winMode=sel.value; renderWinStandings(_winMode); });
+})();
 if(typeof window!=='undefined') window.togglePRCat = togglePRCat;
 </script>
 </body>
