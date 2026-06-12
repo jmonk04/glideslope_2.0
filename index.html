@@ -920,7 +920,7 @@ body.has-tabbar #appWin{padding-bottom:96px}
 }
 
 .tap-hint{font-size:11px;color:var(--ink-dim);font-family:'Chakra Petch',monospace;letter-spacing:.04em;text-align:center;margin:2px 0 12px;opacity:.85}
-.cmd-stoplight{display:flex;align-items:center;gap:16px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:12px 16px;margin-bottom:16px}
+.cmd-stoplight{display:flex;align-items:center;gap:16px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:13px;padding:12px 16px;margin:14px 0 16px}
 .cmd-stoplight:empty{display:none}
 .cmd-stoplight .csl-title{font-family:'Chakra Petch',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
 .cmd-stoplight .div-dots{gap:14px}
@@ -1345,8 +1345,6 @@ body.has-tabbar #appWin{padding-bottom:96px}
   </header>
   <div class="prod-clock" id="prodClock"></div>
 
-  <div class="cmd-stoplight" id="cmdStoplight"></div>
-
   <div class="cic-tabs-label">SITREPs</div>
   <!-- CIC sub-navigation -->
   <div class="cic-tabs" id="cicTabs">
@@ -1362,6 +1360,7 @@ body.has-tabbar #appWin{padding-bottom:96px}
       <div class="section-tag"><span class="num">◎</span><h2>Command SITREP</h2><span class="rule"></span></div>
       <div id="sitrepBody" class="cmd-breakdown"></div>
     </section>
+    <div class="cmd-stoplight" id="cmdStoplight"></div>
   </div>
 
   <!-- TAB: Division -->
@@ -2932,7 +2931,7 @@ function renderProdClock(){
     : `<div class="pc-ring" style="background:conic-gradient(from -90deg, ${fyColor} 0 ${(fyPct*100).toFixed(1)}%, var(--line-soft) ${(fyPct*100).toFixed(1)}% 100%)"><div class="pc-rc"><div class="big">${elapsed}</div><div class="small">of ${total}</div></div></div>`;
   const ringMO = moLeft==null
     ? `<div class="pc-ring" style="background:conic-gradient(from -90deg,var(--line-soft) 0 100%)"><div class="pc-rc"><div class="big">—</div></div></div>`
-    : `<div class="pc-ring" style="background:conic-gradient(from -90deg, var(--poseidon) 0 ${(moPct*100).toFixed(1)}%, var(--line-soft) ${(moPct*100).toFixed(1)}% 100%)"><div class="pc-rc"><div class="big">${moLeft}</div><div class="small">left</div></div></div>`;
+    : `<div class="pc-ring" style="background:conic-gradient(from -90deg, var(--poseidon) 0 ${(moPct*100).toFixed(1)}%, var(--line-soft) ${(moPct*100).toFixed(1)}% 100%)"><div class="pc-rc"><div class="big">${moElapsed}</div><div class="small">of ${moTotal}</div></div></div>`;
 
   host.innerHTML = `
     <div class="pc-status"><span class="ds-dot"></span>Data current as of <b>${pretty}</b></div>
@@ -2940,7 +2939,7 @@ function renderProdClock(){
       <div class="pc-gauge">${ringFY}
         <div class="pc-cap">FY26<br><span class="accent" style="color:${elapsed==null?'var(--ink-dim)':fyColor}">${remaining==null?'\u2014':remaining+' left \u00b7 '+(remPct*100).toFixed(1)+'%'}</span></div></div>
       <div class="pc-gauge">${ringMO}
-        <div class="pc-cap">${moLabel} prod-days<br><span class="accent">${moLeft==null?'\u2014':moElapsed+' of '+moTotal+' done'}</span></div></div>
+        <div class="pc-cap">${moLabel} prod-days<br><span class="accent">${moLeft==null?'\u2014':moLeft+' left \u00b7 '+(moLeft/moTotal*100).toFixed(1)+'%'}</span></div></div>
     </div>`;
 }
 function renderCmdStoplight(){
