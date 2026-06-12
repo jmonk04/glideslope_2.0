@@ -1,7 +1,7 @@
 /* Triton Glideslope — service worker
    Bump CACHE_VERSION whenever you deploy changes so clients
    pick up the new files instead of serving stale ones. */
-const CACHE_VERSION = 'glideslope-v54';
+const CACHE_VERSION = 'glideslope-v55';
 const ASSETS = [
   './',
   './index.html',
@@ -52,6 +52,32 @@ self.addEventListener('fetch', (e) => {
           return res;
         })
         .catch(() => caches.match(e.request))   // offline → last good copy
+    );
+    return;
+  }
+
+  // NETWORK-FIRST for the HTML shell so a fresh deploy reaches every device on
+  // the next load. Short timeout + cache fallback keeps it fast / offline-safe.
+  if (e.request.mode === 'navigate' ||
+      (url.origin === location.origin && /\/(index\.html)?$/.test(url.pathname))) {
+    e.respondWith(
+      new Promise((resolve) => {
+        let settled = false;
+        const fallback = () => caches.match(e.request)
+          .then((c) => c || caches.match('./index.html'))
+          .then((c) => c || caches.match('./'))
+          .then((c) => c || fetch(e.request));
+        const timer = setTimeout(() => { if (!settled) { settled = true; resolve(fallback()); } }, 3500);
+        fetch(e.request).then((res) => {
+          if (settled) return;
+          settled = true; clearTimeout(timer);
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_VERSION).then((c) => c.put('./index.html', copy));
+          }
+          resolve(res);
+        }).catch(() => { if (!settled) { settled = true; clearTimeout(timer); resolve(fallback()); } });
+      })
     );
     return;
   }
