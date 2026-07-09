@@ -670,6 +670,8 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .sit-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
 .sit-cv{font-family:'Chakra Petch',monospace;font-size:11px;color:var(--ink-dim);margin-bottom:4px;white-space:nowrap}
 .sit-bar{width:72%;border-radius:4px 4px 0 0;opacity:.9}
+.sit-bar.sit-projshell{position:relative;opacity:1}
+.sit-bar-act{position:absolute;bottom:0;left:0;right:0;border-radius:4px 4px 0 0}
 .sit-lbls{display:flex;gap:6px;margin-top:6px}
 .sit-lbl{flex:1;text-align:center;font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.03em;color:var(--ink-faint)}
 .sit-avg,.sit-ref{position:absolute;left:0;right:0;border-top:1px dashed var(--ink-dim);pointer-events:none}
@@ -2787,12 +2789,20 @@ const PROGRAMS = [
 function monthlyBarChart(name, prog){
   const data=DataLayer.monthlyDeltas(name, prog.fieldFn);
   if(!data.length) return `<div class="azm-no-eom">No EOM snapshots yet — upload month-end sheets to populate this chart.</div>`;
-  const maxVal=Math.max(...data.map(d=>d.value),1);
-  const bars=data.map(d=>{
-    const h=Math.max(4, Math.round((d.value/maxVal)*81));
-    return `<div class="azm-bar-col"><div class="azm-bar-val">${d.value||''}</div><div class="azm-bar" style="height:${h}px;background:${prog.color};opacity:.85"></div><div class="azm-bar-lbl">${d.month}</div></div>`;
-  }).join('');
-  return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment (EOM Snapshots)</div><div class="azm-bar-wrap">${bars}</div>`;
+  let items=data.map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
+  const st=DataLayer.station(name);
+  const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
+  if(st && lastEom){
+    const before=lastEom.stations.find(x=>x.name===name);
+    if(before){
+      const cur=Math.max(0,Math.round((prog.fieldFn(st)||0)-(prog.fieldFn(before)||0)));
+      items.push({label:'Now', value:cur, proj:projectMonth(cur), current:true});
+    }
+  }
+  const goalFn=PROG_GOALOF[prog.key];
+  const g=(st&&goalFn)?goalFn(st):0;
+  const thr=g>0?g/12:null;
+  return `<div class="azm-monthly-title">${prog.label} · Monthly Attainment</div>${_sitChart(items, prog.color, thr!=null?{refVal:thr, refLabel:`req ${Math.round(thr*10)/10}/mo`}:{})}`;
 }
 
 /* glideslope delta between latest and `snapCount` snapshots back */
@@ -2827,6 +2837,8 @@ function _contractsLabel(s){
   const color=next.label==='Triton'?'var(--danger)':next.label==='Poseidon'?'var(--triton)':'var(--poseidon)';
   return {val:`${needed}`, sub:`to ${next.label}`, color};
 }
+
+const PROG_GOALOF={alnav:s=>s.goal||0, ac:s=>s.ac?.goal||0, nso:s=>s.nso?.goal||0, nuke:s=>s.nuke?.goal||0, nns:s=>s.nns?.goal||0};
 
 let _activeProgKey='alnav';
 let _trendWindow=8;
@@ -3057,17 +3069,8 @@ function renderProdClock(){
   const fyColor = _lerpHex('#3da9fc','#ffb627',(fyPct-0.6)/0.4);  // blue -> amber as year runs out
 
   let moLabel='—', moLeft=null, moTotal=null, moElapsed=null, moPct=0;
-  if(!isNaN(d) && remaining!=null){
-    const MON=CAL2FY[d.getMonth()], idx=FY_MONTHS.indexOf(MON);
-    if(idx>=0){
-      const nextStart = idx<11 ? FY_REMAIN_AT_START[FY_MONTHS[idx+1]] : 0;
-      moTotal=FY_MONTH_PRODDAYS[MON];
-      moLeft=Math.max(0,remaining-nextStart);
-      moElapsed=Math.max(0,moTotal-moLeft);
-      moPct=moTotal?moElapsed/moTotal:0;
-      moLabel=MON;
-    }
-  }
+  const mp=monthProgress();
+  if(mp){ moLabel=mp.mon; moTotal=mp.total; moLeft=mp.left; moElapsed=mp.elapsed; moPct=moTotal?moElapsed/moTotal:0; }
 
   const ringFY = elapsed==null
     ? `<div class="pc-ring" style="background:conic-gradient(from -90deg,var(--line-soft) 0 100%)"><div class="pc-rc"><div class="big">—</div></div></div>`
@@ -3233,9 +3236,9 @@ function _renderDivModal(divName){
   const monthly=divMonthlyDeltas(divName, cfg.attn);
   const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
   let items=monthly.map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
-  if(lastEom){ const cur=_divScopedAttn(snap,divName,cfg.attn)-_divScopedAttn(lastEom,divName,cfg.attn); items.push({label:'Now', value:Math.max(0,Math.round(cur)), current:true}); }
-  const completed=monthly.map(m=>m.value); const avg=completed.length?completed.reduce((a,b)=>a+b,0)/completed.length:null;
-  const chartHtml=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, {avgVal:avg})}`;
+  if(lastEom){ const cur=Math.max(0,Math.round(_divScopedAttn(snap,divName,cfg.attn)-_divScopedAttn(lastEom,divName,cfg.attn))); items.push({label:'Now', value:cur, proj:projectMonth(cur), current:true}); }
+  const thr=goal>0?goal/12:null;
+  const chartHtml=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, thr!=null?{refVal:thr, refLabel:`req ${Math.round(thr)}/mo`}:{})}`;
 
   // per-set glideslope trend (division-scoped)
   const allSeries=_divSetSeries(divName, cfg);
@@ -3423,6 +3426,36 @@ function prodDaysRemaining(){
   if(typeof snap.contractDaysRemaining==='number') return snap.contractDaysRemaining;
   const idx=prodDayIndex(snap.date); return idx==null?null:Math.max(0,PROD_DAYS_YEAR-idx);
 }
+/* current-month production-day progress, from the latest snapshot.
+   Month total comes from the authoritative FY26 date map (per-month key count);
+   elapsed comes from the DSR's own contractDaysRemaining counter when present,
+   falling back to a date-map count. Single source of truth: the Production-Day
+   Clock renders from this same helper. */
+function monthProgress(){
+  const snap=DataLayer.latest(); if(!snap||!snap.date) return null;
+  const iso=String(snap.date), ym=iso.slice(0,7);
+  const keys=Object.keys(FY26_PROD_DAYS);
+  const total=keys.filter(k=>k.slice(0,7)===ym).length;
+  if(!total) return null;
+  const d=new Date(iso+'T00:00:00');
+  const mon=isNaN(d)?ym:CAL2FY[d.getMonth()];
+  const beforeMonth=keys.filter(k=>k<ym+'-01').length;
+  let elapsed;
+  const fyTotal=(typeof snap.contractDaysTotal==='number'&&snap.contractDaysTotal>0)?snap.contractDaysTotal:PROD_DAYS_YEAR;
+  if(typeof snap.contractDaysRemaining==='number'){
+    elapsed=Math.max(0,Math.min(total,(fyTotal-snap.contractDaysRemaining)-beforeMonth));
+  }else{
+    elapsed=keys.filter(k=>k.slice(0,7)===ym&&k<=iso).length;
+  }
+  return {mon, total, elapsed, left:Math.max(0,total-elapsed)};
+}
+/* projected month-end total from month-to-date count */
+function projectMonth(mtd){
+  const mp=monthProgress();
+  if(!mp||mp.elapsed<=0) return null;
+  return Math.round(mtd/mp.elapsed*mp.total);
+}
+
 function attrMonthly(){
   const eoms=DataLayer.eomSnapshots(); const out=[];
   for(let i=0;i<eoms.length;i++){
@@ -3443,9 +3476,14 @@ function _sitChart(items, color, opts){
   if(!items.length) return '<div class="azm-no-eom">No EOM snapshots yet.</div>';
   const H=120;
   const fmtV=v=> opts.fmt==='pct'?`${(v*100).toFixed(1)}%`:`${Math.round(v)}`;
-  const maxV=Math.max(...items.map(i=>i.value), opts.refVal||0, opts.avgVal||0, 0.0001);
+  const maxV=Math.max(...items.map(i=>Math.max(i.value, i.proj||0)), opts.refVal||0, opts.avgVal||0, 0.0001);
   const cols=items.map(i=>{
     const h=Math.max(3,Math.round((i.value/maxV)*H));
+    if(i.current && i.proj!=null && i.proj>i.value){
+      const ph=Math.max(h+2,Math.round((i.proj/maxV)*H));
+      const shell=`repeating-linear-gradient(45deg,rgba(255,255,255,.10),rgba(255,255,255,.10) 6px,transparent 6px,transparent 11px)`;
+      return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}▸${fmtV(i.proj)}</div><div class="sit-bar sit-projshell" style="height:${ph}px;background:${shell};box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"><div class="sit-bar-act" style="height:${h}px;background:${color}"></div></div></div>`;
+    }
     const bg=i.current?`repeating-linear-gradient(45deg,${color},${color} 6px,rgba(255,255,255,.18) 6px,rgba(255,255,255,.18) 11px)`:color;
     return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}</div><div class="sit-bar" style="height:${h}px;background:${bg}"></div></div>`;
   }).join('');
@@ -3530,9 +3568,9 @@ function renderCmdSitrep(){
     const monthly=cmdMonthlyDeltas(cfg.attn);
     const lastEom=DataLayer.eomSnapshots().slice(-1)[0];
     let items=monthly.map(m=>({label:String(m.month||'').slice(0,3), value:m.value}));
-    if(lastEom){ const cur=commandAttn(snap,cfg.attn)-commandAttn(lastEom,cfg.attn); items.push({label:'Now', value:Math.max(0,Math.round(cur)), current:true}); }
-    const completed=monthly.map(m=>m.value); const avg=completed.length?completed.reduce((a,b)=>a+b,0)/completed.length:null;
-    chart=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, {avgVal:avg})}`;
+    if(lastEom){ const cur=Math.max(0,Math.round(commandAttn(snap,cfg.attn)-commandAttn(lastEom,cfg.attn))); items.push({label:'Now', value:cur, proj:projectMonth(cur), current:true}); }
+    const thr=goal>0?goal/12:null;
+    chart=`<div class="azm-section">${cfg.label} · Monthly Attainment</div>${_sitChart(items, cfg.color, thr!=null?{refVal:thr, refLabel:`req ${Math.round(thr)}/mo`}:{})}`;
     trend=_sitTrend(setSeries(cfg), `${cfg.label} Glideslope Trend`);
   } else {
     const grossT=sts.reduce((a,s)=>a+(s.gross||0),0), lossT=sts.reduce((a,s)=>a+(s.loss||0),0);
