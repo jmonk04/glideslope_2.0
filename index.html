@@ -2805,6 +2805,18 @@ function _gsDelta(name, snapCount){
   return Math.round((cur.glideslope_pct-past.glideslope_pct)*10000)/10000;
 }
 
+/* station-scoped production-day window: gs delta + gross contracts written */
+function _staWin(name, targetDays){
+  const b=findVelocityBaseline(DataLayer.allSnapshots(), targetDays);
+  if(!b) return null;
+  const cur=b.cur.stations.find(x=>x.name===name);
+  const past=b.past.stations.find(x=>x.name===name);
+  if(!cur||!past) return null;
+  return {span:b.span,
+          gsDelta:(cur.glideslope_pct!=null&&past.glideslope_pct!=null)?cur.glideslope_pct-past.glideslope_pct:null,
+          gross:Math.round((cur.gross||0)-(past.gross||0))};
+}
+
 /* contracts to next tier (or cushion above Zeus). Uses requirement, falls back to goal. */
 function _contractsLabel(s){
   const gs=s.glideslope_pct, req=s.requirement||s.goal||0;
@@ -2818,10 +2830,11 @@ function _contractsLabel(s){
 
 let _activeProgKey='alnav';
 let _trendWindow=8;
+let _staTile={d5:'gs', d20:'gs'};
 
 function showStationModal(name){
   const s=DataLayer.station(name); if(!s) return;
-  _activeProgKey='alnav'; _trendWindow=8;
+  _activeProgKey='alnav'; _trendWindow=8; _staTile={d5:'gs',d20:'gs'};
   _renderStationModal(name, s);
   document.getElementById('azModal').classList.add('show');
 }
@@ -2829,15 +2842,20 @@ function showStationModal(name){
 function _renderStationModal(name, s){
   const {tier,level,reward}=tierLevelReward(s);
 
-  const d5=_gsDelta(name,1);
-  const d5Txt=d5==null?'—':`${d5>=0?'+':''}${(d5*100).toFixed(1)}%`;
-  const d5Color=d5==null?'var(--ink-faint)':d5>0?'var(--good)':d5<0?'var(--danger)':'var(--ink-dim)';
-  const d5Arrow=d5==null?'':d5>0?'▲ ':d5<0?'▼ ':'';
-
-  const d20=_gsDelta(name,4);
-  const d20Txt=d20==null?'—':`${d20>=0?'+':''}${(d20*100).toFixed(1)}%`;
-  const d20Color=d20==null?'var(--ink-faint)':d20>0?'var(--good)':d20<0?'var(--danger)':'var(--ink-dim)';
-  const d20Arrow=d20==null?'':d20>0?'▲ ':d20<0?'▼ ':'';
+  const winTile=(w,key,label)=>{
+    if(!w) return {l:label, v:'—', c:'var(--ink-faint)', s:'insufficient history'};
+    if(_staTile[key]==='gross'){
+      const g=w.gross;
+      const c=g>0?'var(--good)':'var(--ink-dim)';
+      return {l:label, v:`${g>=0?'+':''}${g}`, c, s:`gross written · ${w.span} prod-days`};
+    }
+    const d=w.gsDelta;
+    const c=d==null?'var(--ink-faint)':d>0?'var(--good)':d<0?'var(--danger)':'var(--ink-dim)';
+    const arrow=d==null?'':d>0?'▲ ':d<0?'▼ ':'';
+    return {l:label, v:d==null?'—':`${arrow}${d>=0?'+':''}${(d*100).toFixed(1)}%`, c, s:`gs Δ · ${w.span} prod-days`};
+  };
+  const w5=_staWin(name,5), w20=_staWin(name,20);
+  const t5=winTile(w5,'d5','Δ 5-Day'), t20=winTile(w20,'d20','Δ 20-Day');
 
   const attrPct=(s.gross>0)?s.loss/s.gross:null;
   const attrTxt=attrPct==null?'—':`${(attrPct*100).toFixed(1)}%`;
@@ -2873,11 +2891,12 @@ function _renderStationModal(name, s){
       ${reward?`<span class="azm-badge" style="background:var(--poseidon);color:#04221c">🎯 ${reward}</span>`:''}
     </div>
     <div class="azm-stats">
-      <div class="azm-stat"><div class="l">Δ 5-Day</div><div class="v" style="color:${d5Color};font-size:22px">${d5Arrow}${d5Txt}</div><div class="s">gs vs last snapshot</div></div>
-      <div class="azm-stat"><div class="l">Δ 20-Day</div><div class="v" style="color:${d20Color};font-size:22px">${d20Arrow}${d20Txt}</div><div class="s">gs vs 4 snapshots back</div></div>
+      <div class="azm-stat toggleable" data-tile="d5"><div class="l">${t5.l}</div><div class="v" style="color:${t5.c};font-size:22px">${t5.v}</div><div class="s">${t5.s}</div></div>
+      <div class="azm-stat toggleable" data-tile="d20"><div class="l">${t20.l}</div><div class="v" style="color:${t20.c};font-size:22px">${t20.v}</div><div class="s">${t20.s}</div></div>
       <div class="azm-stat"><div class="l">Attrition</div><div class="v" style="color:${attrColor}">${attrTxt}</div><div class="s">${attrSub}</div></div>
       <div class="azm-stat"><div class="l">Contracts</div><div class="v" style="color:${ct.color}">${ct.val}</div><div class="s">${ct.sub}</div></div>
     </div>
+    <div class="tap-hint">Tap Δ tiles for gross contracts · ⇄</div>
     <div class="azm-section">Program Breakdown · Tap for Monthly Totals</div>
     <div class="azm-prog">${progCards}</div>
     <div id="azMonthlyChart" class="azm-monthly">${chartHtml}</div>
@@ -2902,6 +2921,14 @@ function _renderStationModal(name, s){
       document.querySelectorAll('#azModalBody .azm-prog .p').forEach(c=>c.classList.toggle('active',c.dataset.prog===_activeProgKey));
       const prog=PROGRAMS.find(p=>p.key===_activeProgKey);
       document.getElementById('azMonthlyChart').innerHTML=monthlyBarChart(stationName, prog);
+    });
+  });
+  document.querySelectorAll('#azModalBody .azm-stats .toggleable').forEach(t=>{
+    t.addEventListener('click',()=>{
+      const k=t.dataset.tile;
+      _staTile[k]=_staTile[k]==='gs'?'gross':'gs';
+      const st=DataLayer.station(name);
+      if(st) _renderStationModal(name, st);
     });
   });
 }
