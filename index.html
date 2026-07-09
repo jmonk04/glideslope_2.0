@@ -666,7 +666,7 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .sit-pick{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .sit-pick label{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
 .sit-pick .az-select{flex:1;max-width:240px}
-.sit-track{position:relative;display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--line);padding-top:18px}
+.sit-track{position:relative;display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--line);padding-top:30px}
 .sit-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
 .sit-cv{font-family:'Chakra Petch',monospace;font-size:11px;color:var(--ink-dim);margin-bottom:4px;white-space:nowrap}
 .sit-bar{width:72%;border-radius:4px 4px 0 0;opacity:.9}
@@ -678,6 +678,9 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .sit-ref{border-top-color:var(--danger)}
 .sit-avg span,.sit-ref span{position:absolute;right:2px;top:-14px;font-family:'Chakra Petch',monospace;font-size:9.5px;letter-spacing:.04em;color:var(--ink-faint)}
 .sit-ref span{color:var(--danger)}
+.sit-legend{display:flex;justify-content:flex-end;gap:14px;font-family:'Chakra Petch',monospace;font-size:9.5px;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:6px}
+.sit-legend .lg-ref{color:var(--danger)}
+.sit-cv .proj-line{display:block;font-size:10px;color:var(--ink-dim);margin-top:1px}
 /* ---------- Momentum Radar (ported) ---------- */
 .mom-radar{display:flex;flex-direction:column;gap:10px}
 .mom-card{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--line-soft);border-left-width:3px;border-radius:12px;padding:12px 14px;cursor:pointer;transition:transform .12s,border-color .15s}
@@ -949,6 +952,19 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .cmd-gs .cell .lbl{font-family:'Chakra Petch',monospace;font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--ink-faint);text-transform:uppercase}
 .cmd-gs .cell .v{font-family:'Chakra Petch',monospace;font-size:13px;font-weight:700;color:var(--ink)}
 .cmd-gs .cell.under .v{color:var(--danger)}
+
+/* ---------- Zeus Strike — tier-crossing celebration ---------- */
+.strike-overlay{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(3,6,14,.93);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:splashIn .3s ease both;cursor:pointer;padding:24px;overflow:auto}
+.strike-flash{position:absolute;inset:0;pointer-events:none;opacity:0;animation:strikeFlash 1.2s ease-out .15s}
+@keyframes strikeFlash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+.strike-bolt{font-size:76px;filter:drop-shadow(0 0 26px rgba(255,182,39,.8));animation:boltIn .55s cubic-bezier(.2,1.7,.4,1) both}
+@keyframes boltIn{from{transform:scale(.15) rotate(-16deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.strike-title{font-family:'Chakra Petch',monospace;font-weight:700;font-size:clamp(26px,7vw,44px);letter-spacing:.14em;text-transform:uppercase;text-align:center;animation:rise .45s ease both}
+.strike-card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:13px 22px;text-align:center;animation:rise .45s ease both;max-width:92vw}
+.strike-nm{font-family:'Chakra Petch',monospace;font-weight:700;font-size:21px;letter-spacing:.06em}
+.strike-sub{font-size:12px;color:var(--ink-dim);margin-top:4px;font-family:'Chakra Petch',monospace}
+.strike-hint{margin-top:8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);animation:pulse 2s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.strike-flash{animation:none}.strike-bolt{animation:none}.strike-title,.strike-card{animation:none}}
 </style>
 <style id="fable-facelift-v1">
 /* ══════════════════════════════════════════════════════════════════
@@ -2451,6 +2467,7 @@ function navigateTo(view){
     tabBar.style.display='grid';
     document.body.classList.add('has-tabbar');
     renderAnalyze();
+    setTimeout(maybeZeusStrike, 400);
   }else if(view==='win'){
     winEl.style.display='block';
     tabBar.style.display='grid';
@@ -3439,14 +3456,10 @@ function monthProgress(){
   if(!total) return null;
   const d=new Date(iso+'T00:00:00');
   const mon=isNaN(d)?ym:CAL2FY[d.getMonth()];
-  const beforeMonth=keys.filter(k=>k<ym+'-01').length;
-  let elapsed;
-  const fyTotal=(typeof snap.contractDaysTotal==='number'&&snap.contractDaysTotal>0)?snap.contractDaysTotal:PROD_DAYS_YEAR;
-  if(typeof snap.contractDaysRemaining==='number'){
-    elapsed=Math.max(0,Math.min(total,(fyTotal-snap.contractDaysRemaining)-beforeMonth));
-  }else{
-    elapsed=keys.filter(k=>k.slice(0,7)===ym&&k<=iso).length;
-  }
+  // Snapshot contract totals reflect END-OF-DAY close for the snapshot's own
+  // date (confirmed against DIV 5 JUL26 hand-count), so that date counts as an
+  // elapsed production day. Count month prod-days <= snapshot date off the map.
+  const elapsed=keys.filter(k=>k.slice(0,7)===ym&&k<=iso).length;
   return {mon, total, elapsed, left:Math.max(0,total-elapsed)};
 }
 /* projected month-end total from month-to-date count */
@@ -3482,16 +3495,21 @@ function _sitChart(items, color, opts){
     if(i.current && i.proj!=null && i.proj>i.value){
       const ph=Math.max(h+2,Math.round((i.proj/maxV)*H));
       const shell=`repeating-linear-gradient(45deg,rgba(255,255,255,.10),rgba(255,255,255,.10) 6px,transparent 6px,transparent 11px)`;
-      return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}▸${fmtV(i.proj)}</div><div class="sit-bar sit-projshell" style="height:${ph}px;background:${shell};box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"><div class="sit-bar-act" style="height:${h}px;background:${color}"></div></div></div>`;
+      return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}<span class="proj-line">▸${fmtV(i.proj)}</span></div><div class="sit-bar sit-projshell" style="height:${ph}px;background:${shell};box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"><div class="sit-bar-act" style="height:${h}px;background:${color}"></div></div></div>`;
     }
     const bg=i.current?`repeating-linear-gradient(45deg,${color},${color} 6px,rgba(255,255,255,.18) 6px,rgba(255,255,255,.18) 11px)`:color;
     return `<div class="sit-col"><div class="sit-cv">${fmtV(i.value)}</div><div class="sit-bar" style="height:${h}px;background:${bg}"></div></div>`;
   }).join('');
-  const lbls=items.map(i=>`<div class="sit-lbl">${i.label}${i.current?' ▸':''}</div>`).join('');
+  const lbls=items.map(i=>`<div class="sit-lbl">${i.label}</div>`).join('');
   let overlay='';
-  if(opts.avgVal!=null){ const b=Math.round((opts.avgVal/maxV)*H); overlay+=`<div class="sit-avg" style="bottom:${b}px"><span>avg ${fmtV(opts.avgVal)}</span></div>`; }
-  if(opts.refVal!=null){ const b=Math.round((opts.refVal/maxV)*H); overlay+=`<div class="sit-ref" style="bottom:${b}px"><span>${opts.refLabel||''}</span></div>`; }
-  return `<div class="sit-track" style="height:${H}px">${cols}${overlay}</div><div class="sit-lbls">${lbls}</div>`;
+  if(opts.avgVal!=null){ const b=Math.round((opts.avgVal/maxV)*H); overlay+=`<div class="sit-avg" style="bottom:${b}px"></div>`; }
+  if(opts.refVal!=null){ const b=Math.round((opts.refVal/maxV)*H); overlay+=`<div class="sit-ref" style="bottom:${b}px"></div>`; }
+  let legend='';
+  const legBits=[];
+  if(opts.avgVal!=null) legBits.push(`<span>‒ ‒ avg ${fmtV(opts.avgVal)}</span>`);
+  if(opts.refVal!=null) legBits.push(`<span class="lg-ref">‒ ‒ ${opts.refLabel||('req '+fmtV(opts.refVal))}</span>`);
+  if(legBits.length) legend=`<div class="sit-legend">${legBits.join('')}</div>`;
+  return `${legend}<div class="sit-track" style="height:${H}px">${cols}${overlay}</div><div class="sit-lbls">${lbls}</div>`;
 }
 function _sitTrend(series, title, opts){
   opts=opts||{};
@@ -3797,6 +3815,58 @@ function renderMomentumRadar(){
   wire();
 }
 
+
+/* ============================================================
+   ZEUS STRIKE — tier-crossing celebration
+   A station that crossed UP through a tier line vs ~1 week ago
+   triggers a one-time overlay (per crossing, per device) when the
+   CIC opens. Highest tier crossed wins the headline.
+   ============================================================ */
+const STRIKE_LS='triton_strikes_seen_v1';
+const STRIKE_TIERS=[
+  {t:1.40,key:'ZEUS',title:'ZEUS STRIKE',icon:'⚡',color:'var(--zeus)',glow:'rgba(255,182,39,.55)'},
+  {t:1.20,key:'POSEIDON',title:'POSEIDON RISING',icon:'🔱',color:'var(--poseidon)',glow:'rgba(44,230,192,.45)'},
+  {t:1.00,key:'TRITON',title:'TRITON SECURED',icon:'🛡️',color:'var(--triton)',glow:'rgba(61,169,252,.45)'}
+];
+function detectStrikes(){
+  if(!DataLayer.hasData()) return [];
+  const cur=DataLayer.latest(); if(!cur) return [];
+  const out=[];
+  DataLayer.stations().forEach(s=>{
+    const d=DataLayer.weekDeltaFor(s.name); if(!d||d.from==null||d.to==null) return;
+    const hit=STRIKE_TIERS.find(x=>d.from<x.t && d.to>=x.t);
+    if(hit) out.push({name:s.name, division:s.division, tier:hit, from:d.from, to:d.to, date:cur.date});
+  });
+  const rank={ZEUS:0,POSEIDON:1,TRITON:2};
+  return out.sort((a,b)=>(rank[a.tier.key]-rank[b.tier.key]) || (b.to-a.to));
+}
+function _strikesSeen(){ try{ return JSON.parse(localStorage.getItem(STRIKE_LS))||{}; }catch(e){ return {}; } }
+function maybeZeusStrike(){
+  if(document.querySelector('.strike-overlay')) return;
+  const seen=_strikesSeen();
+  const fresh=detectStrikes().filter(k=>!seen[`${k.date}|${k.name}|${k.tier.key}`]);
+  if(!fresh.length) return;
+  const top=fresh[0].tier;
+  const cards=fresh.slice(0,6).map(k=>`<div class="strike-card" style="border-color:${k.tier.color}">
+      <div class="strike-nm" style="color:${k.tier.color}">${k.tier.icon} ${k.name}</div>
+      <div class="strike-sub">${k.division||''} · ${(k.from*100).toFixed(1)}% → <b style="color:${k.tier.color}">${(k.to*100).toFixed(1)}%</b> · crossed ${k.tier.key}</div>
+    </div>`).join('');
+  const more=fresh.length>6?`<div class="strike-sub">+${fresh.length-6} more this week</div>`:'';
+  const el=document.createElement('div');
+  el.className='strike-overlay';
+  el.innerHTML=`<div class="strike-flash" style="background:radial-gradient(circle at 50% 30%, ${top.glow}, transparent 60%)"></div>
+    <div class="strike-bolt">${top.icon}</div>
+    <div class="strike-title" style="color:${top.color}">${top.title}</div>
+    ${cards}${more}
+    <div class="strike-hint">tap to continue</div>`;
+  el.addEventListener('click',()=>{
+    const s=_strikesSeen();
+    fresh.forEach(k=>{ s[`${k.date}|${k.name}|${k.tier.key}`]=1; });
+    try{ localStorage.setItem(STRIKE_LS, JSON.stringify(s)); }catch(e){}
+    el.remove();
+  });
+  document.body.appendChild(el);
+}
 
 /* ============================================================
    WIN MODULE (Leaderboards) — folded in from leaderboard.html.
