@@ -3947,7 +3947,10 @@ function _leadWeekly(){
     const s=wks[i][1], p=wks[i-1][1];
     const gap=(new Date(s.date+'T00:00:00')-new Date(p.date+'T00:00:00'))/864e5;
     if(gap>9) continue;
-    out.push({week:wks[i][0], date:String(s.date), v:Math.round(commandAttn(s,x=>x.attn)-commandAttn(p,x=>x.attn))});
+    const pd=Object.keys(FY26_PROD_DAYS).filter(k=>k>String(p.date)&&k<=String(s.date)).length;
+    if(pd<1) continue;
+    const v=Math.round(commandAttn(s,x=>x.attn)-commandAttn(p,x=>x.attn));
+    out.push({week:wks[i][0], date:String(s.date), v, pd, r:v/pd});
   }
   return out.length>=4?out:null;
 }
@@ -3960,9 +3963,9 @@ function _fy25Weekly(){
     const r=e.r, mm=Math.floor(r/100), dd=r%100;
     const cal=mm<=2?mm+10:mm-2, yr=mm<=2?2024:2025;   // rank 0xx-2xx = Oct-Dec 2024
     const k=wkKey(new Date(yr,cal-1,dd));
-    m.set(k,(m.get(k)||0)+v);
+    const cur=m.get(k)||{s:0,d:0}; cur.s+=v; cur.d+=1; m.set(k,cur);
   });
-  const arr=[...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(e=>e[1]);
+  const arr=[...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(e=>e[1].s/e[1].d);
   return arr.slice(1,-1);   // trim partial edge weeks of the fiscal year
 }
 function _stats(vs){
@@ -3977,12 +3980,12 @@ function renderLead(){
   if(!DataLayer.hasData()){ root.innerHTML='<div class="lead-sub">Waiting for data…</div>'; return; }
   const wk=_leadWeekly();
   if(!wk){ root.innerHTML='<div class="lead-sub">Not enough weekly history yet.</div>'; return; }
-  const vs=wk.map(w=>w.v);
+  const vs=wk.map(w=>w.r);
   const st=_stats(vs);
   const ucl=st.mean+3*st.sd, lcl=Math.max(0,st.mean-3*st.sd);
   const f25=_fy25Weekly(), st25=_stats(f25);
   const goal=DataLayer.stations().reduce((a,s)=>a+(s.goal||0),0);
-  const reqWk=goal*5/PROD_DAYS_YEAR;
+  const reqDay=goal/PROD_DAYS_YEAR;
 
   /* ---- SPC control chart ---- */
   const W=320,H=150,PL=8,PR=8,PT=10,PB=14;
@@ -3996,52 +3999,52 @@ function renderLead(){
   }).join('');
   const oocN=vs.filter(v=>v>ucl||v<lcl).length;
   const refLine=(v,c,dash)=>`<line x1="${PL}" y1="${Y(v).toFixed(1)}" x2="${W-PR}" y2="${Y(v).toFixed(1)}" stroke="${c}" stroke-width="1" ${dash?'stroke-dasharray="4 3"':''} opacity=".8"/>`;
-  const bias=(st.mean-reqWk)/reqWk*100;
-  const spc=`<div class="lead-card"><div class="lead-title">SPC Control Chart · weekly ALNAV</div>
+  const bias=(st.mean-reqDay)/reqDay*100;
+  const spc=`<div class="lead-card"><div class="lead-title">SPC Control Chart · ALNAV per prod-day, by week</div>
     <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--ink-faint)"></span>mean ${st.mean.toFixed(1)}</span>
-    <span style="color:var(--zeus,#ffb627)"><span class="yoy-sw" style="background:var(--zeus,#ffb627)"></span>req ${reqWk.toFixed(0)}</span>
-    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(0)}–${ucl.toFixed(0)})</span></div>
-    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(reqWk,'var(--zeus,#ffb627)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
+    <span style="color:var(--zeus,#ffb627)"><span class="yoy-sw" style="background:var(--zeus,#ffb627)"></span>req ${reqDay.toFixed(1)}/d</span>
+    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(1)}–${ucl.toFixed(1)})</span></div>
+    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(reqDay,'var(--zeus,#ffb627)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
     <path d="${path}" fill="none" stroke="var(--triton)" stroke-width="1.6" opacity=".9"/>${dots}</svg>
     <div class="lead-note">${oocN===0?'All '+st.n+' weeks inside control limits — stable process.':oocN+' week(s) outside ±3σ — special cause, worth a debrief.'} Process center sits ${Math.abs(bias).toFixed(0)}% ${bias>=0?'above':'below'} the requirement line: precision is the band, accuracy is the gap between the grey and gold dashes.</div></div>`;
 
   /* ---- volatility + consistency tiles ---- */
   const cv=st.sd/st.mean*100, cv25=st25.sd/st25.mean*100;
   const within=t=>vs.filter(v=>Math.abs(v-st.mean)<=t*st.mean).length/st.n*100;
-  const hitRate=vs.filter(v=>v>=reqWk).length/st.n*100;
-  const cpk=(st.mean-reqWk)/(3*st.sd);
+  const hitRate=vs.filter(v=>v>=reqDay).length/st.n*100;
+  const cpk=(st.mean-reqDay)/(3*st.sd);
   const tiles=`<div class="lead-tiles">
     <div class="lead-tile"><div class="l">Volatility Index</div><div class="v" style="color:${cv<=cv25?'var(--good)':'var(--danger)'}">σ ${st.sd.toFixed(1)}</div><div class="s">precision · CV ${cv.toFixed(0)}% · FY25: ${cv25.toFixed(0)}%</div></div>
     <div class="lead-tile"><div class="l">Consistency Score</div><div class="v">${within(0.10).toFixed(0)}%</div><div class="s">precision · weeks within ±10% of own mean</div></div>
-    <div class="lead-tile"><div class="l">Process Center</div><div class="v" style="color:${st.mean>=reqWk?'var(--good)':'var(--danger)'}">${st.mean.toFixed(1)}</div><div class="s">accuracy · vs ${reqWk.toFixed(0)} req/wk (${bias>=0?'+':''}${bias.toFixed(0)}%)</div></div>
-    <div class="lead-tile"><div class="l">Requirement Hit Rate</div><div class="v" style="color:${hitRate>=50?'var(--good)':'var(--danger)'}">${hitRate.toFixed(0)}%</div><div class="s">weeks ≥ req · Cpk ${cpk.toFixed(2)}</div></div>
+    <div class="lead-tile"><div class="l">Process Center</div><div class="v" style="color:${st.mean>=reqDay?'var(--good)':'var(--danger)'}">${st.mean.toFixed(1)}</div><div class="s">accuracy · vs ${reqDay.toFixed(1)} req/prod-day (${bias>=0?'+':''}${bias.toFixed(1)}%)</div></div>
+    <div class="lead-tile"><div class="l">Requirement Hit Rate</div><div class="v" style="color:${hitRate>=50?'var(--good)':'var(--danger)'}">${hitRate.toFixed(0)}%</div><div class="s">weeks at/above req rate · Cpk ${cpk.toFixed(2)}</div></div>
   </div>`;
 
   /* ---- rolling 4-week pace ---- */
   const roll=[];
   for(let i=3;i<vs.length;i++) roll.push((vs[i]+vs[i-1]+vs[i-2]+vs[i-3])/4);
-  const rlo=Math.min(reqWk,...roll)*0.92, rhi=Math.max(reqWk,...roll)*1.05;
+  const rlo=Math.min(reqDay,...roll)*0.92, rhi=Math.max(reqDay,...roll)*1.05;
   const RX=i=>PL+(i/(roll.length-1))*(W-PL-PR);
   const RY=v=>PT+(1-(v-rlo)/(rhi-rlo||1))*(H-PT-PB);
   const rpath=roll.map((v,i)=>`${i?'L':'M'}${RX(i).toFixed(1)},${RY(v).toFixed(1)}`).join('');
-  const nowAbove=roll[roll.length-1]>=reqWk;
+  const nowAbove=roll[roll.length-1]>=reqDay;
   const rolling=`<div class="lead-card"><div class="lead-title">Rolling 4-Week Pace</div>
     <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--triton)"></span>4-wk avg</span>
-    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>req ≈${reqWk.toFixed(0)}/wk</span></div>
-    ${_leadSvgOpen(W,H)}${`<line x1="${PL}" y1="${RY(reqWk).toFixed(1)}" x2="${W-PR}" y2="${RY(reqWk).toFixed(1)}" stroke="var(--danger)" stroke-width="1" stroke-dasharray="4 3" opacity=".85"/>`}
+    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>req ${reqDay.toFixed(1)}/prod-day</span></div>
+    ${_leadSvgOpen(W,H)}${`<line x1="${PL}" y1="${RY(reqDay).toFixed(1)}" x2="${W-PR}" y2="${RY(reqDay).toFixed(1)}" stroke="var(--danger)" stroke-width="1" stroke-dasharray="4 3" opacity=".85"/>`}
     <path d="${rpath}" fill="none" stroke="var(--triton)" stroke-width="2"/>
     <circle cx="${RX(roll.length-1).toFixed(1)}" cy="${RY(roll[roll.length-1]).toFixed(1)}" r="3" fill="${nowAbove?'var(--good)':'var(--danger)'}"/></svg>
-    <div class="lead-note">Attitude indicator, not GPS: is the machine getting stronger or weaker? Currently ${roll[roll.length-1].toFixed(1)}/wk vs ≈${reqWk.toFixed(0)} required ${nowAbove?'— above the line.':'— below the line.'}</div></div>`;
+    <div class="lead-note">Attitude indicator, not GPS: is the machine getting stronger or weaker? Currently ${roll[roll.length-1].toFixed(1)}/prod-day vs ${reqDay.toFixed(1)} required ${nowAbove?'— above the line.':'— below the line.'}</div></div>`;
 
   /* ---- weekly heatmap ---- */
   const cells=wk.map(w=>{
-    const ratio=w.v/reqWk;
+    const ratio=w.r/reqDay;
     const col=ratio>=1.2?'rgba(44,230,192,.85)':ratio>=1.0?'rgba(44,230,192,.45)':ratio>=0.8?'rgba(255,182,39,.4)':'rgba(255,92,120,.5)';
-    return `<div class="lead-cell" style="background:${col}" title="wk of ${w.week}: ${w.v}">${w.v}</div>`;
+    return `<div class="lead-cell" style="background:${col}" title="wk of ${w.week}: ${w.v} in ${w.pd}d">${w.r.toFixed(1)}</div>`;
   }).join('');
   const heat=`<div class="lead-card"><div class="lead-title">Weekly Heatmap · ${wk.length} weeks</div>
     <div class="lead-heat">${cells}</div>
-    <div class="lead-note">vs required week (≈${reqWk.toFixed(0)}): teal ≥100%, bright teal ≥120%, amber 80–100%, red <80%. Oldest top-left.</div></div>`;
+    <div class="lead-note">per prod-day vs required ${reqDay.toFixed(1)}: teal ≥100%, bright teal ≥120%, amber 80–100%, red <80%. Oldest top-left.</div></div>`;
 
   /* ---- consistency vs intensity quadrant ---- */
   const win=8, pts=[];
@@ -4062,7 +4065,7 @@ function renderLead(){
   const lab=(x,y,t,anch)=>`<text x="${x}" y="${y}" fill="var(--ink-faint)" font-size="7.5" font-family="Chakra Petch,monospace" text-anchor="${anch}" letter-spacing=".08em">${t}</text>`;
   const quad=`<div class="lead-card"><div class="lead-title">Consistency × Intensity · rolling ${win}-wk</div>
     ${_leadSvgOpen(qW,qH)}
-    <line x1="${QX(Math.max(Math.min(...xs),Math.min(reqWk,Math.max(...xs)))).toFixed(1)}" y1="${qP}" x2="${QX(Math.max(Math.min(...xs),Math.min(reqWk,Math.max(...xs)))).toFixed(1)}" y2="${qH-qP}" stroke="var(--zeus,#ffb627)" stroke-width="1" stroke-dasharray="4 3" opacity=".7"/>
+    <line x1="${QX(Math.max(Math.min(...xs),Math.min(reqDay,Math.max(...xs)))).toFixed(1)}" y1="${qP}" x2="${QX(Math.max(Math.min(...xs),Math.min(reqDay,Math.max(...xs)))).toFixed(1)}" y2="${qH-qP}" stroke="var(--zeus,#ffb627)" stroke-width="1" stroke-dasharray="4 3" opacity=".7"/>
     <line x1="${qP}" y1="${QY(medY).toFixed(1)}" x2="${qW-qP}" y2="${QY(medY).toFixed(1)}" stroke="var(--line)" stroke-width="1"/>
     ${lab(qW-qP,qP-6,'VOLATILE · HOT','end')}${lab(qP,qP-6,'VOLATILE · UNDERPOWERED','start')}
     ${lab(qW-qP,qH-4,'★ ELITE','end')}${lab(qP,qH-4,'STABLE · UNDERPOWERED','start')}
@@ -4078,7 +4081,7 @@ function renderLead(){
   </div>`;
 
   root.innerHTML=`<div class="lead-h">Lead · Operating System</div>
-    <div class="lead-sub">Output is what happened; repeatability is what you built. These read the command as a production process: ${st.n} complete weeks, FY26.</div>
+    <div class="lead-sub">Output is what happened; repeatability is what you built. These read the command as a production process — per production day, so holiday-short weeks are judged fairly. ${st.n} weekly windows, FY26. Non-production = weekends, holidays, zero-attainment weekdays.</div>
     ${spc}${tiles}${rolling}${heat}${quad}${need}`;
 }
 
