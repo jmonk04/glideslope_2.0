@@ -968,6 +968,23 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .yoy-sw{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:4px}
 .yoy-foot{display:flex;justify-content:space-between;font-family:'Chakra Petch',monospace;font-size:10px;color:var(--ink-faint);margin-top:6px}
 .yoy-delta{font-weight:700}
+
+/* ---------- LEAD — command operating system ---------- */
+.lead-h{font-family:'Chakra Petch',monospace;font-weight:700;font-size:18px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:4px 0 2px}
+.lead-sub{font-size:12px;color:var(--ink-dim);margin-bottom:14px;line-height:1.5}
+.lead-card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
+.lead-title{font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal,#2CE6C0);margin-bottom:8px}
+.lead-note{font-size:10.5px;color:var(--ink-faint);margin-top:7px;line-height:1.45;font-family:'Chakra Petch',monospace}
+.lead-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.lead-tile{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.lead-tile .l{font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.lead-tile .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:23px;margin:3px 0}
+.lead-tile .s{font-size:10.5px;color:var(--ink-faint);font-family:'Chakra Petch',monospace}
+.lead-heat{display:grid;grid-template-columns:repeat(13,1fr);gap:3px}
+.lead-cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',monospace;font-size:7.5px;color:rgba(255,255,255,.75)}
+.lead-need{border:1px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
+.lead-need .nm{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.08em;color:var(--ink);margin-bottom:2px}
+.lead-need .rq{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:8px}
 .strike-hint{margin-top:8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);animation:pulse 2s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.strike-flash{animation:none}.strike-bolt{animation:none}.strike-title,.strike-card{animation:none}}
 </style>
@@ -1128,7 +1145,7 @@ body::after{ /* the sweep — one slow beam circling the plot */
         </div>
       </button>
 
-      <button class="module-card disabled" type="button" aria-disabled="true">
+      <button class="door module-card" data-door="lead">
         <div class="hud-icon">
           <svg class="hud-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
             <g class="hud-rings"><circle cx="50" cy="50" r="46" fill="none" stroke="rgba(70,170,255,.22)" stroke-width="1" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(70,170,255,.35)" stroke-width="1"/></g>
@@ -1137,11 +1154,13 @@ body::after{ /* the sweep — one slow beam circling the plot */
           </svg>
         </div>
         <div class="module-copy">
-          <h2>Command Views</h2>
-          <p>CO, XO, DLCPO, and division-level dashboards that turn the same data into a leadership operating picture.</p>
-          <div class="module-meta"><span class="module-chip verb-chip">Lead</span><span class="module-chip">Coming Soon</span></div>
+          <h2>Operating System</h2>
+          <p>SPC control chart, volatility index, rolling pace, and the consistency×intensity picture — the command as a production process.</p>
+          <div class="module-meta"><span class="module-chip verb-chip">Lead</span><span class="module-chip">Live</span></div>
         </div>
-        <div class="launch-button">Soon</div>
+        <div class="launch-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
       </button>
 
       <button class="door module-card" data-door="win">
@@ -1184,8 +1203,7 @@ body::after{ /* the sweep — one slow beam circling the plot */
   <button class="tab-home" data-nav="home" aria-label="Home">
     <span class="tab-home-mark">🔱</span>
   </button>
-  <button class="tab-item disabled" data-nav="lead" aria-disabled="true">
-    <span class="tab-soon">Soon</span>
+  <button class="tab-item" data-nav="lead">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 4 7 12 11 20 7 12 3"/><path d="M4 12l8 4 8-4M4 17l8 4 8-4"/></svg>
     <span>Lead</span>
   </button>
@@ -1538,6 +1556,10 @@ body::after{ /* the sweep — one slow beam circling the plot */
     <button class="az-modal-close" id="divModalClose">✕</button>
     <div id="divModalBody"></div>
   </div>
+</div>
+
+<div class="wrap" id="appLead" style="display:none">
+  <div id="leadRoot"></div>
 </div>
 
 <div class="wrap" id="appWin" style="display:none">
@@ -2441,6 +2463,7 @@ splashEl.addEventListener('click',()=>{ clearTimeout(splashTimer); showHome(); }
 // door selection
 const analyzeEl=document.getElementById('appAnalyze');
 const winEl=document.getElementById('appWin');
+const leadEl=document.getElementById('appLead');
 const moonTransition=document.getElementById('moonTransition');
 const moonVideo=document.getElementById('moonVideo');
 
@@ -2459,6 +2482,7 @@ function navigateTo(view){
   toolEl.style.display='none';
   analyzeEl.style.display='none';
   winEl.style.display='none';
+  leadEl.style.display='none';
   if(view==='home'){
     homeEl.style.display='flex'; homeEl.classList.add('show');
     tabBar.style.display='none';
@@ -2473,6 +2497,11 @@ function navigateTo(view){
     document.body.classList.add('has-tabbar');
     renderAnalyze();
     setTimeout(maybeZeusStrike, 400);
+  }else if(view==='lead'){
+    leadEl.style.display='block';
+    tabBar.style.display='grid';
+    document.body.classList.add('has-tabbar');
+    renderLead();
   }else if(view==='win'){
     winEl.style.display='block';
     tabBar.style.display='grid';
@@ -2485,7 +2514,7 @@ function navigateTo(view){
 
 // the view swap used by the moon transition (home cards)
 function goToDoor(which){
-  navigateTo(which==='planning' ? 'planning' : which==='win' ? 'win' : 'analyze');
+  navigateTo(which==='planning' ? 'planning' : which==='win' ? 'win' : which==='lead' ? 'lead' : 'analyze');
 }
 
 // Moon-rush transition: scale-push zoom (~2.6s) then fade into the destination.
@@ -3897,6 +3926,154 @@ function yoyChart(){
       <span class="yoy-delta" style="color:${dC}">${d>=0?'+':''}${d} vs FY25 today</span>
     </div>
   </div>`;
+}
+
+/* ============================================================
+   LEAD — command operating system dashboards.
+   Weekly production series is built from one snapshot anchor per
+   ISO week (last snapshot of each week); consecutive anchors give
+   7-day windows, comparable across the Wed-weekly and daily eras.
+   Gaps > 9 days are dropped rather than merged.
+   ============================================================ */
+function _leadWeekly(){
+  const snaps=DataLayer.allSnapshots().filter(s=>!s.eom);
+  if(snaps.length<4) return null;
+  const wkKey=iso=>{const d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;d.setDate(d.getDate()-off);return d.toISOString().slice(0,10);};
+  const byWk=new Map();
+  snaps.forEach(s=>byWk.set(wkKey(String(s.date)), s));   // input sorted -> last per week wins
+  const wks=[...byWk.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+  const out=[];
+  for(let i=1;i<wks.length;i++){
+    const s=wks[i][1], p=wks[i-1][1];
+    const gap=(new Date(s.date+'T00:00:00')-new Date(p.date+'T00:00:00'))/864e5;
+    if(gap>9) continue;
+    out.push({week:wks[i][0], date:String(s.date), v:Math.round(commandAttn(s,x=>x.attn)-commandAttn(p,x=>x.attn))});
+  }
+  return out.length>=4?out:null;
+}
+function _fy25Weekly(){
+  const wkKey=d=>{const x=new Date(d);const off=(x.getDay()+6)%7;x.setDate(x.getDate()-off);return x.toISOString().slice(0,10);};
+  const m=new Map();
+  let prev=0;
+  FY25_CUM.forEach((e,i)=>{
+    const v=e.cum-prev; prev=e.cum;
+    const r=e.r, mm=Math.floor(r/100), dd=r%100;
+    const cal=mm<=2?mm+10:mm-2, yr=mm<=2?2024:2025;   // rank 0xx-2xx = Oct-Dec 2024
+    const k=wkKey(new Date(yr,cal-1,dd));
+    m.set(k,(m.get(k)||0)+v);
+  });
+  const arr=[...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(e=>e[1]);
+  return arr.slice(1,-1);   // trim partial edge weeks of the fiscal year
+}
+function _stats(vs){
+  const n=vs.length, mean=vs.reduce((a,b)=>a+b,0)/n;
+  const sd=Math.sqrt(vs.reduce((a,b)=>a+(b-mean)*(b-mean),0)/(n-1));
+  return {n, mean, sd};
+}
+function _leadSvgOpen(W,H){return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" style="display:block">`;}
+
+function renderLead(){
+  const root=document.getElementById('leadRoot');
+  if(!DataLayer.hasData()){ root.innerHTML='<div class="lead-sub">Waiting for data…</div>'; return; }
+  const wk=_leadWeekly();
+  if(!wk){ root.innerHTML='<div class="lead-sub">Not enough weekly history yet.</div>'; return; }
+  const vs=wk.map(w=>w.v);
+  const st=_stats(vs);
+  const ucl=st.mean+3*st.sd, lcl=Math.max(0,st.mean-3*st.sd);
+  const f25=_fy25Weekly(), st25=_stats(f25);
+  const goal=DataLayer.stations().reduce((a,s)=>a+(s.goal||0),0);
+  const reqWk=goal*5/PROD_DAYS_YEAR;
+
+  /* ---- SPC control chart ---- */
+  const W=320,H=150,PL=8,PR=8,PT=10,PB=14;
+  const lo=Math.min(lcl,...vs), hi=Math.max(ucl,...vs);
+  const X=i=>PL+(i/(vs.length-1))*(W-PL-PR);
+  const Y=v=>PT+(1-(v-lo)/(hi-lo||1))*(H-PT-PB);
+  const path=vs.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  const dots=vs.map((v,i)=>{
+    const ooc=v>ucl||v<lcl, latest=i===vs.length-1;
+    return `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${latest?3.2:ooc?3:1.8}" fill="${ooc?'var(--danger)':latest?'var(--teal,#2CE6C0)':'var(--triton)'}" ${ooc?'stroke="rgba(255,255,255,.7)" stroke-width="1"':''}/>`;
+  }).join('');
+  const oocN=vs.filter(v=>v>ucl||v<lcl).length;
+  const refLine=(v,c,dash)=>`<line x1="${PL}" y1="${Y(v).toFixed(1)}" x2="${W-PR}" y2="${Y(v).toFixed(1)}" stroke="${c}" stroke-width="1" ${dash?'stroke-dasharray="4 3"':''} opacity=".8"/>`;
+  const spc=`<div class="lead-card"><div class="lead-title">SPC Control Chart · weekly ALNAV</div>
+    <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--ink-faint)"></span>mean ${st.mean.toFixed(1)}</span>
+    <span class="lg-ref" ><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(0)}–${ucl.toFixed(0)})</span></div>
+    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
+    <path d="${path}" fill="none" stroke="var(--triton)" stroke-width="1.6" opacity=".9"/>${dots}</svg>
+    <div class="lead-note">${oocN===0?'All '+st.n+' weeks inside control limits — the production process is statistically stable. Misses inside the band are normal variation, not special cause.':oocN+' week(s) outside ±3σ — special-cause events worth a debrief.'}</div></div>`;
+
+  /* ---- volatility + consistency tiles ---- */
+  const cv=st.sd/st.mean*100, cv25=st25.sd/st25.mean*100;
+  const within=t=>vs.filter(v=>Math.abs(v-st.mean)<=t*st.mean).length/st.n*100;
+  const tiles=`<div class="lead-tiles">
+    <div class="lead-tile"><div class="l">Volatility Index</div><div class="v" style="color:${cv<=cv25?'var(--good)':'var(--danger)'}">σ ${st.sd.toFixed(1)}</div><div class="s">CV ${cv.toFixed(0)}% · FY25: σ ${st25.sd.toFixed(1)} / ${cv25.toFixed(0)}%</div></div>
+    <div class="lead-tile"><div class="l">Consistency Score</div><div class="v">${within(0.10).toFixed(0)}%</div><div class="s">weeks within ±10% of mean · ±5%: ${within(0.05).toFixed(0)}% · ±15%: ${within(0.15).toFixed(0)}%</div></div>
+  </div>`;
+
+  /* ---- rolling 4-week pace ---- */
+  const roll=[];
+  for(let i=3;i<vs.length;i++) roll.push((vs[i]+vs[i-1]+vs[i-2]+vs[i-3])/4);
+  const rlo=Math.min(reqWk,...roll)*0.92, rhi=Math.max(reqWk,...roll)*1.05;
+  const RX=i=>PL+(i/(roll.length-1))*(W-PL-PR);
+  const RY=v=>PT+(1-(v-rlo)/(rhi-rlo||1))*(H-PT-PB);
+  const rpath=roll.map((v,i)=>`${i?'L':'M'}${RX(i).toFixed(1)},${RY(v).toFixed(1)}`).join('');
+  const nowAbove=roll[roll.length-1]>=reqWk;
+  const rolling=`<div class="lead-card"><div class="lead-title">Rolling 4-Week Pace</div>
+    <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--triton)"></span>4-wk avg</span>
+    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>req ≈${reqWk.toFixed(0)}/wk</span></div>
+    ${_leadSvgOpen(W,H)}${`<line x1="${PL}" y1="${RY(reqWk).toFixed(1)}" x2="${W-PR}" y2="${RY(reqWk).toFixed(1)}" stroke="var(--danger)" stroke-width="1" stroke-dasharray="4 3" opacity=".85"/>`}
+    <path d="${rpath}" fill="none" stroke="var(--triton)" stroke-width="2"/>
+    <circle cx="${RX(roll.length-1).toFixed(1)}" cy="${RY(roll[roll.length-1]).toFixed(1)}" r="3" fill="${nowAbove?'var(--good)':'var(--danger)'}"/></svg>
+    <div class="lead-note">Attitude indicator, not GPS: is the machine getting stronger or weaker? Currently ${roll[roll.length-1].toFixed(1)}/wk vs ≈${reqWk.toFixed(0)} required ${nowAbove?'— above the line.':'— below the line.'}</div></div>`;
+
+  /* ---- weekly heatmap ---- */
+  const cells=wk.map(w=>{
+    const ratio=w.v/reqWk;
+    const col=ratio>=1.2?'rgba(44,230,192,.85)':ratio>=1.0?'rgba(44,230,192,.45)':ratio>=0.8?'rgba(255,182,39,.4)':'rgba(255,92,120,.5)';
+    return `<div class="lead-cell" style="background:${col}" title="wk of ${w.week}: ${w.v}">${w.v}</div>`;
+  }).join('');
+  const heat=`<div class="lead-card"><div class="lead-title">Weekly Heatmap · ${wk.length} weeks</div>
+    <div class="lead-heat">${cells}</div>
+    <div class="lead-note">vs required week (≈${reqWk.toFixed(0)}): teal ≥100%, bright teal ≥120%, amber 80–100%, red <80%. Oldest top-left.</div></div>`;
+
+  /* ---- consistency vs intensity quadrant ---- */
+  const win=8, pts=[];
+  for(let i=win-1;i<vs.length;i++){
+    const seg=vs.slice(i-win+1,i+1), s=_stats(seg);
+    pts.push({x:s.mean,y:s.sd});
+  }
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const medX=xs.slice().sort((a,b)=>a-b)[Math.floor(xs.length/2)];
+  const medY=ys.slice().sort((a,b)=>a-b)[Math.floor(ys.length/2)];
+  const qW=320,qH=190,qP=18;
+  const QX=v=>qP+(v-Math.min(...xs))/((Math.max(...xs)-Math.min(...xs))||1)*(qW-2*qP);
+  const QY=v=>qP+((v-Math.min(...ys))/((Math.max(...ys)-Math.min(...ys))||1))*(qH-2*qP);  // sigma up = worse (top)
+  const qdots=pts.map((p,i)=>{
+    const last=i===pts.length-1;
+    return `<circle cx="${QX(p.x).toFixed(1)}" cy="${QY(p.y).toFixed(1)}" r="${last?4:2}" fill="${last?'var(--teal,#2CE6C0)':'var(--triton)'}" opacity="${last?1:(0.25+0.6*i/pts.length).toFixed(2)}"/>`;
+  }).join('');
+  const lab=(x,y,t,anch)=>`<text x="${x}" y="${y}" fill="var(--ink-faint)" font-size="7.5" font-family="Chakra Petch,monospace" text-anchor="${anch}" letter-spacing=".08em">${t}</text>`;
+  const quad=`<div class="lead-card"><div class="lead-title">Consistency × Intensity · rolling ${win}-wk</div>
+    ${_leadSvgOpen(qW,qH)}
+    <line x1="${QX(medX).toFixed(1)}" y1="${qP}" x2="${QX(medX).toFixed(1)}" y2="${qH-qP}" stroke="var(--line)" stroke-width="1"/>
+    <line x1="${qP}" y1="${QY(medY).toFixed(1)}" x2="${qW-qP}" y2="${QY(medY).toFixed(1)}" stroke="var(--line)" stroke-width="1"/>
+    ${lab(qW-qP,qP-6,'VOLATILE · HOT','end')}${lab(qP,qP-6,'VOLATILE · UNDERPOWERED','start')}
+    ${lab(qW-qP,qH-4,'★ ELITE','end')}${lab(qP,qH-4,'STABLE · UNDERPOWERED','start')}
+    ${qdots}</svg>
+    <div class="lead-note">x = rolling mean (intensity, right = more) · y = rolling σ (volatility, down = steadier). Dots fade with age; bright dot is now. Bottom-right is the standard: high output, repeatable.</div></div>`;
+
+  /* ---- data-needed card ---- */
+  const need=`<div class="lead-need">
+    <div class="nm">Forecast Accuracy — not yet measurable</div>
+    <div class="rq">Requires each DLCPO's Monday contract forecast logged against Friday actuals. No forecast data is collected today; this is an input to design, not a chart to draw.</div>
+    <div class="nm">Closeout Efficiency — accruing</div>
+    <div class="rq">Requires intra-week (Wed vs Fri) cumulative positions. Daily snapshots began late June, so this becomes measurable after a few more weeks of daily publishing.</div>
+  </div>`;
+
+  root.innerHTML=`<div class="lead-h">Lead · Operating System</div>
+    <div class="lead-sub">Output is what happened; repeatability is what you built. These read the command as a production process: ${st.n} complete weeks, FY26.</div>
+    ${spc}${tiles}${rolling}${heat}${quad}${need}`;
 }
 
 /* ============================================================
