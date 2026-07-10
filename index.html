@@ -3996,19 +3996,25 @@ function renderLead(){
   }).join('');
   const oocN=vs.filter(v=>v>ucl||v<lcl).length;
   const refLine=(v,c,dash)=>`<line x1="${PL}" y1="${Y(v).toFixed(1)}" x2="${W-PR}" y2="${Y(v).toFixed(1)}" stroke="${c}" stroke-width="1" ${dash?'stroke-dasharray="4 3"':''} opacity=".8"/>`;
+  const bias=(st.mean-reqWk)/reqWk*100;
   const spc=`<div class="lead-card"><div class="lead-title">SPC Control Chart · weekly ALNAV</div>
     <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--ink-faint)"></span>mean ${st.mean.toFixed(1)}</span>
-    <span class="lg-ref" ><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(0)}–${ucl.toFixed(0)})</span></div>
-    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
+    <span style="color:var(--zeus,#ffb627)"><span class="yoy-sw" style="background:var(--zeus,#ffb627)"></span>req ${reqWk.toFixed(0)}</span>
+    <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(0)}–${ucl.toFixed(0)})</span></div>
+    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(reqWk,'var(--zeus,#ffb627)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
     <path d="${path}" fill="none" stroke="var(--triton)" stroke-width="1.6" opacity=".9"/>${dots}</svg>
-    <div class="lead-note">${oocN===0?'All '+st.n+' weeks inside control limits — the production process is statistically stable. Misses inside the band are normal variation, not special cause.':oocN+' week(s) outside ±3σ — special-cause events worth a debrief.'}</div></div>`;
+    <div class="lead-note">${oocN===0?'All '+st.n+' weeks inside control limits — stable process.':oocN+' week(s) outside ±3σ — special cause, worth a debrief.'} Process center sits ${Math.abs(bias).toFixed(0)}% ${bias>=0?'above':'below'} the requirement line: precision is the band, accuracy is the gap between the grey and gold dashes.</div></div>`;
 
   /* ---- volatility + consistency tiles ---- */
   const cv=st.sd/st.mean*100, cv25=st25.sd/st25.mean*100;
   const within=t=>vs.filter(v=>Math.abs(v-st.mean)<=t*st.mean).length/st.n*100;
+  const hitRate=vs.filter(v=>v>=reqWk).length/st.n*100;
+  const cpk=(st.mean-reqWk)/(3*st.sd);
   const tiles=`<div class="lead-tiles">
-    <div class="lead-tile"><div class="l">Volatility Index</div><div class="v" style="color:${cv<=cv25?'var(--good)':'var(--danger)'}">σ ${st.sd.toFixed(1)}</div><div class="s">CV ${cv.toFixed(0)}% · FY25: σ ${st25.sd.toFixed(1)} / ${cv25.toFixed(0)}%</div></div>
-    <div class="lead-tile"><div class="l">Consistency Score</div><div class="v">${within(0.10).toFixed(0)}%</div><div class="s">weeks within ±10% of mean · ±5%: ${within(0.05).toFixed(0)}% · ±15%: ${within(0.15).toFixed(0)}%</div></div>
+    <div class="lead-tile"><div class="l">Volatility Index</div><div class="v" style="color:${cv<=cv25?'var(--good)':'var(--danger)'}">σ ${st.sd.toFixed(1)}</div><div class="s">precision · CV ${cv.toFixed(0)}% · FY25: ${cv25.toFixed(0)}%</div></div>
+    <div class="lead-tile"><div class="l">Consistency Score</div><div class="v">${within(0.10).toFixed(0)}%</div><div class="s">precision · weeks within ±10% of own mean</div></div>
+    <div class="lead-tile"><div class="l">Process Center</div><div class="v" style="color:${st.mean>=reqWk?'var(--good)':'var(--danger)'}">${st.mean.toFixed(1)}</div><div class="s">accuracy · vs ${reqWk.toFixed(0)} req/wk (${bias>=0?'+':''}${bias.toFixed(0)}%)</div></div>
+    <div class="lead-tile"><div class="l">Requirement Hit Rate</div><div class="v" style="color:${hitRate>=50?'var(--good)':'var(--danger)'}">${hitRate.toFixed(0)}%</div><div class="s">weeks ≥ req · Cpk ${cpk.toFixed(2)}</div></div>
   </div>`;
 
   /* ---- rolling 4-week pace ---- */
@@ -4044,7 +4050,7 @@ function renderLead(){
     pts.push({x:s.mean,y:s.sd});
   }
   const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
-  const medX=xs.slice().sort((a,b)=>a-b)[Math.floor(xs.length/2)];
+  // intensity crosshair anchored to the weekly requirement (accuracy), not the median
   const medY=ys.slice().sort((a,b)=>a-b)[Math.floor(ys.length/2)];
   const qW=320,qH=190,qP=18;
   const QX=v=>qP+(v-Math.min(...xs))/((Math.max(...xs)-Math.min(...xs))||1)*(qW-2*qP);
@@ -4056,12 +4062,12 @@ function renderLead(){
   const lab=(x,y,t,anch)=>`<text x="${x}" y="${y}" fill="var(--ink-faint)" font-size="7.5" font-family="Chakra Petch,monospace" text-anchor="${anch}" letter-spacing=".08em">${t}</text>`;
   const quad=`<div class="lead-card"><div class="lead-title">Consistency × Intensity · rolling ${win}-wk</div>
     ${_leadSvgOpen(qW,qH)}
-    <line x1="${QX(medX).toFixed(1)}" y1="${qP}" x2="${QX(medX).toFixed(1)}" y2="${qH-qP}" stroke="var(--line)" stroke-width="1"/>
+    <line x1="${QX(Math.max(Math.min(...xs),Math.min(reqWk,Math.max(...xs)))).toFixed(1)}" y1="${qP}" x2="${QX(Math.max(Math.min(...xs),Math.min(reqWk,Math.max(...xs)))).toFixed(1)}" y2="${qH-qP}" stroke="var(--zeus,#ffb627)" stroke-width="1" stroke-dasharray="4 3" opacity=".7"/>
     <line x1="${qP}" y1="${QY(medY).toFixed(1)}" x2="${qW-qP}" y2="${QY(medY).toFixed(1)}" stroke="var(--line)" stroke-width="1"/>
     ${lab(qW-qP,qP-6,'VOLATILE · HOT','end')}${lab(qP,qP-6,'VOLATILE · UNDERPOWERED','start')}
     ${lab(qW-qP,qH-4,'★ ELITE','end')}${lab(qP,qH-4,'STABLE · UNDERPOWERED','start')}
     ${qdots}</svg>
-    <div class="lead-note">x = rolling mean (intensity, right = more) · y = rolling σ (volatility, down = steadier). Dots fade with age; bright dot is now. Bottom-right is the standard: high output, repeatable.</div></div>`;
+    <div class="lead-note">x = rolling mean (intensity) · y = rolling σ (volatility, down = steadier). Gold dashed line = weekly requirement: right of it is accurate, low on the chart is precise. Bottom-right of the gold line is the standard — on target, repeatable. Bright dot is now.</div></div>`;
 
   /* ---- data-needed card ---- */
   const need=`<div class="lead-need">
