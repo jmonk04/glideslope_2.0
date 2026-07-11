@@ -985,6 +985,26 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .lead-need{border:1px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
 .lead-need .nm{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.08em;color:var(--ink);margin-bottom:2px}
 .lead-need .rq{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:8px}
+.lead-scope{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+.lead-chip{flex:0 0 auto;font-family:'Chakra Petch',monospace;font-size:11px;letter-spacing:.08em;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);cursor:pointer}
+.lead-chip.active{border-color:var(--triton);color:var(--ink);background:rgba(61,169,252,.12);box-shadow:0 0 10px rgba(61,169,252,.25)}
+.lead-board{width:100%;border-collapse:collapse;font-family:'Chakra Petch',monospace}
+.lead-board th{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+.lead-board th:first-child{text-align:left}
+.lead-board td{font-size:12px;text-align:right;padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--ink)}
+.lead-board td:first-child{text-align:left;font-weight:700}
+.lead-board tr{cursor:pointer}
+.lead-board tr:active{background:rgba(61,169,252,.08)}
+.sig-card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
+.sig-row{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:12.5px;line-height:1.45;color:var(--ink)}
+.sig-ic{flex:0 0 auto;font-size:13px;width:18px;text-align:center}
+.sig-crit .sig-ic{color:var(--danger)} .sig-act .sig-ic{color:var(--danger)}
+.sig-watch .sig-ic{color:var(--zeus,#ffb627)} .sig-good .sig-ic{color:var(--good)}
+.load-bar{display:flex;gap:3px;margin:6px 0 2px}
+.load-cell{flex:1;height:10px;border-radius:2px;background:rgba(255,255,255,.07)}
+.load-cell.on{background:var(--zeus,#ffb627)} .load-cell.crit{background:var(--danger)}
+.narr{font-size:13px;line-height:1.62;color:var(--ink)}
+.narr b{color:var(--teal,#2CE6C0)}
 .strike-hint{margin-top:8px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);animation:pulse 2s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.strike-flash{animation:none}.strike-bolt{animation:none}.strike-title,.strike-card{animation:none}}
 </style>
@@ -3935,7 +3955,9 @@ function yoyChart(){
    7-day windows, comparable across the Wed-weekly and daily eras.
    Gaps > 9 days are dropped rather than merged.
    ============================================================ */
-function _leadWeekly(){
+let _leadScope='';   // '' = command; otherwise a division label
+function _scopeAttn(sn,div){return sn.stations.filter(s=>!div||s.division===div).reduce((a,s)=>a+(s.attn||0),0);}
+function _leadWeekly(div){
   const snaps=DataLayer.allSnapshots().filter(s=>!s.eom);
   if(snaps.length<4) return null;
   const wkKey=iso=>{const d=new Date(iso+'T00:00:00');const off=(d.getDay()+6)%7;d.setDate(d.getDate()-off);return d.toISOString().slice(0,10);};
@@ -3949,7 +3971,7 @@ function _leadWeekly(){
     if(gap>9) continue;
     const pd=Object.keys(FY26_PROD_DAYS).filter(k=>k>String(p.date)&&k<=String(s.date)).length;
     if(pd<1) continue;
-    const v=Math.round(commandAttn(s,x=>x.attn)-commandAttn(p,x=>x.attn));
+    const v=Math.round(_scopeAttn(s,div)-_scopeAttn(p,div));
     out.push({week:wks[i][0], date:String(s.date), v, pd, r:v/pd});
   }
   return out.length>=4?out:null;
@@ -3975,17 +3997,147 @@ function _stats(vs){
 }
 function _leadSvgOpen(W,H){return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" style="display:block">`;}
 
+/* ============================================================
+   SIGNALS — deterministic change-detection over the weekly rate
+   series. Every sentence is computable from data; nothing is
+   generated that cannot be shown in the instruments below.
+   Severity: crit > act > watch > good.
+   ============================================================ */
+function _slice(a,n){return a.slice(Math.max(0,a.length-n));}
+function _leadSignals(scope){
+  const wk=_leadWeekly(scope); if(!wk||wk.length<8) return null;
+  const r=wk.map(w=>w.r);
+  const goal=DataLayer.stations().filter(s=>!scope||s.division===scope).reduce((a,s)=>a+(s.goal||0),0);
+  const req=goal/PROD_DAYS_YEAR;
+  const st=_stats(r), n=r.length, latest=r[n-1];
+  const sigs=[];
+  const add=(sev,text)=>sigs.push({sev,text});
+
+  /* SPC state */
+  const z=(latest-st.mean)/st.sd;
+  if(z<=-3) add('crit',`Special cause: latest week ${latest.toFixed(1)}/day is below the lower control limit — not normal variation.`);
+  else if(z>=3) add('good',`Special cause (high): latest week ${latest.toFixed(1)}/day cleared the upper control limit.`);
+  else if(z<=-2) add('watch',`Latest week sits ${(-z).toFixed(1)}σ low — approaching the lower control boundary.`);
+  const last8=_slice(r,8);
+  if(last8.every(v=>v<st.mean)) add('act','Process shift: eight consecutive weeks below the season mean.');
+  else if(last8.every(v=>v>st.mean)) add('good','Process shift (up): eight consecutive weeks above the season mean.');
+
+  /* volatility change */
+  if(n>=16){
+    const sNew=_stats(_slice(r,8)).sd, sOld=_stats(r.slice(n-16,n-8)).sd;
+    const dv=(sNew/sOld-1)*100;
+    if(dv>=25) add('act',`Consistency deteriorating: volatility up ${dv.toFixed(0)}% over the last eight weeks.`);
+    else if(dv<=-25) add('good',`Consistency improving: volatility down ${(-dv).toFixed(0)}% over the last eight weeks.`);
+  }
+
+  /* momentum: rolling-4 direction and reversal */
+  const roll=[]; for(let i=3;i<n;i++) roll.push((r[i]+r[i-1]+r[i-2]+r[i-3])/4);
+  if(roll.length>=5){
+    const d=[]; for(let i=1;i<roll.length;i++) d.push(roll[i]-roll[i-1]);
+    const lastD=d[d.length-1];
+    let prior=0; for(let i=d.length-2;i>=0;i--){ if(Math.sign(d[i])===Math.sign(lastD)*-1) prior++; else break; }
+    if(prior>=3) add(lastD<0?'act':'good',`Momentum ${lastD<0?'reversed downward':'turned positive'} after ${prior} weeks moving the other way.`);
+    else{
+      const l3=_slice(d,3);
+      if(l3.every(x=>x<0)) add('watch','Operational tempo decelerating: three consecutive rolling declines.');
+      if(l3.every(x=>x>0)) add('good','Operational tempo accelerating: three consecutive rolling gains.');
+    }
+  }
+
+  /* threshold streaks */
+  let missRun=0; for(let i=n-1;i>=0;i--){ if(r[i]<req) missRun++; else break; }
+  let hitRun=0;  for(let i=n-1;i>=0;i--){ if(r[i]>=req) hitRun++; else break; }
+  if(missRun>=3) add('act',`Requirement missed ${missRun} consecutive weeks (need ${req.toFixed(1)}/prod-day).`);
+  else if(hitRun>=5) add('good',`Requirement met ${hitRun} consecutive weeks — season-long control at spec.`);
+
+  /* mission cushion */
+  const snaps=DataLayer.allSnapshots().filter(s=>!s.eom);
+  const cush=iso_sn=>{
+    const el=Object.keys(FY26_PROD_DAYS).filter(k=>k<=String(iso_sn.date)).length;
+    return _scopeAttn(iso_sn,scope)-goal*el/PROD_DAYS_YEAR;
+  };
+  const cNow=cush(snaps[snaps.length-1]);
+  const anchors=_slice(snaps.filter((s,i)=>i%1===0),22);
+  const wkAnchors=[]; const seen=new Set();
+  for(let i=anchors.length-1;i>=0&&wkAnchors.length<4;i--){
+    const wkk=String(anchors[i].date).slice(0,10);
+    const key=(()=>{const x=new Date(wkk+'T00:00:00');const off=(x.getDay()+6)%7;x.setDate(x.getDate()-off);return x.toISOString().slice(0,10);})();
+    if(!seen.has(key)){seen.add(key);wkAnchors.unshift(anchors[i]);}
+  }
+  if(wkAnchors.length>=3){
+    const cs=wkAnchors.map(cush);
+    const shrinking=cs.every((v,i)=>i===0||v<cs[i-1]);
+    const growing=cs.every((v,i)=>i===0||v>cs[i-1]);
+    if(cNow>=0&&shrinking) add('watch',`Mission cushion +${cNow.toFixed(0)} but shrinking ${cs.length-1} straight weeks.`);
+    else if(cNow<0&&growing) add('good',`Mission cushion ${cNow.toFixed(0)} and recovering ${cs.length-1} straight weeks.`);
+    else if(cNow<0) add('act',`Below annual glide: mission cushion ${cNow.toFixed(0)} contracts.`);
+    else add('good',`Above annual glide: mission cushion +${cNow.toFixed(0)} contracts.`);
+  }
+
+  /* division callouts — command scope only */
+  if(!scope){
+    const divs=[...new Set(DataLayer.stations().map(s=>s.division).filter(Boolean))].sort();
+    divs.forEach(dv=>{
+      const w=_leadWeekly(dv); if(!w||w.length<4) return;
+      const rr=w.map(x=>x.r);
+      const g=DataLayer.stations().filter(x=>x.division===dv).reduce((a,x)=>a+(x.goal||0),0);
+      const rq=g/PROD_DAYS_YEAR;
+      const l4=_slice(rr,4), miss=l4.filter(v=>v<rq).length;
+      if(miss>=3) add('act',`${dv} has missed its requirement ${miss} of the last 4 weeks.`);
+      const prior4=rr.slice(Math.max(0,rr.length-8),rr.length-4);
+      if(prior4.length===4){
+        const wasBelow=prior4.filter(v=>v<rq).length>=3, nowAbove=l4.filter(v=>v>=rq).length>=3;
+        if(wasBelow&&nowAbove) add('good',`${dv} recovered: at/above requirement 3 of the last 4 weeks after a soft month.`);
+      }
+    });
+    if(n>=8){
+      let worst=null;
+      divs.forEach(dv=>{
+        const w=_leadWeekly(dv); if(!w||w.length<8) return;
+        const s8=_stats(_slice(w.map(x=>x.r),8)).sd;
+        const g=DataLayer.stations().filter(x=>x.division===dv).reduce((a,x)=>a+(x.goal||0),0);
+        const cvv=s8/(g/PROD_DAYS_YEAR);
+        if(!worst||cvv>worst.cvv) worst={dv,cvv};
+      });
+      if(worst&&worst.cvv>0.45) add('watch',`${worst.dv} is driving most of the recent variability (8-wk CV ${(worst.cvv*100).toFixed(0)}% of its requirement).`);
+    }
+  }
+
+  const order={crit:0,act:1,watch:2,good:3};
+  sigs.sort((a,b)=>order[a.sev]-order[b.sev]);
+  const active=sigs.filter(s=>s.sev!=='good').length;
+  const crit=sigs.filter(s=>s.sev==='crit').length;
+
+  /* narrative composer — speaks only proven sentences */
+  const tempo4=_stats(_slice(r,4)).mean;
+  const parts=[];
+  parts.push(`Operational tempo is <b>${tempo4.toFixed(1)}/prod-day</b> over the last four weeks against a requirement of <b>${req.toFixed(1)}</b>${tempo4>=req?' — at or above the line':' — below the line'}.`);
+  const volSig=sigs.find(s=>s.text.startsWith('Consistency'));
+  parts.push(volSig?volSig.text:`Consistency is holding: week-to-week variation shows no significant change.`);
+  const cushSig=sigs.find(s=>s.text.includes('cushion')||s.text.includes('glide'));
+  if(cushSig) parts.push(cushSig.text);
+  sigs.filter(s=>/^DIV /.test(s.text)).slice(0,2).forEach(s=>parts.push(s.text));
+  const spcSig=sigs.find(s=>s.text.startsWith('Special cause')||s.text.startsWith('Process shift'));
+  parts.push(spcSig?spcSig.text:'No statistical process shift detected — recent misses and gains alike remain inside normal variation.');
+  const narrative=parts.join(' ');
+
+  return {sigs, active, crit, narrative};
+}
+
 function renderLead(){
   const root=document.getElementById('leadRoot');
   if(!DataLayer.hasData()){ root.innerHTML='<div class="lead-sub">Waiting for data…</div>'; return; }
-  const wk=_leadWeekly();
+  const scope=_leadScope;
+  const wk=_leadWeekly(scope);
   if(!wk){ root.innerHTML='<div class="lead-sub">Not enough weekly history yet.</div>'; return; }
   const vs=wk.map(w=>w.r);
   const st=_stats(vs);
   const ucl=st.mean+3*st.sd, lcl=Math.max(0,st.mean-3*st.sd);
   const f25=_fy25Weekly(), st25=_stats(f25);
-  const goal=DataLayer.stations().reduce((a,s)=>a+(s.goal||0),0);
+  const goal=DataLayer.stations().filter(s=>!scope||s.division===scope).reduce((a,s)=>a+(s.goal||0),0);
   const reqDay=goal/PROD_DAYS_YEAR;
+  const divs=[...new Set(DataLayer.stations().map(s=>s.division).filter(Boolean))].sort();
+  const chips=`<div class="lead-scope">${['',...divs].map(d=>`<button class="lead-chip${d===scope?' active':''}" data-scope="${d}">${d||'CMD'}</button>`).join('')}</div>`;
 
   /* ---- SPC control chart ---- */
   const W=320,H=150,PL=8,PR=8,PT=10,PB=14;
@@ -4072,6 +4224,22 @@ function renderLead(){
     ${qdots}</svg>
     <div class="lead-note">x = rolling mean (intensity) · y = rolling σ (volatility, down = steadier). Gold dashed line = weekly requirement: right of it is accurate, low on the chart is precise. Bottom-right of the gold line is the standard — on target, repeatable. Bright dot is now.</div></div>`;
 
+  /* ---- division capability board (command scope only) ---- */
+  let board='';
+  if(!scope){
+    const rows=divs.map(dv=>{
+      const w=_leadWeekly(dv); if(!w) return null;
+      const r=w.map(x=>x.r), s=_stats(r);
+      const g=DataLayer.stations().filter(x=>x.division===dv).reduce((a,x)=>a+(x.goal||0),0);
+      const rq=g/PROD_DAYS_YEAR;
+      return {dv, mean:s.mean, sd:s.sd, rq, cpk:(s.mean-rq)/(3*s.sd), hit:r.filter(x=>x>=rq).length/s.n*100};
+    }).filter(Boolean).sort((a,b)=>b.cpk-a.cpk);
+    board=`<div class="lead-card"><div class="lead-title">Division Capability · ranked by Cpk</div>
+      <table class="lead-board"><tr><th>Div</th><th>rate</th><th>req</th><th>σ</th><th>Cpk</th><th>hit</th></tr>
+      ${rows.map(r=>`<tr data-scope="${r.dv}"><td>${r.dv}</td><td style="color:${r.mean>=r.rq?'var(--good)':'var(--danger)'}">${r.mean.toFixed(1)}</td><td>${r.rq.toFixed(1)}</td><td>${r.sd.toFixed(1)}</td><td style="color:${r.cpk>=0?'var(--good)':'var(--danger)'};font-weight:700">${r.cpk.toFixed(2)}</td><td>${r.hit.toFixed(0)}%</td></tr>`).join('')}
+      </table><div class="lead-note">rate/req in contracts per prod-day. Cpk ≥ 0: process centered at/above its requirement. Tap a row to drill in.</div></div>`;
+  }
+
   /* ---- data-needed card ---- */
   const need=`<div class="lead-need">
     <div class="nm">Forecast Accuracy — not yet measurable</div>
@@ -4080,9 +4248,27 @@ function renderLead(){
     <div class="rq">Requires intra-week (Wed vs Fri) cumulative positions. Daily snapshots began late June, so this becomes measurable after a few more weeks of daily publishing.</div>
   </div>`;
 
-  root.innerHTML=`<div class="lead-h">Lead · Operating System</div>
-    <div class="lead-sub">Output is what happened; repeatability is what you built. These read the command as a production process — per production day, so holiday-short weeks are judged fairly. ${st.n} weekly windows, FY26. Non-production = weekends, holidays, zero-attainment weekdays.</div>
-    ${spc}${tiles}${rolling}${heat}${quad}${need}`;
+  const sg=_leadSignals(scope);
+  let sigHtml='';
+  if(sg){
+    const icon={crit:'⚠️',act:'⚠️',watch:'△',good:'✓'};
+    const cells=Array.from({length:10},(_,i)=>`<div class="load-cell${i<sg.active?(i<sg.crit?' crit':' on'):''}"></div>`).join('');
+    sigHtml=`<div class="sig-card"><div class="lead-title">Command Assessment</div>
+      <div class="narr">${sg.narrative}</div></div>
+    <div class="sig-card"><div class="lead-title">Leadership Load</div>
+      <div class="load-bar">${cells}</div>
+      <div class="lead-note">${sg.active} active issue${sg.active===1?'':'s'}${sg.crit?` · ${sg.crit} critical`:''} · ${sg.sigs.length-sg.active} positive</div>
+      ${sg.sigs.map(s=>`<div class="sig-row sig-${s.sev}"><div class="sig-ic">${icon[s.sev]}</div><div>${s.text}</div></div>`).join('')}
+    </div>`;
+  }
+  root.innerHTML=`<div class="lead-h">Lead · ${scope||'Command'} Operating System</div>
+    <div class="lead-sub">Output is what happened; repeatability is what you built. Per production day, so holiday-short weeks are judged fairly. ${st.n} weekly windows, FY26${scope?' · FY25 tile comparison is command-wide (no FY25 division data)':''}. Non-production = weekends, holidays, zero-attainment weekdays.</div>
+    ${chips}${sigHtml}${spc}${tiles}${board}${rolling}${heat}${quad}${need}`;
+  root.querySelectorAll('[data-scope]').forEach(el=>el.addEventListener('click',()=>{
+    _leadScope=el.dataset.scope;
+    renderLead();
+    window.scrollTo({top:0});
+  }));
 }
 
 /* ============================================================
