@@ -980,8 +980,10 @@ body.has-tabbar #appWin{padding-bottom:96px}
 .lead-tile .l{font-family:'Chakra Petch',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
 .lead-tile .v{font-family:'Chakra Petch',monospace;font-weight:700;font-size:23px;margin:3px 0}
 .lead-tile .s{font-size:10.5px;color:var(--ink-faint);font-family:'Chakra Petch',monospace}
-.lead-heat{display:grid;grid-template-columns:repeat(13,1fr);gap:3px}
-.lead-cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch',monospace;font-size:7.5px;color:rgba(255,255,255,.75)}
+.lead-heat{display:grid;gap:4px}
+.lead-heat{grid-template-columns:repeat(9,1fr)}
+.lead-cell{height:40px;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Chakra Petch',monospace;font-size:10px;font-weight:700;color:rgba(255,255,255,.9);gap:1px}
+.lead-cell small{font-size:6.5px;font-weight:400;opacity:.75;letter-spacing:.04em}
 .lead-need{border:1px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
 .lead-need .nm{font-family:'Chakra Petch',monospace;font-size:12px;letter-spacing:.08em;color:var(--ink);margin-bottom:2px}
 .lead-need .rq{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:8px}
@@ -4042,15 +4044,22 @@ function _leadSignals(scope){
 
   /* momentum: rolling-4 direction and reversal */
   const roll=[]; for(let i=3;i<n;i++) roll.push((r[i]+r[i-1]+r[i-2]+r[i-3])/4);
+  let slope=null;
+  if(roll.length>=8){
+    const w8=_slice(roll,8), m=w8.length, xm=(m-1)/2, ym=w8.reduce((a,b)=>a+b,0)/m;
+    let num=0,den=0; w8.forEach((v,i)=>{num+=(i-xm)*(v-ym);den+=(i-xm)*(i-xm);});
+    slope=num/den;   // contracts per prod-day, per week
+  }
+  const slopeTxt=slope==null?'':` (${slope>=0?'+':''}${slope.toFixed(2)}/day per week over 8 wks)`;
   if(roll.length>=5){
     const d=[]; for(let i=1;i<roll.length;i++) d.push(roll[i]-roll[i-1]);
     const lastD=d[d.length-1];
     let prior=0; for(let i=d.length-2;i>=0;i--){ if(Math.sign(d[i])===Math.sign(lastD)*-1) prior++; else break; }
-    if(prior>=3) add(lastD<0?'act':'good',`Momentum ${lastD<0?'reversed downward':'turned positive'} after ${prior} weeks moving the other way.`);
+    if(prior>=3) add(lastD<0?'act':'good',`Momentum ${lastD<0?'reversed downward':'turned positive'} after ${prior} weeks moving the other way${slopeTxt}.`);
     else{
       const l3=_slice(d,3);
-      if(l3.every(x=>x<0)) add('watch','Operational tempo decelerating: three consecutive rolling declines.');
-      if(l3.every(x=>x>0)) add('good','Operational tempo accelerating: three consecutive rolling gains.');
+      if(l3.every(x=>x<0)) add('watch',`Operational tempo decelerating: three consecutive rolling declines${slopeTxt}.`);
+      if(l3.every(x=>x>0)) add('good',`Operational tempo accelerating: three consecutive rolling gains${slopeTxt}.`);
     }
   }
 
@@ -4120,8 +4129,10 @@ function _leadSignals(scope){
 
   /* narrative composer — speaks only proven sentences */
   const tempo4=_stats(_slice(r,4)).mean;
+  const obj=req*1.2;
+  const band=tempo4>=obj?'at objective pace — Poseidon or better':tempo4>=req?'above minimum glide but below objective pace':'below minimum glide';
   const parts=[];
-  parts.push(`Operational tempo is <b>${tempo4.toFixed(1)}/prod-day</b> over the last four weeks against a requirement of <b>${req.toFixed(1)}</b>${tempo4>=req?' — at or above the line':' — below the line'}.`);
+  parts.push(`Operational tempo is <b>${tempo4.toFixed(1)}/prod-day</b> over the last four weeks against a requirement of <b>${req.toFixed(1)}</b> and an objective of <b>${obj.toFixed(1)}</b> — ${band}.`);
   const volSig=sigs.find(s=>s.text.startsWith('Consistency'));
   parts.push(volSig?volSig.text:`Consistency is holding: week-to-week variation shows no significant change.`);
   const cushSig=sigs.find(s=>s.text.includes('cushion')||s.text.includes('glide'));
@@ -4178,12 +4189,13 @@ function renderLead(){
   const f25=_fy25Weekly(), st25=_stats(f25);
   const goal=DataLayer.stations().filter(s=>!scope||s.division===scope).reduce((a,s)=>a+(s.goal||0),0);
   const reqDay=goal/PROD_DAYS_YEAR;
+  const objDay=reqDay*1.2;   // Poseidon pace — the objective tier above minimum glide
   const divs=[...new Set(DataLayer.stations().map(s=>s.division).filter(Boolean))].sort();
   const chips=`<div class="lead-scope">${['',...divs].map(d=>`<button class="lead-chip${d===scope?' active':''}" data-scope="${d}">${d||'CMD'}</button>`).join('')}</div>`;
 
   /* ---- SPC control chart ---- */
   const W=320,H=150,PL=8,PR=8,PT=10,PB=14;
-  const lo=Math.min(lcl,...vs), hi=Math.max(ucl,...vs);
+  const lo=Math.min(lcl,...vs), hi=Math.max(ucl,objDay,...vs);
   const X=i=>PL+(i/(vs.length-1))*(W-PL-PR);
   const Y=v=>PT+(1-(v-lo)/(hi-lo||1))*(H-PT-PB);
   const path=vs.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
@@ -4197,8 +4209,9 @@ function renderLead(){
   const spc=`<div class="lead-card"><div class="lead-title">SPC Control Chart · ALNAV per prod-day, by week</div>
     <div class="yoy-legend"><span><span class="yoy-sw" style="background:var(--ink-faint)"></span>mean ${st.mean.toFixed(1)}</span>
     <span style="color:var(--zeus,#ffb627)"><span class="yoy-sw" style="background:var(--zeus,#ffb627)"></span>req ${reqDay.toFixed(1)}/d</span>
+    <span style="color:var(--poseidon,#2CE6C0)"><span class="yoy-sw" style="background:var(--poseidon,#2CE6C0)"></span>obj ${objDay.toFixed(1)}/d</span>
     <span class="lg-ref"><span class="yoy-sw" style="background:var(--danger)"></span>±3σ (${lcl.toFixed(1)}–${ucl.toFixed(1)})</span></div>
-    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(reqDay,'var(--zeus,#ffb627)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
+    ${_leadSvgOpen(W,H)}${refLine(st.mean,'var(--ink-faint)',true)}${refLine(reqDay,'var(--zeus,#ffb627)',true)}${refLine(objDay,'var(--poseidon,#2CE6C0)',true)}${refLine(ucl,'var(--danger)',false)}${refLine(lcl,'var(--danger)',false)}
     <path d="${path}" fill="none" stroke="var(--triton)" stroke-width="1.6" opacity=".9"/>${dots}</svg>
     <div class="lead-note">${oocN===0?'All '+st.n+' weeks inside control limits — stable process.':oocN+' week(s) outside ±3σ — special cause, worth a debrief.'} Process center sits ${Math.abs(bias).toFixed(0)}% ${bias>=0?'above':'below'} the requirement line: precision is the band, accuracy is the gap between the grey and gold dashes.</div></div>`;
 
@@ -4232,13 +4245,13 @@ function renderLead(){
 
   /* ---- weekly heatmap ---- */
   const cells=wk.map(w=>{
-    const ratio=w.r/reqDay;
-    const col=ratio>=1.2?'rgba(44,230,192,.85)':ratio>=1.0?'rgba(44,230,192,.45)':ratio>=0.8?'rgba(255,182,39,.4)':'rgba(255,92,120,.5)';
-    return `<div class="lead-cell" style="background:${col}" title="wk of ${w.week}: ${w.v} in ${w.pd}d">${w.r.toFixed(1)}</div>`;
+    const col=w.r>=objDay?'rgba(44,230,192,.85)':w.r>=reqDay?'rgba(44,230,192,.42)':w.r>=reqDay*0.8?'rgba(255,182,39,.42)':'rgba(255,92,120,.5)';
+    const lbl=w.week.slice(5).replace('-','/');
+    return `<div class="lead-cell" style="background:${col}" title="wk of ${w.week}: ${w.v} in ${w.pd}d">${w.r.toFixed(1)}<small>${lbl}</small></div>`;
   }).join('');
-  const heat=`<div class="lead-card"><div class="lead-title">Weekly Heatmap · ${wk.length} weeks</div>
+  const heat=`<div class="lead-card"><div class="lead-title">Status Timeline · ${wk.length} weeks · per prod-day</div>
     <div class="lead-heat">${cells}</div>
-    <div class="lead-note">per prod-day vs required ${reqDay.toFixed(1)}: teal ≥100%, bright teal ≥120%, amber 80–100%, red <80%. Oldest top-left.</div></div>`;
+    <div class="lead-note">bright teal ≥ objective ${objDay.toFixed(1)} (Poseidon pace) · teal ≥ required ${reqDay.toFixed(1)} · amber within 80% · red below. Oldest top-left; cell label is week-of date.</div></div>`;
 
   /* ---- consistency vs intensity quadrant ---- */
   const win=8, pts=[];
