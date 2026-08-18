@@ -1,7 +1,7 @@
 {
-  "generated": "2026-08-14T23:55:55.529Z",
-  "latest": "2026-08-14",
-  "count": 97,
+  "generated": "2026-08-18T00:44:03.839Z",
+  "latest": "2026-08-17",
+  "count": 98,
   "snapshots": [
     {
       "date": "2025-10-08",
@@ -157446,28 +157446,28 @@
           "loss": 4,
           "attn": 133,
           "alnav_pct": 0.9236,
-          "glideslope_pct": 1.0809,
-          "requirement": 123.05,
-          "pace": 9.95,
+          "glideslope_pct": 1.0644,
+          "requirement": 124.95,
+          "pace": 8.05,
           "ac": {
             "goal": 140,
             "attn": 130,
-            "glideslope_pct": 1.0867
+            "glideslope_pct": 1.0701
           },
           "nso": {
             "goal": 7,
             "attn": 8,
-            "glideslope_pct": 1.3375
+            "glideslope_pct": 1.3171
           },
           "nuke": {
             "goal": 10,
             "attn": 4,
-            "glideslope_pct": 0.4681
+            "glideslope_pct": 0.461
           },
           "nns": {
             "goal": 9,
             "attn": 3,
-            "glideslope_pct": 0.3901
+            "glideslope_pct": 0.3841
           },
           "recruiterHealth": {
             "recruiterCount": 9,
@@ -157501,28 +157501,28 @@
           "loss": 4,
           "attn": 85,
           "alnav_pct": 1.1184,
-          "glideslope_pct": 1.3089,
-          "requirement": 64.94,
-          "pace": 20.06,
+          "glideslope_pct": 1.2889,
+          "requirement": 65.95,
+          "pace": 19.05,
           "ac": {
             "goal": 77,
             "attn": 80,
-            "glideslope_pct": 1.2159
+            "glideslope_pct": 1.1973
           },
           "nso": {
             "goal": 5,
             "attn": 6,
-            "glideslope_pct": 1.4043
+            "glideslope_pct": 1.3829
           },
           "nuke": {
             "goal": 6,
             "attn": 5,
-            "glideslope_pct": 0.9752
+            "glideslope_pct": 0.9604
           },
           "nns": {
             "goal": 6,
             "attn": 5,
-            "glideslope_pct": 0.9752
+            "glideslope_pct": 0.9604
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -157556,28 +157556,28 @@
           "loss": 8,
           "attn": 91,
           "alnav_pct": 0.8505,
-          "glideslope_pct": 0.9953,
-          "requirement": 91.43,
-          "pace": -0.43,
+          "glideslope_pct": 0.9801,
+          "requirement": 92.85,
+          "pace": -1.85,
           "ac": {
             "goal": 105,
             "attn": 89,
-            "glideslope_pct": 0.9919
+            "glideslope_pct": 0.9768
           },
           "nso": {
             "goal": 6,
             "attn": 3,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "nuke": {
             "goal": 7,
             "attn": 5,
-            "glideslope_pct": 0.8359
+            "glideslope_pct": 0.8232
           },
           "nns": {
             "goal": 7,
             "attn": 5,
-            "glideslope_pct": 0.8359
+            "glideslope_pct": 0.8232
           },
           "recruiterHealth": {
             "recruiterCount": 9,
@@ -157611,28 +157611,28 @@
           "loss": 9,
           "attn": 68,
           "alnav_pct": 0.8293,
-          "glideslope_pct": 0.9705,
-          "requirement": 70.07,
-          "pace": -2.07,
+          "glideslope_pct": 0.9557,
+          "requirement": 71.15,
+          "pace": -3.15,
           "ac": {
             "goal": 80,
             "attn": 64,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "nso": {
             "goal": 6,
             "attn": 8,
-            "glideslope_pct": 1.5604
+            "glideslope_pct": 1.5366
           },
           "nuke": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "nns": {
             "goal": 6,
             "attn": 5,
-            "glideslope_pct": 0.9752
+            "glideslope_pct": 0.9604
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -157666,28 +157666,28 @@
           "loss": 15,
           "attn": 141,
           "alnav_pct": 0.9097,
-          "glideslope_pct": 1.0646,
-          "requirement": 132.45,
-          "pace": 8.55,
+          "glideslope_pct": 1.0483,
+          "requirement": 134.5,
+          "pace": 6.5,
           "ac": {
             "goal": 151,
             "attn": 135,
-            "glideslope_pct": 1.0463
+            "glideslope_pct": 1.0303
           },
           "nso": {
             "goal": 7,
             "attn": 6,
-            "glideslope_pct": 1.0031
+            "glideslope_pct": 0.9878
           },
           "nuke": {
             "goal": 9,
             "attn": 6,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "nns": {
             "goal": 9,
             "attn": 6,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "recruiterHealth": {
             "recruiterCount": 14,
@@ -157721,13 +157721,13 @@
           "loss": 2,
           "attn": 57,
           "alnav_pct": 1,
-          "glideslope_pct": 1.1703,
-          "requirement": 48.71,
-          "pace": 8.29,
+          "glideslope_pct": 1.1524,
+          "requirement": 49.46,
+          "pace": 7.54,
           "ac": {
             "goal": 57,
             "attn": 57,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nso": {
             "goal": 4,
@@ -157737,12 +157737,12 @@
           "nuke": {
             "goal": 5,
             "attn": 6,
-            "glideslope_pct": 1.4043
+            "glideslope_pct": 1.3829
           },
           "nns": {
             "goal": 6,
             "attn": 4,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "recruiterHealth": {
             "recruiterCount": 4,
@@ -157776,28 +157776,28 @@
           "loss": 14,
           "attn": 94,
           "alnav_pct": 1,
-          "glideslope_pct": 1.1703,
-          "requirement": 80.32,
-          "pace": 13.68,
+          "glideslope_pct": 1.1524,
+          "requirement": 81.57,
+          "pace": 12.43,
           "ac": {
             "goal": 92,
             "attn": 87,
-            "glideslope_pct": 1.1067
+            "glideslope_pct": 1.0898
           },
           "nso": {
             "goal": 6,
             "attn": 10,
-            "glideslope_pct": 1.9505
+            "glideslope_pct": 1.9207
           },
           "nuke": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nns": {
             "goal": 5,
             "attn": 4,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "recruiterHealth": {
             "recruiterCount": 9,
@@ -157831,28 +157831,28 @@
           "loss": 6,
           "attn": 75,
           "alnav_pct": 0.9868,
-          "glideslope_pct": 1.1549,
-          "requirement": 64.94,
-          "pace": 10.06,
+          "glideslope_pct": 1.1373,
+          "requirement": 65.95,
+          "pace": 9.05,
           "ac": {
             "goal": 75,
             "attn": 69,
-            "glideslope_pct": 1.0767
+            "glideslope_pct": 1.0602
           },
           "nso": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nuke": {
             "goal": 5,
             "attn": 7,
-            "glideslope_pct": 1.6384
+            "glideslope_pct": 1.6134
           },
           "nns": {
             "goal": 5,
             "attn": 5,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "recruiterHealth": {
             "recruiterCount": 6,
@@ -157886,28 +157886,28 @@
           "loss": 0,
           "attn": 67,
           "alnav_pct": 1.1167,
-          "glideslope_pct": 1.3068,
-          "requirement": 51.27,
-          "pace": 15.73,
+          "glideslope_pct": 1.2869,
+          "requirement": 52.06,
+          "pace": 14.94,
           "ac": {
             "goal": 59,
             "attn": 66,
-            "glideslope_pct": 1.3091
+            "glideslope_pct": 1.2892
           },
           "nso": {
             "goal": 4,
             "attn": 4,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nuke": {
             "goal": 4,
             "attn": 2,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "nns": {
             "goal": 3,
             "attn": 1,
-            "glideslope_pct": 0.3901
+            "glideslope_pct": 0.3841
           },
           "recruiterHealth": {
             "recruiterCount": 4,
@@ -157941,28 +157941,28 @@
           "loss": 9,
           "attn": 113,
           "alnav_pct": 0.876,
-          "glideslope_pct": 1.0251,
-          "requirement": 110.23,
-          "pace": 2.77,
+          "glideslope_pct": 1.0095,
+          "requirement": 111.94,
+          "pace": 1.06,
           "ac": {
             "goal": 127,
             "attn": 112,
-            "glideslope_pct": 1.0321
+            "glideslope_pct": 1.0163
           },
           "nso": {
             "goal": 5,
             "attn": 5,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nuke": {
             "goal": 9,
             "attn": 3,
-            "glideslope_pct": 0.3901
+            "glideslope_pct": 0.3841
           },
           "nns": {
             "goal": 11,
             "attn": 1,
-            "glideslope_pct": 0.1064
+            "glideslope_pct": 0.1048
           },
           "recruiterHealth": {
             "recruiterCount": 12,
@@ -157996,28 +157996,28 @@
           "loss": 4,
           "attn": 39,
           "alnav_pct": 0.661,
-          "glideslope_pct": 0.7736,
-          "requirement": 50.42,
-          "pace": -11.42,
+          "glideslope_pct": 0.7618,
+          "requirement": 51.2,
+          "pace": -12.2,
           "ac": {
             "goal": 58,
             "attn": 39,
-            "glideslope_pct": 0.7869
+            "glideslope_pct": 0.7749
           },
           "nso": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nuke": {
             "goal": 5,
             "attn": 1,
-            "glideslope_pct": 0.2341
+            "glideslope_pct": 0.2305
           },
           "nns": {
             "goal": 3,
             "attn": 3,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "recruiterHealth": {
             "recruiterCount": 8,
@@ -158045,19 +158045,19 @@
           "name": "ANAHEIM",
           "division": "DIV 3",
           "size": "MEDIUM",
-          "status": "MISS AC",
+          "status": "MISS ALNAV",
           "goal": 65,
           "gross": 66,
           "loss": 10,
           "attn": 56,
           "alnav_pct": 0.8615,
-          "glideslope_pct": 1.0082,
-          "requirement": 55.54,
-          "pace": 0.46,
+          "glideslope_pct": 0.9929,
+          "requirement": 56.4,
+          "pace": -0.4,
           "ac": {
             "goal": 64,
             "attn": 53,
-            "glideslope_pct": 0.9691
+            "glideslope_pct": 0.9544
           },
           "nso": {
             "goal": 2,
@@ -158067,12 +158067,12 @@
           "nuke": {
             "goal": 4,
             "attn": 4,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 5,
             "attn": 4,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "recruiterHealth": {
             "recruiterCount": 10,
@@ -158100,34 +158100,34 @@
           "name": "GARDEN GROVE",
           "division": "DIV 3",
           "size": "MEDIUM",
-          "status": "MISS RC",
+          "status": "MISS ALNAV",
           "goal": 55,
           "gross": 53,
           "loss": 6,
           "attn": 47,
           "alnav_pct": 0.8545,
-          "glideslope_pct": 1.0001,
-          "requirement": 47,
-          "pace": 0,
+          "glideslope_pct": 0.9848,
+          "requirement": 47.72,
+          "pace": -0.72,
           "ac": {
             "goal": 53,
             "attn": 47,
-            "glideslope_pct": 1.0378
+            "glideslope_pct": 1.022
           },
           "nso": {
             "goal": 1,
             "attn": 2,
-            "glideslope_pct": 2.3406
+            "glideslope_pct": 2.3049
           },
           "nuke": {
             "goal": 2,
             "attn": 2,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 4,
             "attn": 2,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158155,34 +158155,34 @@
           "name": "HUNTINGTON BEACH",
           "division": "DIV 3",
           "size": "MEDIUM",
-          "status": "MISS AC",
+          "status": "MISS ALNAV",
           "goal": 65,
           "gross": 60,
           "loss": 4,
           "attn": 56,
           "alnav_pct": 0.8615,
-          "glideslope_pct": 1.0082,
-          "requirement": 55.54,
-          "pace": 0.46,
+          "glideslope_pct": 0.9929,
+          "requirement": 56.4,
+          "pace": -0.4,
           "ac": {
             "goal": 65,
             "attn": 52,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "nso": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "nuke": {
             "goal": 4,
             "attn": 5,
-            "glideslope_pct": 1.4628
+            "glideslope_pct": 1.4405
           },
           "nns": {
             "goal": 4,
             "attn": 1,
-            "glideslope_pct": 0.2926
+            "glideslope_pct": 0.2881
           }
         },
         {
@@ -158195,28 +158195,28 @@
           "loss": 6,
           "attn": 46,
           "alnav_pct": 0.7302,
-          "glideslope_pct": 0.8545,
-          "requirement": 53.83,
-          "pace": -7.83,
+          "glideslope_pct": 0.8415,
+          "requirement": 54.67,
+          "pace": -8.67,
           "ac": {
             "goal": 62,
             "attn": 46,
-            "glideslope_pct": 0.8683
+            "glideslope_pct": 0.855
           },
           "nso": {
             "goal": 7,
             "attn": 6,
-            "glideslope_pct": 1.0031
+            "glideslope_pct": 0.9878
           },
           "nuke": {
             "goal": 7,
             "attn": 4,
-            "glideslope_pct": 0.6687
+            "glideslope_pct": 0.6585
           },
           "nns": {
             "goal": 4,
             "attn": 1,
-            "glideslope_pct": 0.2926
+            "glideslope_pct": 0.2881
           },
           "recruiterHealth": {
             "recruiterCount": 8,
@@ -158250,28 +158250,28 @@
           "loss": 4,
           "attn": 68,
           "alnav_pct": 0.9577,
-          "glideslope_pct": 1.1208,
-          "requirement": 60.67,
-          "pace": 7.33,
+          "glideslope_pct": 1.1037,
+          "requirement": 61.61,
+          "pace": 6.39,
           "ac": {
             "goal": 70,
             "attn": 63,
-            "glideslope_pct": 1.0532
+            "glideslope_pct": 1.0372
           },
           "nso": {
             "goal": 3,
             "attn": 3,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nuke": {
             "goal": 4,
             "attn": 1,
-            "glideslope_pct": 0.2926
+            "glideslope_pct": 0.2881
           },
           "nns": {
             "goal": 4,
             "attn": 6,
-            "glideslope_pct": 1.7554
+            "glideslope_pct": 1.7287
           },
           "recruiterHealth": {
             "recruiterCount": 8,
@@ -158305,28 +158305,28 @@
           "loss": 7,
           "attn": 73,
           "alnav_pct": 0.9865,
-          "glideslope_pct": 1.1545,
-          "requirement": 63.23,
-          "pace": 9.77,
+          "glideslope_pct": 1.1369,
+          "requirement": 64.21,
+          "pace": 8.79,
           "ac": {
             "goal": 72,
             "attn": 69,
-            "glideslope_pct": 1.1215
+            "glideslope_pct": 1.1044
           },
           "nso": {
             "goal": 3,
             "attn": 1,
-            "glideslope_pct": 0.3901
+            "glideslope_pct": 0.3841
           },
           "nuke": {
             "goal": 4,
             "attn": 2,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "nns": {
             "goal": 5,
             "attn": 2,
-            "glideslope_pct": 0.4681
+            "glideslope_pct": 0.461
           },
           "recruiterHealth": {
             "recruiterCount": 3,
@@ -158360,28 +158360,28 @@
           "loss": 9,
           "attn": 55,
           "alnav_pct": 0.7051,
-          "glideslope_pct": 0.8252,
-          "requirement": 66.65,
-          "pace": -11.65,
+          "glideslope_pct": 0.8126,
+          "requirement": 67.68,
+          "pace": -12.68,
           "ac": {
             "goal": 77,
             "attn": 55,
-            "glideslope_pct": 0.8359
+            "glideslope_pct": 0.8232
           },
           "nso": {
             "goal": 3,
             "attn": 1,
-            "glideslope_pct": 0.3901
+            "glideslope_pct": 0.3841
           },
           "nuke": {
             "goal": 4,
             "attn": 2,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "nns": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158415,28 +158415,28 @@
           "loss": 4,
           "attn": 70,
           "alnav_pct": 0.875,
-          "glideslope_pct": 1.024,
-          "requirement": 68.36,
-          "pace": 1.64,
+          "glideslope_pct": 1.0084,
+          "requirement": 69.42,
+          "pace": 0.58,
           "ac": {
             "goal": 78,
             "attn": 69,
-            "glideslope_pct": 1.0352
+            "glideslope_pct": 1.0195
           },
           "nso": {
             "goal": 4,
             "attn": 1,
-            "glideslope_pct": 0.2926
+            "glideslope_pct": 0.2881
           },
           "nuke": {
             "goal": 5,
             "attn": 5,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 6,
             "attn": 6,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -158470,28 +158470,28 @@
           "loss": 7,
           "attn": 72,
           "alnav_pct": 0.9351,
-          "glideslope_pct": 1.0943,
-          "requirement": 65.8,
-          "pace": 6.2,
+          "glideslope_pct": 1.0776,
+          "requirement": 66.81,
+          "pace": 5.19,
           "ac": {
             "goal": 75,
             "attn": 71,
-            "glideslope_pct": 1.1079
+            "glideslope_pct": 1.091
           },
           "nso": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nuke": {
             "goal": 6,
             "attn": 4,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "nns": {
             "goal": 6,
             "attn": 8,
-            "glideslope_pct": 1.5604
+            "glideslope_pct": 1.5366
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158519,34 +158519,34 @@
           "name": "TEMECULA",
           "division": "DIV 4",
           "size": "MEGA",
-          "status": "MISS NUKE",
+          "status": "MISS AC",
           "goal": 167,
           "gross": 154,
           "loss": 8,
           "attn": 146,
           "alnav_pct": 0.8743,
-          "glideslope_pct": 1.0231,
-          "requirement": 142.7,
-          "pace": 3.3,
+          "glideslope_pct": 1.0075,
+          "requirement": 144.91,
+          "pace": 1.09,
           "ac": {
             "goal": 165,
             "attn": 142,
-            "glideslope_pct": 1.0071
+            "glideslope_pct": 0.9918
           },
           "nso": {
             "goal": 11,
             "attn": 5,
-            "glideslope_pct": 0.5319
+            "glideslope_pct": 0.5238
           },
           "nuke": {
             "goal": 14,
             "attn": 11,
-            "glideslope_pct": 0.9195
+            "glideslope_pct": 0.9055
           },
           "nns": {
             "goal": 9,
             "attn": 10,
-            "glideslope_pct": 1.3003
+            "glideslope_pct": 1.2805
           },
           "recruiterHealth": {
             "recruiterCount": 13,
@@ -158580,28 +158580,28 @@
           "loss": 7,
           "attn": 55,
           "alnav_pct": 0.7237,
-          "glideslope_pct": 0.8469,
-          "requirement": 64.94,
-          "pace": -9.94,
+          "glideslope_pct": 0.834,
+          "requirement": 65.95,
+          "pace": -10.95,
           "ac": {
             "goal": 74,
             "attn": 49,
-            "glideslope_pct": 0.7749
+            "glideslope_pct": 0.7631
           },
           "nso": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nuke": {
             "goal": 5,
             "attn": 2,
-            "glideslope_pct": 0.4681
+            "glideslope_pct": 0.461
           },
           "nns": {
             "goal": 6,
             "attn": 4,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -158635,28 +158635,28 @@
           "loss": 6,
           "attn": 82,
           "alnav_pct": 0.988,
-          "glideslope_pct": 1.1562,
-          "requirement": 70.92,
-          "pace": 11.08,
+          "glideslope_pct": 1.1386,
+          "requirement": 72.02,
+          "pace": 9.98,
           "ac": {
             "goal": 81,
             "attn": 79,
-            "glideslope_pct": 1.1414
+            "glideslope_pct": 1.124
           },
           "nso": {
             "goal": 4,
             "attn": 7,
-            "glideslope_pct": 2.048
+            "glideslope_pct": 2.0168
           },
           "nuke": {
             "goal": 6,
             "attn": 8,
-            "glideslope_pct": 1.5604
+            "glideslope_pct": 1.5366
           },
           "nns": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158690,28 +158690,28 @@
           "loss": 3,
           "attn": 47,
           "alnav_pct": 0.5802,
-          "glideslope_pct": 0.679,
-          "requirement": 69.21,
-          "pace": -22.21,
+          "glideslope_pct": 0.6687,
+          "requirement": 70.29,
+          "pace": -23.29,
           "ac": {
             "goal": 80,
             "attn": 46,
-            "glideslope_pct": 0.6729
+            "glideslope_pct": 0.6627
           },
           "nso": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "nuke": {
             "goal": 6,
             "attn": 7,
-            "glideslope_pct": 1.3653
+            "glideslope_pct": 1.3445
           },
           "nns": {
             "goal": 5,
             "attn": 4,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158745,28 +158745,28 @@
           "loss": 8,
           "attn": 95,
           "alnav_pct": 0.9406,
-          "glideslope_pct": 1.1008,
-          "requirement": 86.3,
-          "pace": 8.7,
+          "glideslope_pct": 1.084,
+          "requirement": 87.64,
+          "pace": 7.36,
           "ac": {
             "goal": 99,
             "attn": 92,
-            "glideslope_pct": 1.0875
+            "glideslope_pct": 1.071
           },
           "nso": {
             "goal": 5,
             "attn": 1,
-            "glideslope_pct": 0.2341
+            "glideslope_pct": 0.2305
           },
           "nuke": {
             "goal": 7,
             "attn": 7,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 6,
             "attn": 6,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "recruiterHealth": {
             "recruiterCount": 8,
@@ -158800,28 +158800,28 @@
           "loss": 8,
           "attn": 90,
           "alnav_pct": 0.9677,
-          "glideslope_pct": 1.1325,
-          "requirement": 79.47,
-          "pace": 10.53,
+          "glideslope_pct": 1.1153,
+          "requirement": 80.7,
+          "pace": 9.3,
           "ac": {
             "goal": 91,
             "attn": 90,
-            "glideslope_pct": 1.1574
+            "glideslope_pct": 1.1398
           },
           "nso": {
             "goal": 5,
             "attn": 4,
-            "glideslope_pct": 0.9362
+            "glideslope_pct": 0.9219
           },
           "nuke": {
             "goal": 5,
             "attn": 9,
-            "glideslope_pct": 2.1065
+            "glideslope_pct": 2.0744
           },
           "nns": {
             "goal": 6,
             "attn": 8,
-            "glideslope_pct": 1.5604
+            "glideslope_pct": 1.5366
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -158855,28 +158855,28 @@
           "loss": 5,
           "attn": 54,
           "alnav_pct": 0.72,
-          "glideslope_pct": 0.8426,
-          "requirement": 64.09,
-          "pace": -10.09,
+          "glideslope_pct": 0.8298,
+          "requirement": 65.08,
+          "pace": -11.08,
           "ac": {
             "goal": 73,
             "attn": 54,
-            "glideslope_pct": 0.8657
+            "glideslope_pct": 0.8525
           },
           "nso": {
             "goal": 5,
             "attn": 1,
-            "glideslope_pct": 0.2341
+            "glideslope_pct": 0.2305
           },
           "nuke": {
             "goal": 6,
             "attn": 5,
-            "glideslope_pct": 0.9752
+            "glideslope_pct": 0.9604
           },
           "nns": {
             "goal": 6,
             "attn": 5,
-            "glideslope_pct": 0.9752
+            "glideslope_pct": 0.9604
           },
           "recruiterHealth": {
             "recruiterCount": 11,
@@ -158910,28 +158910,28 @@
           "loss": 2,
           "attn": 58,
           "alnav_pct": 0.6744,
-          "glideslope_pct": 0.7893,
-          "requirement": 73.49,
-          "pace": -15.49,
+          "glideslope_pct": 0.7772,
+          "requirement": 74.62,
+          "pace": -16.62,
           "ac": {
             "goal": 84,
             "attn": 57,
-            "glideslope_pct": 0.7941
+            "glideslope_pct": 0.782
           },
           "nso": {
             "goal": 5,
             "attn": 9,
-            "glideslope_pct": 2.1065
+            "glideslope_pct": 2.0744
           },
           "nuke": {
             "goal": 5,
             "attn": 2,
-            "glideslope_pct": 0.4681
+            "glideslope_pct": 0.461
           },
           "nns": {
             "goal": 6,
             "attn": 9,
-            "glideslope_pct": 1.7554
+            "glideslope_pct": 1.7287
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -158965,28 +158965,28 @@
           "loss": 8,
           "attn": 92,
           "alnav_pct": 0.9583,
-          "glideslope_pct": 1.1215,
-          "requirement": 82.03,
-          "pace": 9.97,
+          "glideslope_pct": 1.1044,
+          "requirement": 83.3,
+          "pace": 8.7,
           "ac": {
             "goal": 94,
             "attn": 88,
-            "glideslope_pct": 1.0956
+            "glideslope_pct": 1.0789
           },
           "nso": {
             "goal": 5,
             "attn": 1,
-            "glideslope_pct": 0.2341
+            "glideslope_pct": 0.2305
           },
           "nuke": {
             "goal": 6,
             "attn": 4,
-            "glideslope_pct": 0.7802
+            "glideslope_pct": 0.7683
           },
           "nns": {
             "goal": 6,
             "attn": 14,
-            "glideslope_pct": 2.7306
+            "glideslope_pct": 2.689
           },
           "recruiterHealth": {
             "recruiterCount": 9,
@@ -159020,28 +159020,28 @@
           "loss": 7,
           "attn": 114,
           "alnav_pct": 0.9344,
-          "glideslope_pct": 1.0935,
-          "requirement": 104.25,
-          "pace": 9.75,
+          "glideslope_pct": 1.0769,
+          "requirement": 105.86,
+          "pace": 8.14,
           "ac": {
             "goal": 120,
             "attn": 109,
-            "glideslope_pct": 1.063
+            "glideslope_pct": 1.0468
           },
           "nso": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "nuke": {
             "goal": 7,
             "attn": 10,
-            "glideslope_pct": 1.6718
+            "glideslope_pct": 1.6463
           },
           "nns": {
             "goal": 6,
             "attn": 11,
-            "glideslope_pct": 2.1455
+            "glideslope_pct": 2.1128
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -159075,28 +159075,28 @@
           "loss": 6,
           "attn": 86,
           "alnav_pct": 0.8113,
-          "glideslope_pct": 0.9495,
-          "requirement": 90.58,
-          "pace": -4.58,
+          "glideslope_pct": 0.935,
+          "requirement": 91.98,
+          "pace": -5.98,
           "ac": {
             "goal": 104,
             "attn": 82,
-            "glideslope_pct": 0.9227
+            "glideslope_pct": 0.9087
           },
           "nso": {
             "goal": 6,
             "attn": -1,
-            "glideslope_pct": -0.195
+            "glideslope_pct": -0.1921
           },
           "nuke": {
             "goal": 7,
             "attn": 7,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 8,
             "attn": 3,
-            "glideslope_pct": 0.4389
+            "glideslope_pct": 0.4322
           },
           "recruiterHealth": {
             "recruiterCount": 10,
@@ -159130,28 +159130,28 @@
           "loss": 9,
           "attn": 85,
           "alnav_pct": 1.0119,
-          "glideslope_pct": 1.1842,
-          "requirement": 71.78,
-          "pace": 13.22,
+          "glideslope_pct": 1.1662,
+          "requirement": 72.89,
+          "pace": 12.11,
           "ac": {
             "goal": 82,
             "attn": 80,
-            "glideslope_pct": 1.1417
+            "glideslope_pct": 1.1243
           },
           "nso": {
             "goal": 4,
             "attn": 7,
-            "glideslope_pct": 2.048
+            "glideslope_pct": 2.0168
           },
           "nuke": {
             "goal": 4,
             "attn": 2,
-            "glideslope_pct": 0.5851
+            "glideslope_pct": 0.5762
           },
           "nns": {
             "goal": 4,
             "attn": 8,
-            "glideslope_pct": 2.3406
+            "glideslope_pct": 2.3049
           }
         },
         {
@@ -159164,28 +159164,28 @@
           "loss": 12,
           "attn": 108,
           "alnav_pct": 0.8372,
-          "glideslope_pct": 0.9798,
-          "requirement": 110.23,
-          "pace": -2.23,
+          "glideslope_pct": 0.9648,
+          "requirement": 111.94,
+          "pace": -3.94,
           "ac": {
             "goal": 127,
             "attn": 106,
-            "glideslope_pct": 0.9768
+            "glideslope_pct": 0.9619
           },
           "nso": {
             "goal": 7,
             "attn": 3,
-            "glideslope_pct": 0.5015
+            "glideslope_pct": 0.4939
           },
           "nuke": {
             "goal": 7,
             "attn": 5,
-            "glideslope_pct": 0.8359
+            "glideslope_pct": 0.8232
           },
           "nns": {
             "goal": 8,
             "attn": 9,
-            "glideslope_pct": 1.3166
+            "glideslope_pct": 1.2965
           },
           "recruiterHealth": {
             "recruiterCount": 12,
@@ -159219,28 +159219,28 @@
           "loss": 6,
           "attn": 63,
           "alnav_pct": 0.8077,
-          "glideslope_pct": 0.9452,
-          "requirement": 66.65,
-          "pace": -3.65,
+          "glideslope_pct": 0.9308,
+          "requirement": 67.68,
+          "pace": -4.68,
           "ac": {
             "goal": 76,
             "attn": 64,
-            "glideslope_pct": 0.9855
+            "glideslope_pct": 0.9705
           },
           "nso": {
             "goal": 4,
             "attn": 3,
-            "glideslope_pct": 0.8777
+            "glideslope_pct": 0.8643
           },
           "nuke": {
             "goal": 5,
             "attn": 5,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 5,
             "attn": 5,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "recruiterHealth": {
             "recruiterCount": 5,
@@ -159274,28 +159274,28 @@
           "loss": 4,
           "attn": 69,
           "alnav_pct": 0.7931,
-          "glideslope_pct": 0.9281,
-          "requirement": 74.34,
-          "pace": -5.34,
+          "glideslope_pct": 0.914,
+          "requirement": 75.49,
+          "pace": -6.49,
           "ac": {
             "goal": 85,
             "attn": 67,
-            "glideslope_pct": 0.9225
+            "glideslope_pct": 0.9084
           },
           "nso": {
             "goal": 4,
             "attn": 1,
-            "glideslope_pct": 0.2926
+            "glideslope_pct": 0.2881
           },
           "nuke": {
             "goal": 4,
             "attn": 4,
-            "glideslope_pct": 1.1703
+            "glideslope_pct": 1.1524
           },
           "nns": {
             "goal": 5,
             "attn": 3,
-            "glideslope_pct": 0.7022
+            "glideslope_pct": 0.6915
           },
           "recruiterHealth": {
             "recruiterCount": 7,
@@ -159320,9 +159320,9 @@
           }
         }
       ],
-      "prodDaysElapsed": 200,
+      "prodDaysElapsed": 203,
       "contractDaysTotal": 233,
-      "contractDaysRemaining": 33
+      "contractDaysRemaining": 30
     },
     {
       "date": "2026-08-13",
@@ -163109,6 +163109,1899 @@
       "prodDaysElapsed": 202,
       "contractDaysTotal": 233,
       "contractDaysRemaining": 31
+    },
+    {
+      "date": "2026-08-17",
+      "seq": 88,
+      "label": "17 AUG 26",
+      "stations": [
+        {
+          "name": "CHULA VISTA",
+          "division": "DIV 1",
+          "size": "MEGA",
+          "status": "MISS RC",
+          "goal": 144,
+          "gross": 141,
+          "loss": 4,
+          "attn": 137,
+          "alnav_pct": 0.9514,
+          "glideslope_pct": 1.0964,
+          "requirement": 124.95,
+          "pace": 12.05,
+          "ac": {
+            "goal": 140,
+            "attn": 134,
+            "glideslope_pct": 1.103
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 8,
+            "glideslope_pct": 1.3171
+          },
+          "nuke": {
+            "goal": 10,
+            "attn": 4,
+            "glideslope_pct": 0.461
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 4,
+            "glideslope_pct": 0.5122
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 117,
+            "stationPPR": 13,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 14,
+              "NOV": 13,
+              "DEC": 7,
+              "JAN": 8,
+              "FEB": 7,
+              "MAR": 13,
+              "APR": 19,
+              "MAY": 13,
+              "JUN": 16,
+              "JUL": 7,
+              "AUG": 7
+            }
+          }
+        },
+        {
+          "name": "COLLEGE GROVE",
+          "division": "DIV 1",
+          "size": "MEDIUM",
+          "status": "MISS NUKE",
+          "goal": 76,
+          "gross": 90,
+          "loss": 4,
+          "attn": 86,
+          "alnav_pct": 1.1316,
+          "glideslope_pct": 1.3041,
+          "requirement": 65.95,
+          "pace": 20.05,
+          "ac": {
+            "goal": 77,
+            "attn": 81,
+            "glideslope_pct": 1.2123
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 6,
+            "glideslope_pct": 1.3829
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9604
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9604
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 81,
+            "stationPPR": 11.571,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 8,
+              "NOV": 7,
+              "DEC": 11,
+              "JAN": 11,
+              "FEB": 9,
+              "MAR": 5,
+              "APR": 10,
+              "MAY": 7,
+              "JUN": 8,
+              "JUL": 5,
+              "AUG": 5
+            }
+          }
+        },
+        {
+          "name": "EL CAJON",
+          "division": "DIV 1",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 107,
+          "gross": 100,
+          "loss": 8,
+          "attn": 92,
+          "alnav_pct": 0.8598,
+          "glideslope_pct": 0.9909,
+          "requirement": 92.85,
+          "pace": -0.85,
+          "ac": {
+            "goal": 105,
+            "attn": 90,
+            "glideslope_pct": 0.9878
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7683
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 5,
+            "glideslope_pct": 0.8232
+          },
+          "nns": {
+            "goal": 7,
+            "attn": 5,
+            "glideslope_pct": 0.8232
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 86,
+            "stationPPR": 9.556,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 5,
+              "DEC": 11,
+              "JAN": 9,
+              "FEB": 6,
+              "MAR": 9,
+              "APR": 10,
+              "MAY": 8,
+              "JUN": 9,
+              "JUL": 9,
+              "AUG": 5
+            }
+          }
+        },
+        {
+          "name": "IMPERIAL BEACH",
+          "division": "DIV 1",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 82,
+          "gross": 78,
+          "loss": 9,
+          "attn": 69,
+          "alnav_pct": 0.8415,
+          "glideslope_pct": 0.9697,
+          "requirement": 71.15,
+          "pace": -2.15,
+          "ac": {
+            "goal": 80,
+            "attn": 64,
+            "glideslope_pct": 0.9219
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.5366
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9604
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 79,
+            "stationPPR": 11.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 8,
+              "DEC": 5,
+              "JAN": 7,
+              "FEB": 9,
+              "MAR": 5,
+              "APR": 10,
+              "MAY": 8,
+              "JUN": 10,
+              "JUL": 8,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "NATIONAL CITY",
+          "division": "DIV 1",
+          "size": "MEGA",
+          "status": "MISS NAT",
+          "goal": 155,
+          "gross": 157,
+          "loss": 15,
+          "attn": 142,
+          "alnav_pct": 0.9161,
+          "glideslope_pct": 1.0558,
+          "requirement": 134.5,
+          "pace": 7.5,
+          "ac": {
+            "goal": 151,
+            "attn": 136,
+            "glideslope_pct": 1.038
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 6,
+            "glideslope_pct": 0.9878
+          },
+          "nuke": {
+            "goal": 9,
+            "attn": 6,
+            "glideslope_pct": 0.7683
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 6,
+            "glideslope_pct": 0.7683
+          },
+          "recruiterHealth": {
+            "recruiterCount": 14,
+            "totalNet": 137,
+            "stationPPR": 9.786,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 14,
+              "DEC": 13,
+              "JAN": 13,
+              "FEB": 8,
+              "MAR": 18,
+              "APR": 16,
+              "MAY": 13,
+              "JUN": 16,
+              "JUL": 17,
+              "AUG": 6
+            }
+          }
+        },
+        {
+          "name": "YUMA",
+          "division": "DIV 1",
+          "size": "LARGE",
+          "status": "MISS NSO",
+          "goal": 57,
+          "gross": 60,
+          "loss": 2,
+          "attn": 58,
+          "alnav_pct": 1.0175,
+          "glideslope_pct": 1.1727,
+          "requirement": 49.46,
+          "pace": 8.54,
+          "ac": {
+            "goal": 57,
+            "attn": 58,
+            "glideslope_pct": 1.1727
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 0,
+            "glideslope_pct": 0
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 6,
+            "glideslope_pct": 1.3829
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7683
+          },
+          "recruiterHealth": {
+            "recruiterCount": 4,
+            "totalNet": 56,
+            "stationPPR": 14,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 2,
+              "DEC": 3,
+              "JAN": 4,
+              "FEB": 4,
+              "MAR": 7,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 11,
+              "JUL": 12,
+              "AUG": 2
+            }
+          }
+        },
+        {
+          "name": "CLAIREMONT",
+          "division": "DIV 2",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 94,
+          "gross": 108,
+          "loss": 14,
+          "attn": 94,
+          "alnav_pct": 1,
+          "glideslope_pct": 1.1524,
+          "requirement": 81.57,
+          "pace": 12.43,
+          "ac": {
+            "goal": 92,
+            "attn": 87,
+            "glideslope_pct": 1.0898
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 10,
+            "glideslope_pct": 1.9207
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.9219
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 97,
+            "stationPPR": 10.778,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 11,
+              "NOV": 9,
+              "DEC": 7,
+              "JAN": 11,
+              "FEB": 13,
+              "MAR": 4,
+              "APR": 15,
+              "MAY": 10,
+              "JUN": 10,
+              "JUL": 7,
+              "AUG": -2
+            }
+          }
+        },
+        {
+          "name": "ESCONDIDO",
+          "division": "DIV 2",
+          "size": "MEDIUM",
+          "status": "MISS NSO",
+          "goal": 76,
+          "gross": 82,
+          "loss": 6,
+          "attn": 76,
+          "alnav_pct": 1,
+          "glideslope_pct": 1.1524,
+          "requirement": 65.95,
+          "pace": 10.05,
+          "ac": {
+            "goal": 75,
+            "attn": 70,
+            "glideslope_pct": 1.0756
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 7,
+            "glideslope_pct": 1.6134
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.1524
+          },
+          "recruiterHealth": {
+            "recruiterCount": 6,
+            "totalNet": 80,
+            "stationPPR": 13.333,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 20,
+              "NOV": 8,
+              "DEC": 10,
+              "JAN": 3,
+              "FEB": 10,
+              "MAR": 6,
+              "APR": 4,
+              "MAY": 3,
+              "JUN": 11,
+              "JUL": 5,
+              "AUG": 2
+            }
+          }
+        },
+        {
+          "name": "MIRA MESA",
+          "division": "DIV 2",
+          "size": "SMALL",
+          "status": "MISS RC",
+          "goal": 60,
+          "gross": 67,
+          "loss": 0,
+          "attn": 67,
+          "alnav_pct": 1.1167,
+          "glideslope_pct": 1.2869,
+          "requirement": 52.06,
+          "pace": 14.94,
+          "ac": {
+            "goal": 59,
+            "attn": 66,
+            "glideslope_pct": 1.2892
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 4,
+            "glideslope_pct": 1.1524
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5762
+          },
+          "nns": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3841
+          },
+          "recruiterHealth": {
+            "recruiterCount": 4,
+            "totalNet": 59,
+            "stationPPR": 14.75,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 5,
+              "DEC": 12,
+              "JAN": 8,
+              "FEB": 5,
+              "MAR": 3,
+              "APR": 5,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 5,
+              "AUG": 5
+            }
+          }
+        },
+        {
+          "name": "OCEANSIDE",
+          "division": "DIV 2",
+          "size": "MEGA",
+          "status": "MISS RC",
+          "goal": 129,
+          "gross": 125,
+          "loss": 9,
+          "attn": 116,
+          "alnav_pct": 0.8992,
+          "glideslope_pct": 1.0363,
+          "requirement": 111.94,
+          "pace": 4.06,
+          "ac": {
+            "goal": 127,
+            "attn": 115,
+            "glideslope_pct": 1.0435
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.1524
+          },
+          "nuke": {
+            "goal": 9,
+            "attn": 3,
+            "glideslope_pct": 0.3841
+          },
+          "nns": {
+            "goal": 11,
+            "attn": 1,
+            "glideslope_pct": 0.1048
+          },
+          "recruiterHealth": {
+            "recruiterCount": 12,
+            "totalNet": 110,
+            "stationPPR": 9.167,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 13,
+              "NOV": 7,
+              "DEC": 11,
+              "JAN": 12,
+              "FEB": 12,
+              "MAR": 12,
+              "APR": 15,
+              "MAY": 6,
+              "JUN": 13,
+              "JUL": 9,
+              "AUG": 6
+            }
+          }
+        },
+        {
+          "name": "POWAY",
+          "division": "DIV 2",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 59,
+          "gross": 43,
+          "loss": 4,
+          "attn": 39,
+          "alnav_pct": 0.661,
+          "glideslope_pct": 0.7618,
+          "requirement": 51.2,
+          "pace": -12.2,
+          "ac": {
+            "goal": 58,
+            "attn": 39,
+            "glideslope_pct": 0.7749
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2305
+          },
+          "nns": {
+            "goal": 3,
+            "attn": 3,
+            "glideslope_pct": 1.1524
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 37,
+            "stationPPR": 4.625,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 5,
+              "DEC": -1,
+              "JAN": 2,
+              "FEB": 5,
+              "MAR": 6,
+              "APR": 4,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 3,
+              "AUG": 2
+            }
+          }
+        },
+        {
+          "name": "ANAHEIM",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS AC",
+          "goal": 65,
+          "gross": 67,
+          "loss": 10,
+          "attn": 57,
+          "alnav_pct": 0.8769,
+          "glideslope_pct": 1.0106,
+          "requirement": 56.4,
+          "pace": 0.6,
+          "ac": {
+            "goal": 64,
+            "attn": 54,
+            "glideslope_pct": 0.9724
+          },
+          "nso": {
+            "goal": 2,
+            "attn": 0,
+            "glideslope_pct": 0
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 5,
+            "glideslope_pct": 1.4405
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.9219
+          },
+          "recruiterHealth": {
+            "recruiterCount": 10,
+            "totalNet": 66,
+            "stationPPR": 6.6,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 6,
+              "DEC": 10,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 2,
+              "APR": 9,
+              "MAY": 8,
+              "JUN": 11,
+              "JUL": 7,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "GARDEN GROVE",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 55,
+          "gross": 53,
+          "loss": 6,
+          "attn": 47,
+          "alnav_pct": 0.8545,
+          "glideslope_pct": 0.9848,
+          "requirement": 47.72,
+          "pace": -0.72,
+          "ac": {
+            "goal": 53,
+            "attn": 47,
+            "glideslope_pct": 1.022
+          },
+          "nso": {
+            "goal": 1,
+            "attn": 2,
+            "glideslope_pct": 2.3049
+          },
+          "nuke": {
+            "goal": 2,
+            "attn": 2,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5762
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 37,
+            "stationPPR": 7.4,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 0,
+              "DEC": 2,
+              "JAN": 6,
+              "FEB": 5,
+              "MAR": 0,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 10,
+              "JUL": 2,
+              "AUG": 0
+            }
+          }
+        },
+        {
+          "name": "HUNTINGTON BEACH",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 65,
+          "gross": 60,
+          "loss": 4,
+          "attn": 56,
+          "alnav_pct": 0.8615,
+          "glideslope_pct": 0.9929,
+          "requirement": 56.4,
+          "pace": -0.4,
+          "ac": {
+            "goal": 65,
+            "attn": 52,
+            "glideslope_pct": 0.9219
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 5,
+            "glideslope_pct": 1.4405
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2881
+          }
+        },
+        {
+          "name": "MISSION VIEJO",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 63,
+          "gross": 54,
+          "loss": 6,
+          "attn": 48,
+          "alnav_pct": 0.7619,
+          "glideslope_pct": 0.878,
+          "requirement": 54.67,
+          "pace": -6.67,
+          "ac": {
+            "goal": 62,
+            "attn": 48,
+            "glideslope_pct": 0.8922
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 7,
+            "glideslope_pct": 1.1524
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 4,
+            "glideslope_pct": 0.6585
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2881
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 44,
+            "stationPPR": 5.5,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 6,
+              "DEC": 3,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 3,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 5,
+              "JUL": 7,
+              "AUG": 4
+            }
+          }
+        },
+        {
+          "name": "SANTA ANA",
+          "division": "DIV 3",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 71,
+          "gross": 72,
+          "loss": 4,
+          "attn": 68,
+          "alnav_pct": 0.9577,
+          "glideslope_pct": 1.1037,
+          "requirement": 61.61,
+          "pace": 6.39,
+          "ac": {
+            "goal": 70,
+            "attn": 63,
+            "glideslope_pct": 1.0372
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 3,
+            "glideslope_pct": 1.1524
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2881
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 6,
+            "glideslope_pct": 1.7287
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 68,
+            "stationPPR": 8.5,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 7,
+              "NOV": 4,
+              "DEC": 7,
+              "JAN": 4,
+              "FEB": 10,
+              "MAR": 3,
+              "APR": 10,
+              "MAY": 9,
+              "JUN": 3,
+              "JUL": 11,
+              "AUG": 0
+            }
+          }
+        },
+        {
+          "name": "HEMET",
+          "division": "DIV 4",
+          "size": "SMALL",
+          "status": "MISS NAT",
+          "goal": 74,
+          "gross": 83,
+          "loss": 7,
+          "attn": 76,
+          "alnav_pct": 1.027,
+          "glideslope_pct": 1.1836,
+          "requirement": 64.21,
+          "pace": 11.79,
+          "ac": {
+            "goal": 72,
+            "attn": 72,
+            "glideslope_pct": 1.1524
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3841
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5762
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 2,
+            "glideslope_pct": 0.461
+          },
+          "recruiterHealth": {
+            "recruiterCount": 3,
+            "totalNet": 63,
+            "stationPPR": 21,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 3,
+              "NOV": 6,
+              "DEC": 5,
+              "JAN": 5,
+              "FEB": 5,
+              "MAR": 9,
+              "APR": 12,
+              "MAY": 7,
+              "JUN": 8,
+              "JUL": 3,
+              "AUG": 4
+            }
+          }
+        },
+        {
+          "name": "MORENO VALLEY",
+          "division": "DIV 4",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 78,
+          "gross": 64,
+          "loss": 9,
+          "attn": 55,
+          "alnav_pct": 0.7051,
+          "glideslope_pct": 0.8126,
+          "requirement": 67.68,
+          "pace": -12.68,
+          "ac": {
+            "goal": 77,
+            "attn": 55,
+            "glideslope_pct": 0.8232
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3841
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5762
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 49,
+            "stationPPR": 9.8,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 3,
+              "NOV": 5,
+              "DEC": 6,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 5,
+              "APR": 8,
+              "MAY": 4,
+              "JUN": 2,
+              "JUL": 8,
+              "AUG": 2
+            }
+          }
+        },
+        {
+          "name": "PALM DESERT",
+          "division": "DIV 4",
+          "size": "SMALL",
+          "status": "MISS RC",
+          "goal": 80,
+          "gross": 75,
+          "loss": 4,
+          "attn": 71,
+          "alnav_pct": 0.8875,
+          "glideslope_pct": 1.0228,
+          "requirement": 69.42,
+          "pace": 1.58,
+          "ac": {
+            "goal": 78,
+            "attn": 70,
+            "glideslope_pct": 1.0342
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2881
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 6,
+            "glideslope_pct": 1.1524
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 68,
+            "stationPPR": 9.714,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 4,
+              "DEC": 6,
+              "JAN": 3,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 6,
+              "MAY": 10,
+              "JUN": 6,
+              "JUL": 8,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "SUN CITY",
+          "division": "DIV 4",
+          "size": "MEDIUM",
+          "status": "MISS RC",
+          "goal": 77,
+          "gross": 79,
+          "loss": 7,
+          "attn": 72,
+          "alnav_pct": 0.9351,
+          "glideslope_pct": 1.0776,
+          "requirement": 66.81,
+          "pace": 5.19,
+          "ac": {
+            "goal": 75,
+            "attn": 71,
+            "glideslope_pct": 1.091
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7683
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.5366
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 68,
+            "stationPPR": 13.6,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 5,
+              "DEC": 6,
+              "JAN": 9,
+              "FEB": 8,
+              "MAR": 6,
+              "APR": 8,
+              "MAY": 7,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 0
+            }
+          }
+        },
+        {
+          "name": "TEMECULA",
+          "division": "DIV 4",
+          "size": "MEGA",
+          "status": "MISS NUKE",
+          "goal": 167,
+          "gross": 157,
+          "loss": 8,
+          "attn": 149,
+          "alnav_pct": 0.8922,
+          "glideslope_pct": 1.0282,
+          "requirement": 144.91,
+          "pace": 4.09,
+          "ac": {
+            "goal": 165,
+            "attn": 145,
+            "glideslope_pct": 1.0127
+          },
+          "nso": {
+            "goal": 11,
+            "attn": 5,
+            "glideslope_pct": 0.5238
+          },
+          "nuke": {
+            "goal": 14,
+            "attn": 11,
+            "glideslope_pct": 0.9055
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 10,
+            "glideslope_pct": 1.2805
+          },
+          "recruiterHealth": {
+            "recruiterCount": 13,
+            "totalNet": 140,
+            "stationPPR": 10.769,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 20,
+              "NOV": 12,
+              "DEC": 12,
+              "JAN": 11,
+              "FEB": 12,
+              "MAR": 10,
+              "APR": 14,
+              "MAY": 17,
+              "JUN": 16,
+              "JUL": 16,
+              "AUG": 9
+            }
+          }
+        },
+        {
+          "name": "BREA",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 76,
+          "gross": 63,
+          "loss": 7,
+          "attn": 56,
+          "alnav_pct": 0.7368,
+          "glideslope_pct": 0.8492,
+          "requirement": 65.95,
+          "pace": -9.95,
+          "ac": {
+            "goal": 74,
+            "attn": 50,
+            "glideslope_pct": 0.7787
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 2,
+            "glideslope_pct": 0.461
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7683
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 52,
+            "stationPPR": 7.429,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 0,
+              "DEC": 4,
+              "JAN": 6,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 4,
+              "MAY": 7,
+              "JUN": 6,
+              "JUL": 4,
+              "AUG": 4
+            }
+          }
+        },
+        {
+          "name": "CORONA",
+          "division": "DIV 5",
+          "size": "MEDIUM",
+          "status": "MISS NNS",
+          "goal": 83,
+          "gross": 88,
+          "loss": 6,
+          "attn": 82,
+          "alnav_pct": 0.988,
+          "glideslope_pct": 1.1386,
+          "requirement": 72.02,
+          "pace": 9.98,
+          "ac": {
+            "goal": 81,
+            "attn": 79,
+            "glideslope_pct": 1.124
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 8,
+            "glideslope_pct": 2.3049
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.5366
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 77,
+            "stationPPR": 15.4,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 4,
+              "DEC": 9,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 4,
+              "APR": 3,
+              "MAY": 9,
+              "JUN": 13,
+              "JUL": 15,
+              "AUG": 0
+            }
+          }
+        },
+        {
+          "name": "RANCHO CUCAMONGA",
+          "division": "DIV 5",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 81,
+          "gross": 51,
+          "loss": 3,
+          "attn": 48,
+          "alnav_pct": 0.5926,
+          "glideslope_pct": 0.6829,
+          "requirement": 70.29,
+          "pace": -22.29,
+          "ac": {
+            "goal": 80,
+            "attn": 47,
+            "glideslope_pct": 0.6771
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 7,
+            "glideslope_pct": 1.3445
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.9219
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 45,
+            "stationPPR": 9,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 2,
+              "NOV": 3,
+              "DEC": 6,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 6,
+              "APR": 5,
+              "MAY": 3,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "RIVERSIDE",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS NSO",
+          "goal": 101,
+          "gross": 103,
+          "loss": 8,
+          "attn": 95,
+          "alnav_pct": 0.9406,
+          "glideslope_pct": 1.084,
+          "requirement": 87.64,
+          "pace": 7.36,
+          "ac": {
+            "goal": 99,
+            "attn": 92,
+            "glideslope_pct": 1.071
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2305
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 7,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 6,
+            "glideslope_pct": 1.1524
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 98,
+            "stationPPR": 12.25,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 16,
+              "NOV": 5,
+              "DEC": 9,
+              "JAN": 11,
+              "FEB": 9,
+              "MAR": 11,
+              "APR": 9,
+              "MAY": 8,
+              "JUN": 9,
+              "JUL": 11,
+              "AUG": 1
+            }
+          }
+        },
+        {
+          "name": "UPLAND",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS RC",
+          "goal": 93,
+          "gross": 100,
+          "loss": 8,
+          "attn": 92,
+          "alnav_pct": 0.9892,
+          "glideslope_pct": 1.14,
+          "requirement": 80.7,
+          "pace": 11.3,
+          "ac": {
+            "goal": 91,
+            "attn": 92,
+            "glideslope_pct": 1.1651
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.9219
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 10,
+            "glideslope_pct": 2.3049
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.5366
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 88,
+            "stationPPR": 12.571,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 9,
+              "DEC": 7,
+              "JAN": 5,
+              "FEB": 5,
+              "MAR": 8,
+              "APR": 10,
+              "MAY": 11,
+              "JUN": 10,
+              "JUL": 13,
+              "AUG": 4
+            }
+          }
+        },
+        {
+          "name": "FONTANA",
+          "division": "DIV 6",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 75,
+          "gross": 60,
+          "loss": 5,
+          "attn": 55,
+          "alnav_pct": 0.7333,
+          "glideslope_pct": 0.8451,
+          "requirement": 65.08,
+          "pace": -10.08,
+          "ac": {
+            "goal": 73,
+            "attn": 55,
+            "glideslope_pct": 0.8683
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2305
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9604
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9604
+          },
+          "recruiterHealth": {
+            "recruiterCount": 11,
+            "totalNet": 70,
+            "stationPPR": 6.364,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 8,
+              "NOV": 2,
+              "DEC": 8,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 10,
+              "APR": 9,
+              "MAY": 10,
+              "JUN": 7,
+              "JUL": 5,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "REDLANDS",
+          "division": "DIV 6",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 86,
+          "gross": 62,
+          "loss": 3,
+          "attn": 59,
+          "alnav_pct": 0.686,
+          "glideslope_pct": 0.7906,
+          "requirement": 74.62,
+          "pace": -15.62,
+          "ac": {
+            "goal": 84,
+            "attn": 58,
+            "glideslope_pct": 0.7957
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 9,
+            "glideslope_pct": 2.0744
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 9,
+            "glideslope_pct": 1.7287
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 58,
+            "stationPPR": 11.6,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 4,
+              "NOV": 5,
+              "DEC": 3,
+              "JAN": 5,
+              "FEB": 7,
+              "MAR": 5,
+              "APR": 8,
+              "MAY": 7,
+              "JUN": 5,
+              "JUL": 9,
+              "AUG": 1
+            }
+          }
+        },
+        {
+          "name": "SAN BERNARDINO",
+          "division": "DIV 6",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 96,
+          "gross": 101,
+          "loss": 8,
+          "attn": 93,
+          "alnav_pct": 0.9688,
+          "glideslope_pct": 1.1164,
+          "requirement": 83.3,
+          "pace": 9.7,
+          "ac": {
+            "goal": 94,
+            "attn": 89,
+            "glideslope_pct": 1.0911
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2305
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7683
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 14,
+            "glideslope_pct": 2.689
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 90,
+            "stationPPR": 10,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 14,
+              "NOV": 8,
+              "DEC": 8,
+              "JAN": 9,
+              "FEB": 10,
+              "MAR": 10,
+              "APR": 6,
+              "MAY": 3,
+              "JUN": 11,
+              "JUL": 11,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "VICTORVILLE",
+          "division": "DIV 6",
+          "size": "MEGA",
+          "status": "MISS NSO",
+          "goal": 122,
+          "gross": 126,
+          "loss": 8,
+          "attn": 118,
+          "alnav_pct": 0.9672,
+          "glideslope_pct": 1.1147,
+          "requirement": 105.86,
+          "pace": 12.14,
+          "ac": {
+            "goal": 120,
+            "attn": 113,
+            "glideslope_pct": 1.0852
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 10,
+            "glideslope_pct": 1.6463
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 11,
+            "glideslope_pct": 2.1128
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 79,
+            "stationPPR": 11.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 13,
+              "NOV": 8,
+              "DEC": 4,
+              "JAN": 3,
+              "FEB": 8,
+              "MAR": 3,
+              "APR": 9,
+              "MAY": 12,
+              "JUN": 12,
+              "JUL": 7,
+              "AUG": 6
+            }
+          }
+        },
+        {
+          "name": "HENDERSON",
+          "division": "DIV 7",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 106,
+          "gross": 93,
+          "loss": 6,
+          "attn": 87,
+          "alnav_pct": 0.8208,
+          "glideslope_pct": 0.9459,
+          "requirement": 91.98,
+          "pace": -4.98,
+          "ac": {
+            "goal": 104,
+            "attn": 83,
+            "glideslope_pct": 0.9197
+          },
+          "nso": {
+            "goal": 6,
+            "attn": -1,
+            "glideslope_pct": -0.1921
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 7,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 8,
+            "attn": 4,
+            "glideslope_pct": 0.5762
+          },
+          "recruiterHealth": {
+            "recruiterCount": 10,
+            "totalNet": 78,
+            "stationPPR": 7.8,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 8,
+              "DEC": 8,
+              "JAN": 6,
+              "FEB": 8,
+              "MAR": 8,
+              "APR": 5,
+              "MAY": 10,
+              "JUN": 5,
+              "JUL": 10,
+              "AUG": 9
+            }
+          }
+        },
+        {
+          "name": "LAS VEGAS",
+          "division": "DIV 7",
+          "size": "MEDIUM",
+          "status": "MISS NUKE",
+          "goal": 84,
+          "gross": 97,
+          "loss": 9,
+          "attn": 88,
+          "alnav_pct": 1.0476,
+          "glideslope_pct": 1.2073,
+          "requirement": 72.89,
+          "pace": 15.11,
+          "ac": {
+            "goal": 82,
+            "attn": 83,
+            "glideslope_pct": 1.1665
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 7,
+            "glideslope_pct": 2.0168
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5762
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 8,
+            "glideslope_pct": 2.3049
+          }
+        },
+        {
+          "name": "NORTHERN LIGHTS",
+          "division": "DIV 7",
+          "size": "MEGA",
+          "status": "MISS ALNAV",
+          "goal": 129,
+          "gross": 122,
+          "loss": 13,
+          "attn": 109,
+          "alnav_pct": 0.845,
+          "glideslope_pct": 0.9738,
+          "requirement": 111.94,
+          "pace": -2.94,
+          "ac": {
+            "goal": 127,
+            "attn": 107,
+            "glideslope_pct": 0.971
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 3,
+            "glideslope_pct": 0.4939
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 5,
+            "glideslope_pct": 0.8232
+          },
+          "nns": {
+            "goal": 8,
+            "attn": 9,
+            "glideslope_pct": 1.2965
+          },
+          "recruiterHealth": {
+            "recruiterCount": 12,
+            "totalNet": 124,
+            "stationPPR": 10.333,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 11,
+              "NOV": 6,
+              "DEC": 11,
+              "JAN": 15,
+              "FEB": 12,
+              "MAR": 21,
+              "APR": 14,
+              "MAY": 11,
+              "JUN": 13,
+              "JUL": 10,
+              "AUG": 4
+            }
+          }
+        },
+        {
+          "name": "RED ROCK",
+          "division": "DIV 7",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 78,
+          "gross": 70,
+          "loss": 6,
+          "attn": 64,
+          "alnav_pct": 0.8205,
+          "glideslope_pct": 0.9456,
+          "requirement": 67.68,
+          "pace": -3.68,
+          "ac": {
+            "goal": 76,
+            "attn": 65,
+            "glideslope_pct": 0.9856
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8643
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.1524
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 42,
+            "stationPPR": 8.4,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 2,
+              "NOV": 4,
+              "DEC": 5,
+              "JAN": 7,
+              "FEB": 3,
+              "MAR": 4,
+              "APR": 5,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 5,
+              "AUG": 3
+            }
+          }
+        },
+        {
+          "name": "SPRING VALLEY",
+          "division": "DIV 7",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 87,
+          "gross": 74,
+          "loss": 5,
+          "attn": 69,
+          "alnav_pct": 0.7931,
+          "glideslope_pct": 0.914,
+          "requirement": 75.49,
+          "pace": -6.49,
+          "ac": {
+            "goal": 85,
+            "attn": 67,
+            "glideslope_pct": 0.9084
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2881
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 4,
+            "glideslope_pct": 1.1524
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6915
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 65,
+            "stationPPR": 9.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 5,
+              "DEC": 7,
+              "JAN": 4,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 6,
+              "MAY": 10,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 5
+            }
+          }
+        }
+      ],
+      "prodDaysElapsed": 203,
+      "contractDaysTotal": 233,
+      "contractDaysRemaining": 30
     }
   ]
 }
