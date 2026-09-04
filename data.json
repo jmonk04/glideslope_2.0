@@ -1,7 +1,7 @@
 {
-  "generated": "2026-09-03T01:04:13.978Z",
-  "latest": "2026-09-02",
-  "count": 111,
+  "generated": "2026-09-04T00:38:39.823Z",
+  "latest": "2026-09-03",
+  "count": 112,
   "snapshots": [
     {
       "date": "2025-10-08",
@@ -189678,6 +189678,1932 @@
       "prodDaysElapsed": 215,
       "contractDaysTotal": 233,
       "contractDaysRemaining": 18
+    },
+    {
+      "date": "2026-09-03",
+      "seq": 101,
+      "label": "03 SEP 26",
+      "stations": [
+        {
+          "name": "CHULA VISTA",
+          "division": "DIV 1",
+          "size": "MEGA",
+          "status": "MISS RC",
+          "goal": 144,
+          "gross": 151,
+          "loss": 4,
+          "attn": 147,
+          "alnav_pct": 1.0208,
+          "glideslope_pct": 1.1035,
+          "requirement": 133.21,
+          "pace": 3,
+          "ac": {
+            "goal": 140,
+            "attn": 144,
+            "glideslope_pct": 1.1119
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 9,
+            "glideslope_pct": 1.3899
+          },
+          "nuke": {
+            "goal": 10,
+            "attn": 4,
+            "glideslope_pct": 0.4324
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 5,
+            "glideslope_pct": 0.6006
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 134,
+            "stationPPR": 14.889,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 14,
+              "NOV": 13,
+              "DEC": 7,
+              "JAN": 8,
+              "FEB": 7,
+              "MAR": 13,
+              "APR": 19,
+              "MAY": 13,
+              "JUN": 16,
+              "JUL": 7,
+              "AUG": 14,
+              "SEP": 3
+            }
+          }
+        },
+        {
+          "name": "COLLEGE GROVE",
+          "division": "DIV 1",
+          "size": "MEDIUM",
+          "status": "MISS NUKE",
+          "goal": 76,
+          "gross": 93,
+          "loss": 4,
+          "attn": 89,
+          "alnav_pct": 1.1711,
+          "glideslope_pct": 1.2659,
+          "requirement": 70.3,
+          "pace": 13,
+          "ac": {
+            "goal": 77,
+            "attn": 84,
+            "glideslope_pct": 1.1793
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 6,
+            "glideslope_pct": 1.2972
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9009
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9009
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 89,
+            "stationPPR": 12.714,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 8,
+              "NOV": 7,
+              "DEC": 11,
+              "JAN": 11,
+              "FEB": 9,
+              "MAR": 5,
+              "APR": 10,
+              "MAY": 8,
+              "JUN": 7,
+              "JUL": 5,
+              "AUG": 8,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "EL CAJON",
+          "division": "DIV 1",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 107,
+          "gross": 111,
+          "loss": 9,
+          "attn": 102,
+          "alnav_pct": 0.9533,
+          "glideslope_pct": 1.0305,
+          "requirement": 98.98,
+          "pace": -5,
+          "ac": {
+            "goal": 105,
+            "attn": 100,
+            "glideslope_pct": 1.0296
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7207
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 5,
+            "glideslope_pct": 0.7722
+          },
+          "nns": {
+            "goal": 7,
+            "attn": 7,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 101,
+            "stationPPR": 11.222,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 5,
+              "DEC": 11,
+              "JAN": 9,
+              "FEB": 6,
+              "MAR": 9,
+              "APR": 10,
+              "MAY": 8,
+              "JUN": 9,
+              "JUL": 9,
+              "AUG": 15,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "IMPERIAL BEACH",
+          "division": "DIV 1",
+          "size": "MEDIUM",
+          "status": "MISS AC",
+          "goal": 82,
+          "gross": 85,
+          "loss": 9,
+          "attn": 76,
+          "alnav_pct": 0.9268,
+          "glideslope_pct": 1.0019,
+          "requirement": 75.85,
+          "pace": -6,
+          "ac": {
+            "goal": 80,
+            "attn": 70,
+            "glideslope_pct": 0.9459
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.4414
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9009
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 78,
+            "stationPPR": 11.143,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 8,
+              "NOV": 2,
+              "DEC": 4,
+              "JAN": 7,
+              "FEB": 8,
+              "MAR": 5,
+              "APR": 10,
+              "MAY": 7,
+              "JUN": 10,
+              "JUL": 7,
+              "AUG": 8,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "NATIONAL CITY",
+          "division": "DIV 1",
+          "size": "MEGA",
+          "status": "MISS NAT",
+          "goal": 155,
+          "gross": 169,
+          "loss": 15,
+          "attn": 154,
+          "alnav_pct": 0.9935,
+          "glideslope_pct": 1.0741,
+          "requirement": 143.38,
+          "pace": -1,
+          "ac": {
+            "goal": 151,
+            "attn": 148,
+            "glideslope_pct": 1.0596
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 6,
+            "glideslope_pct": 0.9266
+          },
+          "nuke": {
+            "goal": 9,
+            "attn": 6,
+            "glideslope_pct": 0.7207
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 7,
+            "glideslope_pct": 0.8408
+          },
+          "recruiterHealth": {
+            "recruiterCount": 14,
+            "totalNet": 148,
+            "stationPPR": 10.571,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 14,
+              "DEC": 13,
+              "JAN": 13,
+              "FEB": 8,
+              "MAR": 18,
+              "APR": 14,
+              "MAY": 10,
+              "JUN": 15,
+              "JUL": 16,
+              "AUG": 18,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "YUMA",
+          "division": "DIV 1",
+          "size": "LARGE",
+          "status": "MISS NSO",
+          "goal": 57,
+          "gross": 63,
+          "loss": 2,
+          "attn": 61,
+          "alnav_pct": 1.0702,
+          "glideslope_pct": 1.1569,
+          "requirement": 52.73,
+          "pace": 4,
+          "ac": {
+            "goal": 57,
+            "attn": 61,
+            "glideslope_pct": 1.1569
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 0,
+            "glideslope_pct": 0
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 7,
+            "glideslope_pct": 1.5134
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7207
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 61,
+            "stationPPR": 12.2,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 2,
+              "DEC": 3,
+              "JAN": 4,
+              "FEB": 4,
+              "MAR": 7,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 11,
+              "JUL": 12,
+              "AUG": 3,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "CLAIREMONT",
+          "division": "DIV 2",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 94,
+          "gross": 114,
+          "loss": 14,
+          "attn": 100,
+          "alnav_pct": 1.0638,
+          "glideslope_pct": 1.15,
+          "requirement": 86.95,
+          "pace": 6,
+          "ac": {
+            "goal": 92,
+            "attn": 93,
+            "glideslope_pct": 1.0928
+          },
+          "nso": {
+            "goal": 6,
+            "attn": 10,
+            "glideslope_pct": 1.8017
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 101,
+            "stationPPR": 11.222,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 11,
+              "NOV": 9,
+              "DEC": 7,
+              "JAN": 11,
+              "FEB": 13,
+              "MAR": 4,
+              "APR": 15,
+              "MAY": 9,
+              "JUN": 11,
+              "JUL": 7,
+              "AUG": 2,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "ESCONDIDO",
+          "division": "DIV 2",
+          "size": "MEDIUM",
+          "status": "MISS NSO",
+          "goal": 76,
+          "gross": 86,
+          "loss": 6,
+          "attn": 80,
+          "alnav_pct": 1.0526,
+          "glideslope_pct": 1.1379,
+          "requirement": 70.3,
+          "pace": 4,
+          "ac": {
+            "goal": 75,
+            "attn": 74,
+            "glideslope_pct": 1.0666
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 7,
+            "glideslope_pct": 1.5134
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 86,
+            "stationPPR": 12.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 20,
+              "NOV": 8,
+              "DEC": 10,
+              "JAN": 3,
+              "FEB": 10,
+              "MAR": 6,
+              "APR": 4,
+              "MAY": 3,
+              "JUN": 11,
+              "JUL": 5,
+              "AUG": 6,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "MIRA MESA",
+          "division": "DIV 2",
+          "size": "SMALL",
+          "status": "MISS RC",
+          "goal": 60,
+          "gross": 74,
+          "loss": 0,
+          "attn": 74,
+          "alnav_pct": 1.2333,
+          "glideslope_pct": 1.3333,
+          "requirement": 55.5,
+          "pace": 14,
+          "ac": {
+            "goal": 59,
+            "attn": 73,
+            "glideslope_pct": 1.3375
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 4,
+            "glideslope_pct": 1.081
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nns": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3603
+          },
+          "recruiterHealth": {
+            "recruiterCount": 4,
+            "totalNet": 71,
+            "stationPPR": 17.75,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 5,
+              "DEC": 12,
+              "JAN": 8,
+              "FEB": 5,
+              "MAR": 3,
+              "APR": 5,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 5,
+              "AUG": 11,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "OCEANSIDE",
+          "division": "DIV 2",
+          "size": "MEGA",
+          "status": "MISS RC",
+          "goal": 129,
+          "gross": 135,
+          "loss": 10,
+          "attn": 125,
+          "alnav_pct": 0.969,
+          "glideslope_pct": 1.0475,
+          "requirement": 119.33,
+          "pace": -4,
+          "ac": {
+            "goal": 127,
+            "attn": 124,
+            "glideslope_pct": 1.0555
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.081
+          },
+          "nuke": {
+            "goal": 9,
+            "attn": 4,
+            "glideslope_pct": 0.4805
+          },
+          "nns": {
+            "goal": 11,
+            "attn": 0,
+            "glideslope_pct": 0
+          },
+          "recruiterHealth": {
+            "recruiterCount": 12,
+            "totalNet": 125,
+            "stationPPR": 10.417,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 13,
+              "NOV": 7,
+              "DEC": 11,
+              "JAN": 12,
+              "FEB": 12,
+              "MAR": 12,
+              "APR": 15,
+              "MAY": 6,
+              "JUN": 13,
+              "JUL": 9,
+              "AUG": 15,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "POWAY",
+          "division": "DIV 2",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 59,
+          "gross": 47,
+          "loss": 4,
+          "attn": 43,
+          "alnav_pct": 0.7288,
+          "glideslope_pct": 0.7879,
+          "requirement": 54.58,
+          "pace": -16,
+          "ac": {
+            "goal": 58,
+            "attn": 43,
+            "glideslope_pct": 0.8015
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2162
+          },
+          "nns": {
+            "goal": 3,
+            "attn": 3,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 43,
+            "stationPPR": 4.778,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 5,
+              "DEC": -1,
+              "JAN": 2,
+              "FEB": 5,
+              "MAR": 6,
+              "APR": 4,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 3,
+              "AUG": 4,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "ANAHEIM",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS AC",
+          "goal": 65,
+          "gross": 71,
+          "loss": 10,
+          "attn": 61,
+          "alnav_pct": 0.9385,
+          "glideslope_pct": 1.0145,
+          "requirement": 60.13,
+          "pace": -4,
+          "ac": {
+            "goal": 64,
+            "attn": 58,
+            "glideslope_pct": 0.9797
+          },
+          "nso": {
+            "goal": 2,
+            "attn": 0,
+            "glideslope_pct": 0
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 6,
+            "glideslope_pct": 1.6215
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.8648
+          },
+          "recruiterHealth": {
+            "recruiterCount": 10,
+            "totalNet": 75,
+            "stationPPR": 7.5,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 6,
+              "DEC": 10,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 2,
+              "APR": 9,
+              "MAY": 8,
+              "JUN": 11,
+              "JUL": 7,
+              "AUG": 9,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "GARDEN GROVE",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS RC",
+          "goal": 55,
+          "gross": 59,
+          "loss": 6,
+          "attn": 53,
+          "alnav_pct": 0.9636,
+          "glideslope_pct": 1.0417,
+          "requirement": 50.88,
+          "pace": -2,
+          "ac": {
+            "goal": 53,
+            "attn": 53,
+            "glideslope_pct": 1.081
+          },
+          "nso": {
+            "goal": 1,
+            "attn": 2,
+            "glideslope_pct": 2.1621
+          },
+          "nuke": {
+            "goal": 2,
+            "attn": 2,
+            "glideslope_pct": 1.081
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 43,
+            "stationPPR": 8.6,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 0,
+              "DEC": 2,
+              "JAN": 6,
+              "FEB": 5,
+              "MAR": 0,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 10,
+              "JUL": 2,
+              "AUG": 5,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "HUNTINGTON BEACH",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 65,
+          "gross": 63,
+          "loss": 6,
+          "attn": 57,
+          "alnav_pct": 0.8769,
+          "glideslope_pct": 0.948,
+          "requirement": 60.13,
+          "pace": -8,
+          "ac": {
+            "goal": 65,
+            "attn": 53,
+            "glideslope_pct": 0.8815
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 5,
+            "glideslope_pct": 1.3513
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2703
+          }
+        },
+        {
+          "name": "MISSION VIEJO",
+          "division": "DIV 3",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 63,
+          "gross": 58,
+          "loss": 7,
+          "attn": 51,
+          "alnav_pct": 0.8095,
+          "glideslope_pct": 0.8751,
+          "requirement": 58.28,
+          "pace": -12,
+          "ac": {
+            "goal": 62,
+            "attn": 51,
+            "glideslope_pct": 0.8892
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 9,
+            "glideslope_pct": 1.3899
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 4,
+            "glideslope_pct": 0.6177
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2703
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 51,
+            "stationPPR": 6.375,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 5,
+              "NOV": 6,
+              "DEC": 3,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 3,
+              "APR": 5,
+              "MAY": 2,
+              "JUN": 5,
+              "JUL": 7,
+              "AUG": 5,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "SANTA ANA",
+          "division": "DIV 3",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 71,
+          "gross": 77,
+          "loss": 4,
+          "attn": 73,
+          "alnav_pct": 1.0282,
+          "glideslope_pct": 1.1115,
+          "requirement": 65.68,
+          "pace": 2,
+          "ac": {
+            "goal": 70,
+            "attn": 68,
+            "glideslope_pct": 1.0501
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 3,
+            "glideslope_pct": 1.081
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2703
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 6,
+            "glideslope_pct": 1.6215
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 73,
+            "stationPPR": 9.125,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 7,
+              "NOV": 4,
+              "DEC": 7,
+              "JAN": 4,
+              "FEB": 10,
+              "MAR": 3,
+              "APR": 10,
+              "MAY": 9,
+              "JUN": 3,
+              "JUL": 11,
+              "AUG": 5,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "HEMET",
+          "division": "DIV 4",
+          "size": "SMALL",
+          "status": "MISS NAT",
+          "goal": 74,
+          "gross": 87,
+          "loss": 7,
+          "attn": 80,
+          "alnav_pct": 1.0811,
+          "glideslope_pct": 1.1687,
+          "requirement": 68.45,
+          "pace": 6,
+          "ac": {
+            "goal": 72,
+            "attn": 76,
+            "glideslope_pct": 1.1411
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3603
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5405
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "recruiterHealth": {
+            "recruiterCount": 3,
+            "totalNet": 71,
+            "stationPPR": 23.667,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 3,
+              "NOV": 6,
+              "DEC": 5,
+              "JAN": 5,
+              "FEB": 5,
+              "MAR": 9,
+              "APR": 12,
+              "MAY": 7,
+              "JUN": 8,
+              "JUL": 3,
+              "AUG": 8,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "MORENO VALLEY",
+          "division": "DIV 4",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 78,
+          "gross": 72,
+          "loss": 9,
+          "attn": 63,
+          "alnav_pct": 0.8077,
+          "glideslope_pct": 0.8731,
+          "requirement": 72.15,
+          "pace": -15,
+          "ac": {
+            "goal": 77,
+            "attn": 63,
+            "glideslope_pct": 0.8845
+          },
+          "nso": {
+            "goal": 3,
+            "attn": 1,
+            "glideslope_pct": 0.3603
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5405
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.8648
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 57,
+            "stationPPR": 11.4,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 3,
+              "NOV": 5,
+              "DEC": 6,
+              "JAN": 3,
+              "FEB": 5,
+              "MAR": 5,
+              "APR": 8,
+              "MAY": 4,
+              "JUN": 2,
+              "JUL": 8,
+              "AUG": 7,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "PALM DESERT",
+          "division": "DIV 4",
+          "size": "SMALL",
+          "status": "MISS RC",
+          "goal": 80,
+          "gross": 80,
+          "loss": 4,
+          "attn": 76,
+          "alnav_pct": 0.95,
+          "glideslope_pct": 1.027,
+          "requirement": 74,
+          "pace": -4,
+          "ac": {
+            "goal": 78,
+            "attn": 75,
+            "glideslope_pct": 1.0395
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2703
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 6,
+            "glideslope_pct": 1.2972
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 7,
+            "glideslope_pct": 1.2612
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 76,
+            "stationPPR": 10.857,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 4,
+              "DEC": 6,
+              "JAN": 3,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 6,
+              "MAY": 10,
+              "JUN": 6,
+              "JUL": 8,
+              "AUG": 6,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "SUN CITY",
+          "division": "DIV 4",
+          "size": "MEDIUM",
+          "status": "MISS RC",
+          "goal": 77,
+          "gross": 86,
+          "loss": 7,
+          "attn": 79,
+          "alnav_pct": 1.026,
+          "glideslope_pct": 1.1091,
+          "requirement": 71.23,
+          "pace": 2,
+          "ac": {
+            "goal": 75,
+            "attn": 78,
+            "glideslope_pct": 1.1243
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7207
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.4414
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 76,
+            "stationPPR": 15.2,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 5,
+              "DEC": 6,
+              "JAN": 9,
+              "FEB": 8,
+              "MAR": 6,
+              "APR": 8,
+              "MAY": 7,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 8,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "TEMECULA",
+          "division": "DIV 4",
+          "size": "MEGA",
+          "status": "MISS AC",
+          "goal": 167,
+          "gross": 164,
+          "loss": 8,
+          "attn": 156,
+          "alnav_pct": 0.9341,
+          "glideslope_pct": 1.0098,
+          "requirement": 154.48,
+          "pace": -11,
+          "ac": {
+            "goal": 165,
+            "attn": 152,
+            "glideslope_pct": 0.9959
+          },
+          "nso": {
+            "goal": 11,
+            "attn": 5,
+            "glideslope_pct": 0.4914
+          },
+          "nuke": {
+            "goal": 14,
+            "attn": 12,
+            "glideslope_pct": 0.9266
+          },
+          "nns": {
+            "goal": 9,
+            "attn": 11,
+            "glideslope_pct": 1.3213
+          },
+          "recruiterHealth": {
+            "recruiterCount": 13,
+            "totalNet": 155,
+            "stationPPR": 11.923,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 20,
+              "NOV": 12,
+              "DEC": 12,
+              "JAN": 11,
+              "FEB": 12,
+              "MAR": 10,
+              "APR": 14,
+              "MAY": 17,
+              "JUN": 16,
+              "JUL": 16,
+              "AUG": 13,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "BREA",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 76,
+          "gross": 67,
+          "loss": 7,
+          "attn": 60,
+          "alnav_pct": 0.7895,
+          "glideslope_pct": 0.8534,
+          "requirement": 70.3,
+          "pace": -16,
+          "ac": {
+            "goal": 74,
+            "attn": 54,
+            "glideslope_pct": 0.7889
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 3,
+            "glideslope_pct": 0.5405
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 60,
+            "stationPPR": 8.571,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 6,
+              "NOV": 0,
+              "DEC": 4,
+              "JAN": 6,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 4,
+              "MAY": 7,
+              "JUN": 6,
+              "JUL": 4,
+              "AUG": 7,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "CORONA",
+          "division": "DIV 5",
+          "size": "MEDIUM",
+          "status": "MADE GOAL",
+          "goal": 83,
+          "gross": 93,
+          "loss": 7,
+          "attn": 86,
+          "alnav_pct": 1.0361,
+          "glideslope_pct": 1.1201,
+          "requirement": 76.78,
+          "pace": 3,
+          "ac": {
+            "goal": 81,
+            "attn": 83,
+            "glideslope_pct": 1.1077
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 9,
+            "glideslope_pct": 2.4323
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 8,
+            "glideslope_pct": 1.4414
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 81,
+            "stationPPR": 16.2,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 4,
+              "DEC": 9,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 4,
+              "APR": 3,
+              "MAY": 9,
+              "JUN": 13,
+              "JUL": 15,
+              "AUG": 5,
+              "SEP": -1
+            }
+          }
+        },
+        {
+          "name": "RANCHO CUCAMONGA",
+          "division": "DIV 5",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 81,
+          "gross": 55,
+          "loss": 4,
+          "attn": 51,
+          "alnav_pct": 0.6296,
+          "glideslope_pct": 0.6806,
+          "requirement": 74.93,
+          "pace": -30,
+          "ac": {
+            "goal": 80,
+            "attn": 50,
+            "glideslope_pct": 0.6756
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 9,
+            "glideslope_pct": 1.6215
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.8648
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 51,
+            "stationPPR": 10.2,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 2,
+              "NOV": 3,
+              "DEC": 6,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 6,
+              "APR": 5,
+              "MAY": 3,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 4,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "RIVERSIDE",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS NSO",
+          "goal": 101,
+          "gross": 110,
+          "loss": 10,
+          "attn": 100,
+          "alnav_pct": 0.9901,
+          "glideslope_pct": 1.0703,
+          "requirement": 93.43,
+          "pace": -1,
+          "ac": {
+            "goal": 99,
+            "attn": 97,
+            "glideslope_pct": 1.0592
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2162
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 7,
+            "glideslope_pct": 1.081
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 6,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 8,
+            "totalNet": 104,
+            "stationPPR": 13,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 16,
+              "NOV": 5,
+              "DEC": 9,
+              "JAN": 11,
+              "FEB": 9,
+              "MAR": 11,
+              "APR": 9,
+              "MAY": 8,
+              "JUN": 9,
+              "JUL": 11,
+              "AUG": 6,
+              "SEP": 0
+            }
+          }
+        },
+        {
+          "name": "UPLAND",
+          "division": "DIV 5",
+          "size": "LARGE",
+          "status": "MISS RC",
+          "goal": 93,
+          "gross": 108,
+          "loss": 8,
+          "attn": 100,
+          "alnav_pct": 1.0753,
+          "glideslope_pct": 1.1624,
+          "requirement": 86.03,
+          "pace": 7,
+          "ac": {
+            "goal": 91,
+            "attn": 99,
+            "glideslope_pct": 1.1761
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.8648
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 10,
+            "glideslope_pct": 2.1621
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 10,
+            "glideslope_pct": 1.8017
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 100,
+            "stationPPR": 14.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 9,
+              "DEC": 7,
+              "JAN": 5,
+              "FEB": 5,
+              "MAR": 8,
+              "APR": 10,
+              "MAY": 11,
+              "JUN": 10,
+              "JUL": 13,
+              "AUG": 10,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "FONTANA",
+          "division": "DIV 6",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 75,
+          "gross": 66,
+          "loss": 5,
+          "attn": 61,
+          "alnav_pct": 0.8133,
+          "glideslope_pct": 0.8792,
+          "requirement": 69.38,
+          "pace": -14,
+          "ac": {
+            "goal": 73,
+            "attn": 61,
+            "glideslope_pct": 0.9033
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2162
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 5,
+            "glideslope_pct": 0.9009
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 6,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 11,
+            "totalNet": 79,
+            "stationPPR": 7.182,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 8,
+              "NOV": 2,
+              "DEC": 8,
+              "JAN": 4,
+              "FEB": 7,
+              "MAR": 10,
+              "APR": 9,
+              "MAY": 10,
+              "JUN": 7,
+              "JUL": 5,
+              "AUG": 8,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "REDLANDS",
+          "division": "DIV 6",
+          "size": "SMALL",
+          "status": "MISS ALNAV",
+          "goal": 86,
+          "gross": 64,
+          "loss": 3,
+          "attn": 61,
+          "alnav_pct": 0.7093,
+          "glideslope_pct": 0.7668,
+          "requirement": 79.55,
+          "pace": -25,
+          "ac": {
+            "goal": 84,
+            "attn": 60,
+            "glideslope_pct": 0.7722
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 9,
+            "glideslope_pct": 1.9459
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 9,
+            "glideslope_pct": 1.6215
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 61,
+            "stationPPR": 12.2,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 4,
+              "NOV": 5,
+              "DEC": 3,
+              "JAN": 5,
+              "FEB": 7,
+              "MAR": 5,
+              "APR": 8,
+              "MAY": 7,
+              "JUN": 5,
+              "JUL": 9,
+              "AUG": 1,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "SAN BERNARDINO",
+          "division": "DIV 6",
+          "size": "LARGE",
+          "status": "MISS NUKE",
+          "goal": 96,
+          "gross": 107,
+          "loss": 8,
+          "attn": 99,
+          "alnav_pct": 1.0313,
+          "glideslope_pct": 1.1148,
+          "requirement": 88.8,
+          "pace": 3,
+          "ac": {
+            "goal": 94,
+            "attn": 95,
+            "glideslope_pct": 1.0925
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 1,
+            "glideslope_pct": 0.2162
+          },
+          "nuke": {
+            "goal": 6,
+            "attn": 4,
+            "glideslope_pct": 0.7207
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 14,
+            "glideslope_pct": 2.5224
+          },
+          "recruiterHealth": {
+            "recruiterCount": 9,
+            "totalNet": 99,
+            "stationPPR": 11,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 14,
+              "NOV": 8,
+              "DEC": 8,
+              "JAN": 9,
+              "FEB": 10,
+              "MAR": 10,
+              "APR": 6,
+              "MAY": 3,
+              "JUN": 11,
+              "JUL": 11,
+              "AUG": 7,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "VICTORVILLE",
+          "division": "DIV 6",
+          "size": "MEGA",
+          "status": "MISS NSO",
+          "goal": 122,
+          "gross": 138,
+          "loss": 8,
+          "attn": 130,
+          "alnav_pct": 1.0656,
+          "glideslope_pct": 1.1519,
+          "requirement": 112.86,
+          "pace": 8,
+          "ac": {
+            "goal": 120,
+            "attn": 125,
+            "glideslope_pct": 1.1261
+          },
+          "nso": {
+            "goal": 5,
+            "attn": 4,
+            "glideslope_pct": 0.8648
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 10,
+            "glideslope_pct": 1.5443
+          },
+          "nns": {
+            "goal": 6,
+            "attn": 13,
+            "glideslope_pct": 2.3422
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 97,
+            "stationPPR": 13.857,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 13,
+              "NOV": 8,
+              "DEC": 4,
+              "JAN": 3,
+              "FEB": 8,
+              "MAR": 3,
+              "APR": 9,
+              "MAY": 12,
+              "JUN": 12,
+              "JUL": 7,
+              "AUG": 17,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "HENDERSON",
+          "division": "DIV 7",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 106,
+          "gross": 103,
+          "loss": 6,
+          "attn": 97,
+          "alnav_pct": 0.9151,
+          "glideslope_pct": 0.9892,
+          "requirement": 98.05,
+          "pace": -9,
+          "ac": {
+            "goal": 104,
+            "attn": 93,
+            "glideslope_pct": 0.9667
+          },
+          "nso": {
+            "goal": 6,
+            "attn": -1,
+            "glideslope_pct": -0.1802
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 8,
+            "glideslope_pct": 1.2355
+          },
+          "nns": {
+            "goal": 8,
+            "attn": 4,
+            "glideslope_pct": 0.5405
+          },
+          "recruiterHealth": {
+            "recruiterCount": 10,
+            "totalNet": 97,
+            "stationPPR": 9.7,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 10,
+              "NOV": 8,
+              "DEC": 8,
+              "JAN": 6,
+              "FEB": 8,
+              "MAR": 8,
+              "APR": 5,
+              "MAY": 10,
+              "JUN": 5,
+              "JUL": 10,
+              "AUG": 15,
+              "SEP": 4
+            }
+          }
+        },
+        {
+          "name": "LAS VEGAS",
+          "division": "DIV 7",
+          "size": "MEDIUM",
+          "status": "MISS NUKE",
+          "goal": 84,
+          "gross": 103,
+          "loss": 9,
+          "attn": 94,
+          "alnav_pct": 1.119,
+          "glideslope_pct": 1.2097,
+          "requirement": 77.7,
+          "pace": 10,
+          "ac": {
+            "goal": 82,
+            "attn": 89,
+            "glideslope_pct": 1.1733
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 8,
+            "glideslope_pct": 2.1621
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 2,
+            "glideslope_pct": 0.5405
+          },
+          "nns": {
+            "goal": 4,
+            "attn": 8,
+            "glideslope_pct": 2.1621
+          }
+        },
+        {
+          "name": "NORTHERN LIGHTS",
+          "division": "DIV 7",
+          "size": "MEGA",
+          "status": "MISS TAR",
+          "goal": 129,
+          "gross": 135,
+          "loss": 13,
+          "attn": 122,
+          "alnav_pct": 0.9457,
+          "glideslope_pct": 1.0224,
+          "requirement": 119.33,
+          "pace": -7,
+          "ac": {
+            "goal": 127,
+            "attn": 120,
+            "glideslope_pct": 1.0214
+          },
+          "nso": {
+            "goal": 7,
+            "attn": 3,
+            "glideslope_pct": 0.4633
+          },
+          "nuke": {
+            "goal": 7,
+            "attn": 6,
+            "glideslope_pct": 0.9266
+          },
+          "nns": {
+            "goal": 8,
+            "attn": 10,
+            "glideslope_pct": 1.3513
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 101,
+            "stationPPR": 14.429,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 4,
+              "NOV": 4,
+              "DEC": 3,
+              "JAN": 8,
+              "FEB": 8,
+              "MAR": 15,
+              "APR": 13,
+              "MAY": 9,
+              "JUN": 11,
+              "JUL": 10,
+              "AUG": 15,
+              "SEP": 1
+            }
+          }
+        },
+        {
+          "name": "RED ROCK",
+          "division": "DIV 7",
+          "size": "MEDIUM",
+          "status": "MISS ALNAV",
+          "goal": 78,
+          "gross": 73,
+          "loss": 6,
+          "attn": 67,
+          "alnav_pct": 0.859,
+          "glideslope_pct": 0.9286,
+          "requirement": 72.15,
+          "pace": -11,
+          "ac": {
+            "goal": 76,
+            "attn": 68,
+            "glideslope_pct": 0.9672
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 3,
+            "glideslope_pct": 0.8108
+          },
+          "nuke": {
+            "goal": 5,
+            "attn": 6,
+            "glideslope_pct": 1.2972
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 5,
+            "glideslope_pct": 1.081
+          },
+          "recruiterHealth": {
+            "recruiterCount": 5,
+            "totalNet": 49,
+            "stationPPR": 9.8,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 2,
+              "NOV": 4,
+              "DEC": 5,
+              "JAN": 7,
+              "FEB": 3,
+              "MAR": 4,
+              "APR": 5,
+              "MAY": 4,
+              "JUN": 3,
+              "JUL": 5,
+              "AUG": 5,
+              "SEP": 2
+            }
+          }
+        },
+        {
+          "name": "SPRING VALLEY",
+          "division": "DIV 7",
+          "size": "LARGE",
+          "status": "MISS ALNAV",
+          "goal": 87,
+          "gross": 83,
+          "loss": 5,
+          "attn": 78,
+          "alnav_pct": 0.8966,
+          "glideslope_pct": 0.9692,
+          "requirement": 80.48,
+          "pace": -9,
+          "ac": {
+            "goal": 85,
+            "attn": 76,
+            "glideslope_pct": 0.9666
+          },
+          "nso": {
+            "goal": 4,
+            "attn": 1,
+            "glideslope_pct": 0.2703
+          },
+          "nuke": {
+            "goal": 4,
+            "attn": 5,
+            "glideslope_pct": 1.3513
+          },
+          "nns": {
+            "goal": 5,
+            "attn": 3,
+            "glideslope_pct": 0.6486
+          },
+          "recruiterHealth": {
+            "recruiterCount": 7,
+            "totalNet": 79,
+            "stationPPR": 11.286,
+            "topQuartilePPR": 0,
+            "medianPPR": 0,
+            "bottomQuartilePPR": 0,
+            "monthlyTotals": {
+              "OCT": 9,
+              "NOV": 5,
+              "DEC": 7,
+              "JAN": 4,
+              "FEB": 8,
+              "MAR": 7,
+              "APR": 6,
+              "MAY": 10,
+              "JUN": 5,
+              "JUL": 4,
+              "AUG": 12,
+              "SEP": 2
+            }
+          }
+        }
+      ],
+      "prodDaysElapsed": 216,
+      "contractDaysTotal": 233,
+      "contractDaysRemaining": 17
     }
   ]
 }
